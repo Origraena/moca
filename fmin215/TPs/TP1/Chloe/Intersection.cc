@@ -267,7 +267,7 @@ bool Intersection(int n, long long segments[][2])
 	return false;
 }
 
-/*int main()
+int main()
 {
 	srand(time(NULL));
 	
@@ -293,6 +293,6 @@ bool Intersection(int n, long long segments[][2])
 	{
 		cout <<"Il n'y a pas d'intersection." << endl;
 	}
-}*/
+}
 
 #endif

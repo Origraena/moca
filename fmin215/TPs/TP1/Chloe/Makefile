@@ -11,7 +11,7 @@ all: $(EXEC)
 $(EXEC): $(OBJ)
 	@$(CC) -o $@ $^ $(LDFLAGS)
 	
-%.o: %.c
+%.o: %.cc
 	@$(CC) -c $< $(CFLAGS)
 	
 .PHONY: clean mrproper
