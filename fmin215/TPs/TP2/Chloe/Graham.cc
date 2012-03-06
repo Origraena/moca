@@ -118,10 +118,20 @@ void TriRapidePolaire(int min, int n, int sommet[][2], int t, int TriPolaire[]){
 
 
 
-void PointAuHasard(int n,int sommet[][2]){
-	//
-	//A COMPLETER
-	//
+void PointAuHasard(int n,int sommet[][2])
+{
+	int i, rayon = 250, centre[2] = {300, 400};
+	
+	for(i = 0 ; i < n ; i++)
+	{
+		sommet[i][0] = rayon + centre[0] + 1;
+		sommet[i][1] = rayon + centre[1] + 1;
+		while(pow(sommet[i][0]-centre[0], 2)+pow(sommet[i][1]-centre[1], 2) > rayon*rayon)
+		{
+			sommet[i][0] = rand() % (2*rayon) + centre[0] - rayon;
+			sommet[i][1] = rand() % (2*rayon) + centre[1] - rayon;
+		}
+	}
 }
 
 void Graham(int n, int sommet[][2],int envconv[]){
@@ -131,7 +141,8 @@ void Graham(int n, int sommet[][2],int envconv[]){
 }
 
 
-int main(){
+int main()
+{
 	int sommet[n][2];
 	int envconv[n+1];
 	for(int i=0;i<n+1;i++){envconv[i]=-1;}
@@ -140,3 +151,5 @@ int main(){
 	Graham(n,sommet,envconv);
 	AffichageEnvConv(n,sommet,envconv);
 }
+
+
