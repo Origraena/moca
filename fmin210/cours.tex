@@ -1,0 +1,675 @@
+\documentclass[a4paper, 11pt, fleqn]{article}
+
+\usepackage[utf8x]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[french]{babel}
+\usepackage{graphicx}
+\usepackage{moreverb}
+\usepackage{subfigure}
+\usepackage{pdfpages}
+\usepackage{eurosym}
+\usepackage{fullpage}
+\usepackage{amsmath}
+\usepackage{bbm}
+\usepackage{amssymb}
+\usepackage{tikz}
+
+\newcommand{\ssi}[0]{si et seulement si }
+\newcommand{\theoreme}[1]{\textbf{\underline{Théorème :}} \\ \begin{center}\parbox{0.90\textwidth}{#1}\end{center}}
+\newcommand{\definition}[1]{\textbf{\underline{Définition :}}\\\begin{center}\parbox{0.90\textwidth}{#1}\end{center}}
+\newcommand{\proposition}[1]{\textbf{\underline{Proposition :}}\\\begin{center}\parbox{0.90\textwidth}{#1}\end{center}}
+\newcommand{\corollaire}[1]{\textbf{\underline{Corollaire :}}\\\begin{center}\parbox{0.90\textwidth}{#1}\end{center}}
+\newcommand{\lemme}[1]{\textbf{\underline{Lemme :}}\\\begin{center}\parbox{0.90\textwidth}{#1}\end{center}}
+\newcommand{\remarque}[0]{\textbf{\underline{Remarque :}}\\}
+\newcommand{\qos}[0]{Qualité de Service }
+\newcommand{\inve}[1]{\frac{1}{#1}}
+\newcommand{\fa}[0]{file d'attente }
+\newcommand{\fas}[0]{files d'attente }
+\newcommand{\VA}[0]{variable aléatoire }
+\newcommand{\VAs}[0]{variables aléatoires }
+\newcommand{\Prob}[0]{\mathbb{P} }
+
+% Page web www.lrimm.fr/~baert/Cours/FMIN210
+% Cours :
+%		* Files d'attentes - Réseaux de file d'attente (processus Markoviens, probabilité)
+%		* Réseaux et services - Routage dans les réseaux (ospf et rip), Tolérance aux pannes, qualités
+%		de service
+% Création de modèles optimaux à partir de la théorie des files d'attente
+
+% Objectif réaliser de la simulation de réseaux (simulation des différents protocoles [TCP - UDP -
+% RED]. Langage utilisé TCL sur un logiciel : network simulator
+
+% TPs notés, rapport d'expérience à réaliser (courbes, analyse de courbes, conclusions, critiques,
+% ...)
+
+\begin{document}
+
+\part{Introduction à la \qos - Métrologie}
+
+\section{Définitions}
+
+\subsection{Débit :}
+
+On a des évènements discrets qui arrivent selon un certain processus
+d'arrivéequi suit une certaine loi à des dates successives\footnote{on est dans un principe de
+discètisation des évènements}. Soient $ \displaystyle a_0, a_1, a_2, \dots, a_n $, les temps
+d'arrivées, on va noter la $n^{ieme}$ interarrivée : $$
+\tau_n = a_{n+1} - a_n $$
+\begin{figure}[h!]
+	\begin{center}
+		\begin{tikzpicture}
+			\draw[->] (-1, 0) -- (13,0) node [right] {$t$};
+			\foreach \x in {0, 1, 2, 3} {
+				\draw (3 * \x, 0.1) -- (3 * \x , -0.1) node[anchor = north] {$a_\x$};
+				\draw[<->] (3*\x + 0.2, 0.3) -- node[above] {$\tau_{\x}$} (3*\x + 2.8, 0.3);
+			}
+			\draw (12, 0.1) -- (12 , -0.1) node[anchor = north] {$a_4$};
+		\end{tikzpicture}
+	\end{center}
+	\caption{Evolution du temps}
+\end{figure}
+
+On notera $N(t) = $ le nombre d'arrivées avant $t$ : $$
+N(t) = card \{ n\ /\ a_n \leq t \} $$
+Le débit d'arrivée est défini par : $$
+\theta = \lim_{y \rightarrow \infty} \frac{N(t)}{t} $$
+C'est le nombre moyen d'arrivées par unité de temps.
+
+On estime le débit d'arrivées par :
+$$ \bar\theta = \frac{N(T)}{T} \mbox{pour T grand} $$
+Le nombremoyen d'arrivées par unité de temps : $$
+\bar\tau = \lim_{m \rightarrow \infty} \frac{1}{n} \sum_{i=0}^{n} \tau_i = \lim_{n \rightarrow
+\infty} \frac{a_n}{n} $$
+On peut estimer : $$
+\bar\tau = \frac{a_N}{N} \quad \quad \mbox{pour N grand} $$
+On voit alors que : $$
+\theta = \frac{1}{\tau} \quad \mbox{ou} \quad \tau = \frac{1}{\theta} $$
+
+\subsection{Débit d'information :} 
+
+Chaque paquet a une quantité d'information donnée. On
+définit alors le débit d'information comme le rapport de la quantité total d'information
+transmise par unité de temps. Soit $\sigma_n$ la quantité d'information du paquet $n$. La
+quantité totale d'information est : $$
+\sum_{i=1}^{n} \sigma_i $$
+La durée total est : $$
+\sum_{i=1}^{n} \tau_i $$
+On définit alors $\bar\delta$, le débit moyen d'information, ainsi : $$
+\bar\delta = \lim_{n \rightarrow \infty} \frac{\sum_{i=1}^{n} \sigma_i}{\sum_{i=1}^n \tau_i}
+$$
+On peut définir la quantité moyenne d'information d'un paquet : $$
+\bar\sigma = \lim_{n \rightarrow \infty} \frac{\sum_{i=1}^n \sigma_i}{n} $$
+On peut alors écrire ce qui suit : $$
+\bar\delta = \bar\theta \times \bar\sigma $$
+Ce qui signifie que le débit d'information ($bit.s^{-1}$) est le produit du débit
+($paquet.s^{-1}$) par la taille moyenne des paquets ($bit$).
+
+\subsection{Débit crête :} 
+
+Le débit est irrégulier dans la plupart des systèmes. On considère
+des processus de type ON/OFF, soit $\thêta '$ le débit crête, on a :
+
+\begin{figure}[h!]
+	\begin{center}
+		\begin{tikzpicture}
+			\draw (-1, 0) -- (0, 0) ;
+			\foreach \x in {1, 2, 3} {
+				\foreach \y/\ytext/\ytest in {0/X/ON, 1/Y/OFF} {
+					\draw (4*\x + 2*\y - 4, 0.1) --  (4*\x + 2*\y -4, -0.1);
+					\draw (4*\x + 2*\y - 4, 0)  -- node[above] {\ytest} node[below] {$\ytext_\x$} (4*\x + 2*\y -2, 0);
+				}
+			}
+			\draw (12, 0.1) -- (12, -0.1);
+			\draw[->] (12, 0) -- (13, 0);
+		\end{tikzpicture}
+	\end{center}
+	\caption{Processus de type ON/OFF}
+\end{figure}
+
+On appelle : $ X_i = $ périodes d'activité, $Y_i = $ périodes d'inactivité, $\bar X = $ période
+moyenne d'activité et $\bar Y$ période moyenne d'inactivité. On peut alors définir le débit
+moyen comme : $$
+\bar\theta = \theta ' \times \frac{\bar X}{\bar X + \bar Y} $$
+
+\subsection{Lois de conservation de débit}
+
+La loi est valable uniquement dans un système stable : à savoir aucun paquet ne se perd dans le
+réseau.\\
+
+\begin{figure}
+	\begin{center}
+		\begin{tikzpicture}
+			\draw[->] (0, 2) -- node[above] {$\lambda_1$} (3, 0.3);
+			\draw[->] (0, -2) -- node[below] {$\lambda_2$} (3, -0.3);
+			\node [circle, draw = black, minimum size=12mm] at (3.5, 0) {S};
+			\draw[->] (4.1, 0) -- node[above] {$\lambda_1 + \lambda_2$} node[below] {$\lambda_3$} (7, 0);
+		\end{tikzpicture}
+	\end{center}
+	\caption{Conservation du débit (1)}
+\end{figure}
+\begin{figure}
+	\begin{center}
+		\begin{tikzpicture}
+			\draw[->] (0, 0) -- node[above] {$\lambda$} (2.9, 0);
+			\node [circle, draw = black, minimum size=12mm] at (3.5, 0) {S};
+			\draw[->] (4.1, 0.3) -- node[above] {$\lambda_p$} (7, 2);
+			\draw[->] (4.1, -0.3) -- node[below] {$1 - \lambda_p$} (7, -2);
+		\end{tikzpicture}
+	\end{center}
+	\caption{Conservation du débit (2)}
+\end{figure}
+\begin{figure}
+	\begin{center}
+		\begin{tikzpicture}
+			\node at (0,1) { };
+			\draw[->] (0, -1) -- node[above] {$\lambda$} (2.9, -1);
+			\node [circle, draw = black, minimum size=12mm] at (3.5, -1) {S};
+			\draw[->] (4.1 , -1) -- node[above] {$\mu$} node[below] {$\lambda = \mu$} (7, -1);
+		\end{tikzpicture}
+	\end{center}
+	\caption{Conservation du débit (3)}
+\end{figure}
+
+%fig 3, 4, 5
+\subsubsection*{Un petit exercice}
+
+Soit le réseau présenté sur la figure \ref{ex}. \\
+
+\begin{figure}
+	\begin{center}
+		\begin{tikzpicture}
+			\draw (0, 0) -- node[above]{$\lambda$} (2, 0) ;
+			\draw[->] (2, 0) -- node[below]{$\lambda '$} (3, 0);
+			\draw (3, -0.5) rectangle (6, 0.5);
+			\node at (4.5, 0) {S};
+			\draw (6, 0) -- node[below] {$\lambda '$} (7, 0) ;
+			\draw[->] (7, 0) -- node[above]{$(1-p) \lambda '$} (9, 0);
+			\draw (7, 0) -- (7, 1.5);
+			\draw (7, 1.5) -- node[above] {$p - \lambda '$} (2, 1.5);
+			\draw[->] (2, 1.5) -- (2, 0);
+		\end{tikzpicture}
+	\end{center}
+	\label{ex}
+	\caption{Exercice : petit réseau}
+\end{figure}
+
+Calculer $\lambda '$.\\
+
+Par a loi de conservation des débits, on a : $$
+\begin{array}{rccl}
+	& ( 1 - p ) \lambda ' &=& \lambda \\
+	\Longrightarrow & \lambda ' & =& \displaystyle \frac {\lambda}{1 - p} \\
+\end{array} $$
+
+\subsection{Temps de réponse}
+
+$a_n$ est le début d'activité de la $n^e$ activité. On note $d_n$ la date de fin de la $n^e$
+activité. Le temps de réponse est alors défini par : $$
+r_n = d_n - a_n $$
+Le temps de réponse moyen est défini par : $$
+\bar r = \lim_{n \rightarrow \infty} \inve{n} \sum_{i=1}^n r_i$$
+qui peut aussi être défini ainsi : $$
+\bar r_N = \inve{N} \sum_{i=1}^N r_i \quad \mbox{pour N grand}$$
+On peut alors calculer la variance de $r$ : $$
+var (r) = \inve{N-1} \sum_{i=1}^n (r_m - \bar r_N) ^ 2$$
+L'objectif est alors de minimiser la variance.
+
+\subsection{Taux d'utilisation}
+
+Reconsidérons les processus ON/OFF. On définit le taux d'utilisation $u$ par : $$
+u = \frac{\bar X}{\bar X + \bar Y} $$
+$u$ est alors le taux d'utilisation du système. En pratique, il faut estimer le temps d'utilisation.
+On comptabilise la durée totale d'activité : $$
+\bar u_T = \inve{T} \times D \quad D \in [0, T], D \mbox{ étant la durée d'activité } $$
+
+Où $\bar u_T$ est le taux moyen d'utilisation sur la période $T$.
+
+\subsection{Taux de perte}
+
+Le taux de perte définit la proportion de requêtes qui ont échoué, on peut aussi le voir comme la
+probabilité qu'une requête quelconque échoue. Considérons un système de traitement qui peut perdre
+des paquets, il y a alors 2 flux de données : 
+\begin{itemize}
+	\item Celui des paquets perdus
+	\item Celui des paquets servis ou acceptés\footnote{appelé débit efficace}
+\end{itemize}
+
+La somme des deux est appelé débit offert. Le taux de perte $\Pi_p$ est donné par : $$
+\Pi_p = \frac{\lambda - \lambda_{eff}}{\lambda}$$ $$
+\Longrightarrow 1 - \Pi_p = \frac {\lambda_{eff}}{\lambda} $$
+
+\section{Description des files d'attente}
+
+\subsection{Caractéristiques communes}
+
+On peut définir un modèle de \fa par ce qui sit :
+\begin{enumerate}
+	\item des entités défilent dans le système
+	\item utilisation de ressources
+	\item des comportements pas complètement prévisibles
+\end{enumerate}
+
+Une \fa est constituée :
+\begin{itemize}
+	\item d'un ou plusieurs serveurs
+	\item de clients demandant un service
+	\item d'un lieu où les clients attendent d'être servis lorsqu'aucun serveur n'est disponible
+	\item d'arrivées étant des processus stochastiques\footnote{Il s'agit de modèles probabilistes dont on
+		connaît les distributions : moyenne, variances, écart-type, ...}
+	\item de processus de renouvellement des populations\footnote{Une \VA modèlisant les arrivées}
+	\item durée de services \footnote{Aussi définie par une \VA}
+\end{itemize}
+
+\begin{figure}
+	\begin{center}
+		\begin{tikzpicture}
+			\draw[->] (0, 0) -- node[above]{Arrivées} node[below] {$a_1, a_2, \dots, a_n$} (3, 0);
+			\draw (3, 0.5) -- ( 7, 0.5 );
+			\draw (3, -0.5) -- ( 7, -0.5 );
+			\draw (7, 0.5) -- (7, -0.5);
+			\node at (5, 0) {Lieu Attente};
+			\draw (7, 0) -- (10, 0);
+			\node [circle, draw=black, minimum size=10mm] at (10.5, 0){S};
+			\node [below=5mm] at (10.5, 0) {Serveurs};
+			\draw[->] (11, 0) -- node[above] {Départs} node[below]{$d_1, d_2, \dots, d_n$} (14, 0);
+		\end{tikzpicture}
+	\end{center}
+	\caption{Une file d'attente}
+\end{figure}
+
+
+\subsection{Notation de Kendall}
+
+$A/S/P/K/D$
+
+Un peu d'éclaircissement :
+\begin{itemize}
+	\item $A$ : décrit la loi des arrivées
+	\item $S$ : décrit la loi des services
+	\item $P$ : nombre de serveurs (par défaut $P=1$)
+	\item $K$ : capacité de traitement du système (i.e. le nombre maximum de clients $K = \infty$)
+	\item $D$ : politique de services (FIFO, LIFO, Priorités\footnote{LIFO et Priorités sont
+			préemptifs (i.e. si un client est servi et qu'un autre arrive avec une priorité supérieure, le
+		premier client sort de la file d'attente)})
+\end{itemize}
+
+\subsubsection{Loi d'inter-arrivée et processus de Poisson}
+
+La loi des inter-arrivées peut être une loi déterministe ($D$), on observe en général ce cas lorsque le
+processus est périodique. 
+
+Elle peut être une loi d'Erlang ($E_m$), elle est alors définie ainsi :
+$$ Q(N) = \frac{\frac{x^N}{\mu^N N!}}{1 + \frac{x}{\mu} + \dots + \frac{x^N}{\mu^N N!}} $$
+$\inve{\mu}$ est alors la durée moyenne d'un appel\footnote{Cette loi ressemble à un développement
+	limité d'exponentielle, les lois exponentielles sont en général utilisées pour les évènements sans
+	mémoire : l'évènement reçu à un temps $t$ est indépendant du précédent et n'influera pas sur le
+suivant}. $\inve{x}$ représente le temps moyen entre 2 appels, et $Q(N)$ est la probabilité qu'un
+appel trouve toutes les lignes occupées. 
+
+Elle peut être de distribution générale ($G$), elle englobe tous les cas.
+
+La loi qui nous intéresse est notée $M$ pour markov, il s'agit d'une loi de distribution
+exponentielle, dans ce cas le processus d'arrivée est un processus de Poisson.
+
+Considérons une suite de \VAs : $$
+0 \leq t_1 < t_2 < \dots < t_n < t_{n+1} < \dots $$
+La \VA enregistre la date d'occurence du $n^e$ évènement dans une expérience\footnote{On peut par
+exemple considérer la date d'arrivée du $n^e$ paquet dans un réseau}. Ce processus est un processus
+stochastique de Poisson avec un taux (paramètre) de $\lambda > 0$ si :
+\begin{enumerate}
+	\item $\Prob (\mbox{ un seul évènement dans un intervalle h }) = \lambda \times h + o(h)$
+	\item $\Prob (\mbox{ plus d'un évènement durant h }) = O(h)$
+	\item Le nombre d'évènements qui arrivent dans des intervalles qui ne chevauchent pas sont
+		indépendants les uns des autres
+\end{enumerate}
+
+La probabilité d'avoir $n$ arrivées dans un intervalle de durée $h$ est alors donnée par : $$
+\begin{array}{lcr}
+	\Prob_n(h) &= &\Prob (N (h) = n) \\
+						 			&=& \frac{(\lambda h) ^ n}{n !} e^{-\lambda h}
+\end{array} $$
+
+La probabilité nous sert juste à calculer le nombre moyen d'arrivées dans un intervalle de temps $h$
+qui nous est donnée par : $$
+\mathbb{E} (N(h)) = \lambda \times h $$
+
+Intuitivement on comprends alors que le nombre moyen d'arrivées par unité de temps est $\lambda$. La
+probabilité que la durée d'attente séprant deux arrivées régies par un processus de Poisson soit
+inférieure à $x$ est donnée par : $$
+\Prob(\tau \leq x) = 1 - e^{-\lambda x} $$
+
+Lors d'arrivées régies par une loi de Poisson, la loi d'inter-arrivée suit une loi exponentielle.
+
+\subsection{Evolution de la file d'attente}
+
+On appelle $N(t)$ : le nombre de clients par unités de temps. Considérons le tableau des processus
+de la figure \ref{tab}.
+
+% fig 8
+% fig 9
+% fig 10
+
+\begin{figure}
+	\begin{center}
+	\begin{tabular}{|c|c|c|c|}
+		\hline
+		Num. Client & Arrivée & Tps Service & Prio \\
+		\hline
+		1 & 0 & 4 & \\
+		\hline 
+		2&2&8&\\
+		\hline 
+		3&6&4& \\
+		\hline 
+		4&8&4& \\
+		\hline 
+		5 & 15 & 2 & \\
+		\hline
+	\end{tabular}
+	\end{center}
+	\caption{Tableau des clients}
+	\label{tab}
+\end{figure}
+
+On prend la courbe de charge et on regarde le nombre de clients par unités de temps.
+
+\begin{figure}
+	\begin{center}
+		\begin{tikzpicture}
+			% Dessin des axes
+			\draw[->] (-1, 0) -- (12, 0) node[right] {$t$};
+			\draw[->] (0, -1) -- (0, 6) node[above] {Nb Clients};
+			\foreach \x in {2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22} {
+				\draw (0.5 * \x, 0.1) -- (0.5 * \x, -0.1) node[below] {\x};
+			}
+			\foreach \x in {1, 2, 3, 4, 5 } {
+				\draw (0.1, \x) -- (-0.1, \x) node[left] {\x};
+			}
+			\node[below] at (-0.3, 0) {0};
+
+			\coordinate (A) at (0, 1);
+			\coordinate (B) at (1, 1);
+			\coordinate (C) at (1, 2);
+			\coordinate (D) at (2, 2);
+			\coordinate (E) at (2, 1);
+			\coordinate (F) at (3, 1);
+			\coordinate (G) at (3, 2);
+			\coordinate (H) at (4, 2);
+			\coordinate (I) at (4, 3);
+			\coordinate (J) at (6, 3);
+			\coordinate (K) at (6, 2);
+			\coordinate (L) at (7.5, 2);
+			\coordinate (M) at (7.5, 3);
+			\coordinate (N) at (8, 3) ;
+			\coordinate (O) at (8, 2) ;
+			\coordinate (P) at (10, 2);
+			\coordinate (Q) at (10, 1);
+			\coordinate (R) at (11, 1);
+			\coordinate (S) at (11, 0);
+
+			\draw (A) -- (B) -- (C) -- (D) -- (E) -- (F) -- (G) -- (H) -- (I) -- (J) -- (K) -- (L) -- (M) -- (N) -- (O) -- (P) -- (Q) -- (R) -- (S);
+			\draw[<->] (0, -1) -- node[above] {1} (4, -1);
+			\draw[<->] (1, -1.5) -- node[above] {2} (6, -1.5);
+			\draw[<->] (3, -2) -- node[above] {3} (8, -2);
+			\draw[<->] (4, -2.5) -- node[above] {4} (10, -2.5);
+			\draw[<->] (7.5, -1) -- node[above] {5} (11, -1);
+		\end{tikzpicture}
+	\end{center}
+	\caption{Nombre de clients en fonction du temps en mode FIFO}
+\end{figure}
+
+\begin{figure}
+	\begin{center}
+		\begin{tikzpicture}[scale=0.7]
+			% Dessin des axes
+			\draw[->] (0, 0) -- (17, 0) node[right] {$t$};
+			\draw[->] (0, 0) -- (0, 6) node[above] {Nb Clients};
+			\foreach \x in {2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32} {
+				\draw (0.5 * \x, 0.1) -- (0.5 * \x, -0.1) node[below] {\x};
+			}
+			\foreach \x in {1, 2, 3, 4, 5 } {
+				\draw (0.1, \x) -- (-0.1, \x) node[left] {\x};
+			}
+			\node[below] at (-0.3, 0) {0};
+
+			\coordinate (A) at (0, 1);
+			\coordinate (B) at (1, 1);
+			\coordinate (Z) at (1, 2);
+			\coordinate (C) at (3, 2);
+			\coordinate (D) at (3, 3);
+			\coordinate (E) at (4, 3);
+			\coordinate (F) at (4, 4);
+			\coordinate (G) at (6, 4);
+			\coordinate (H) at (6, 3);
+			\coordinate (I) at (7.5, 3);
+			\coordinate (J) at (7.5, 4);
+			\coordinate (K) at (8.5, 4);
+			\coordinate (L) at (8.5, 3);
+			\coordinate (M) at (10.5, 3);
+			\coordinate (N) at (10.5, 2) ;
+			\coordinate (O) at (14.5, 2) ;
+			\coordinate (P) at (14.5, 1);
+			\coordinate (Q) at (16.5, 1);
+			\coordinate (R) at (16.5, 0);
+
+			\draw (A) -- (B) -- (Z) -- (C) -- (D) -- (E) -- (F) -- (G) -- (H) -- (I) -- (J) -- (K) -- (L) -- (M) -- (N) -- (O) -- (P) -- (Q) -- (R);
+			\draw[<->] (0, -1) -- node[above] {1} (16.5, -1);
+			\draw[<->] (1, -1.5) -- node[above] {2} (14.5, -1.5);
+			\draw[<->] (3, -2) -- node[above] {3} (10.5, -2);
+			\draw[<->] (4, -2.5) -- node[above] {4} (6, -2.5);
+			\draw[<->] (7.5, -2.5) -- node[above] {5} (8.5, -2.5);
+		\end{tikzpicture}
+	\end{center}
+	\caption{Nombre de clients en fonction du temps en mode LIFO sans mémoire de travail}
+\end{figure}
+
+\begin{figure}
+	\begin{center}
+		\begin{tikzpicture}
+			% Dessin des axes
+			\draw[->] (-1, 0) -- (12, 0) node[right] {$t$};
+			\draw[->] (0, -1) -- (0, 6) node[above] {Nb Clients};
+			\foreach \x in {2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22} {
+				\draw (0.5 * \x, 0.1) -- (0.5 * \x, -0.1) node[below] {\x};
+			}
+			\foreach \x in {1, 2, 3, 4, 5 } {
+				\draw (0.1, \x) -- (-0.1, \x) node[left] {\x};
+			}
+			\node[below] at (-0.3, 0) {0};
+
+			\coordinate (A) at (0, 1);
+			\coordinate (B) at (1, 1);
+			\coordinate (C) at (1, 2);
+			\coordinate (D) at (3, 2);
+			\coordinate (E) at (3, 3);
+			\coordinate (F) at (4, 3);
+			\coordinate (G) at (4, 4);
+			\coordinate (H) at (6, 4);
+			\coordinate (I) at (6, 3);
+			\coordinate (J) at (7, 3);
+			\coordinate (K) at (7, 2);
+			\coordinate (L) at (7.5, 2);
+			\coordinate (M) at (7.5, 3);
+			\coordinate (N) at (8.5, 3) ;
+			\coordinate (O) at (8.5, 2) ;
+			\coordinate (P) at (10, 2);
+			\coordinate (Q) at (10, 1);
+			\coordinate (R) at (11, 1);
+			\coordinate (S) at (11, 0);
+
+			\draw (A) -- (B) -- (C) -- (D) -- (E) -- (F) -- (G) -- (H) -- (I) -- (J) -- (K) -- (L) -- (M) -- (N) -- (O) -- (P) -- (Q) -- (R) -- (S);
+			\draw[<->] (0, -1) -- node[above] {1} (11, -1);
+			\draw[<->] (1, -1.5) -- node[above] {2} (10, -1.5);
+			\draw[<->] (3, -2) -- node[above] {3} (7, -2);
+			\draw[<->] (4, -2.5) -- node[above] {4} (6, -2.5);
+			\draw[<->] (7.5, -2.5) -- node[above] {5} (8.5, -2.5);
+		\end{tikzpicture}
+	\end{center}
+	\caption{Nombre de clients en fonction du temps en mode LIFO avec mémoire de travail}
+\end{figure}
+
+\begin{figure}
+	\begin{center}
+		\begin{tikzpicture}
+			% Dessin des axes
+			\draw[->] (-1, 0) -- (12, 0) node[right] {$t$};
+			\draw[->] (0, -1) -- (0, 7) node[above] {Charge restante};
+			\foreach \x in {2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22} {
+				\draw (0.5 * \x, 0.1) -- (0.5 * \x, -0.1) node[below] {\x};
+			}
+			\foreach \x in {2, 4, 6, 8, 10, 12} {
+				\draw (0.1, 0.5 * \x) -- (-0.1, 0.5 * \x) node[left] {\x};
+			}
+			\node[below] at (-0.3, 0) {0};
+
+			\coordinate (A) at (0, 2);
+			\coordinate (B) at (1, 1);
+			\coordinate (C) at (1, 5);
+			\coordinate (D) at (3, 3);
+			\coordinate (E) at (3, 5);
+			\coordinate (F) at (4, 4);
+			\coordinate (G) at (4, 6);
+			\coordinate (H) at (7.5, 2.5);
+			\coordinate (I) at (7.5, 3.5);
+			\coordinate (J) at (11, 0);
+
+			\draw (A) -- (B) -- (C) -- (D) -- (E) -- (F) -- (G) -- (H) -- (I) -- (J);
+		\end{tikzpicture}
+	\end{center}
+	\caption{Courbe de charge en mode FIFO}
+\end{figure}
+
+On définit la charge du système à l'instant $t$ comme la quantité de travail qui reste à effectuer
+par le système à cet instant.
+
+\subsection{Etude de la stabilité d'un système}
+
+Le nombre moyen de client est donné par : $$
+E (N) = \lim_{T \rightarrow \infty} \frac{1}{T} \int_0^T N(t) dt $$
+
+On a aussi vu que le temps de réponse moyen est donné par : $$
+\bar r = \lim_{n\rightarrow \infty} \frac{1}{n} \sum_{i=1}^n r_i $$
+
+On peut alors écrire le \underline{théorème de Little} :
+
+Pour tout système stable on a : $$
+\bar N = \lambda \bar r \quad \mbox{où } \lambda \mbox{ est le débit et } \bar r \mbox{ est le temps
+de réponse moyen. }$$
+
+Si le serveur est occupé avec une robabilité de $u$ l'utilisation moyenne (dans le cas d'un système ON/OFF), la formule de Little devient : $$
+\bar u = \lambda \bar r $$
+
+Comme $\bar u \in [0, 1]$, le débit ne peut être supérieur à $\frac{1}{\bar r}$, on appelle alors
+cette valeur, la capacité de traitement et on la note $\mu$.
+
+%fig 12
+
+Si $\lambda < \mu$ on a : \begin{itemize}
+	\item système stable
+	\item le débit de sortie est exactement $\lambda$
+	\item le taux d'utilisation est alors : $ u = \frac{\lambda}{\mu} $
+\end{itemize}
+
+Si $\lambda > \mu$ on a : \begin{itemize}
+	\item le système est instable
+	\item $N(t) \underset{t \rightarrow \infty}{\longrightarrow} \infty$
+	\item le débit de sortie est $\mu$
+	\item $\bar u = 1$
+\end{itemize}
+
+\subsection{Etudes des files M/M/1}
+
+Ce genre de file permet de modéliser des serveurs ftp et web. Commençons par en énoncer les
+caractéristiques : 
+\begin{itemize}
+	\item arrivées poissonniennes
+	\item le temps entre deux arrivées suit une loi exponentielle ($1 - e^{-\lambda t}$)
+	\item services poissonniens
+	\item le temps de service suit une loi exponentielle ($1 - e^{- \mu t}$)
+	\item un seul serveur
+	\item traitement FIFO
+\end{itemize}
+
+Le débit moyen est $\lambda$, le temps de service moyen est $\inve{\mu}$ et la capacité de
+traitement est $\mu$. D'après la formule de Little, le système est stable si $\lambda < \mu$.
+On cherche maintenant à calculer le nombre moyen de clients.
+
+Pour ce faire, notons $P_i$ la probabilité d'avoir $i$ clients dans le système. Soit la chronologie
+suivante : 
+\begin{enumerate}
+	\item J'ai 0 client
+	\item 1 client arrive avec un débit de $\lambda$
+	\item 1 client part avec un débit $\mu$
+\end{enumerate}
+
+%fig 13
+
+D'un point de vue stationnaire on a : \begin{itemize}
+	\item le nombre de clients qui arrivent est $\lambda P_0$
+	\item le nombre de clients qui partent est $\mu P_1$
+\end{itemize}
+
+Généralisons à $n$ clients :
+%fig 14
+
+L'état stationnaire du noeud $k$ nous donne (par conservation du débit), l'égalité suivante :$$
+\lambda P_k + \mu P_k = \lambda P_{k-1} + \mu P_{k+1} $$
+
+Sur l'ensemble du système on peut écrire : $$
+\left \lbrace \begin{array}{rcl}
+	\lambda P_0 &=& \mu P_1 \\
+	\vdots & = & \vdots \\
+	\lambda P_{k-1} + \mu P_{k-1} & = & \lambda P_{k-2} + \mu P {k}\\
+	\lambda P_{k} + \mu P_{k} & = & \lambda P_{k-1} + \mu P_{k+1}\\
+	\vdots & = & \vdots \\
+	\mu P_{n} & = & \lambda P_{n-1}\\
+\end{array} \right .
+$$
+
+Par l'énoncé on a : $$
+P_n = \left ( \frac{\lambda}{\mu} \right )^n . P_0 $$
+
+\textbf{Preuve :}
+Procédons par récurrence.  De par la première ligne, on a : $$
+P_1 = \frac{\lambda}{\mu} P_0 $$
+Et de par la seconde ligne on a : $$
+\begin{array}{rrcl}
+	&\lambda P_1 + \mu P_1 &=& \lambda P_0 + \mu P_2 \\
+	\Rightarrow & \frac{\lambda^2}{\mu} P_1 + \lambda P_0 - \lambda P_0 & = & \mu P_2 \\
+	\Rightarrow & P_2 & = & \displaystyle \left ( \frac{\lambda}{\mu} \right )^2
+\end{array} $$
+
+Supposons la propriété vraie au rang $k-1$ et au rang $k$ et intéressons nous au rang $k+1$,
+$\forall k \in [1;n-1]$. : $$
+\begin{array}{rrcl}
+	&\lambda P_k + \mu P_k &=& \lambda P_{k-1} + \mu P_{k+1} \\
+	\Rightarrow & \displaystyle P_0 \left ( \frac{\lambda}{\mu} \right )^k \left [ \lambda + \mu -
+\lambda \left ( \frac{\mu}{\lambda} \right ) \right ] &=& \mu P_{k+1} \\
+	\Rightarrow & \displaystyle P_0 \lambda \left( \frac{\lambda}{\mu} \right )^k &=& \mu P_{k+1} \\
+	\Rightarrow & P_{k+1} &=& \displaystyle\left (\frac{\lambda}{\mu} \right )^{k+1}
+\end{array} $$
+
+
+On définit de plus la valeur : $$
+\rho = \frac{\lambda}{\mu} $$
+
+Par définition des probabilités, on a : $$
+\begin{array}{rlcl}
+	&\displaystyle \sum_{k = 1}^n P_k & = & 1\\
+	\Longrightarrow & P_0 \displaystyle \sum_{k = 1}^n \rho^k & = & 1 \\
+	\Longrightarrow & P_0 . \displaystyle \inve{1 - \rho} & = & 1 \\
+\end{array} $$
+
+De la même manière on peut écrire $P_n$ sous la forme suivante : $$
+P_n = (1-\rho) . \rho $$
+
+On peut alors calculer le nombre moyen de clients : $$
+\begin{array}{rcl}
+	E(N) & = & \displaystyle \sum_{i=0}^{n-1} i P_i \\
+			 	 & = & \displaystyle \sum_{i=0}^{n-1} i (1 - \rho) \rho^i \\
+				 & = & \displaystyle \frac{\rho}{1 - \rho} \\
+\end{array}$$
+
+Par la formule de Little, on a : $$
+\bar r = \frac{\bar N}{\lambda} = \frac{\rho}{\lambda (1 - \rho)} = \inve{\mu - \lambda} $$
+\end{document}
