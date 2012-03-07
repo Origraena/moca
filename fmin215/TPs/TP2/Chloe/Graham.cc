@@ -1,11 +1,19 @@
+
 #include <iostream>
 #include <fstream>
 #include <math.h> // pour cos() et sin()
+
 #define PI 3.14159265
 
 using namespace std;
 
 int const n=20;
+
+
+long long determinant(int x1, int y1, int x2, int y2)
+{
+	return x1 * y2 - x2 * y1;
+}
 
 void AffichagePoints(int n, int sommet[][2]){
 	//Affichage de n points dont les coordonnees sont donnees dans sommet[n][2]
@@ -79,9 +87,10 @@ bool AnglePolaireInferieur(int p0[2], int p1[2], int p2[2])
 
 
 void TriRapidePolaire(int min, int n, int sommet[][2], int t, int TriPolaire[]){
-	// En entree, les parametres sont min: l'indice du sommet autour duquel les autres sont tries par
-	// ordre polaire croissant, n: le nombre de sommet, TriPolaire le tableau contenant la liste des
-	// indices des sommets a trier, donc au debut, tous sauf min, et enfin t: la taille de TriPolaire
+	// En entree, les parametres sont min: l'indice du sommet autour duquel les autres sont tries par ordre polaire croissant
+	//n: le nombre de sommet
+	//TriPolaire le tableau contenant la liste des indices des sommets a trier, donc au debut, tous sauf min
+	//t: la taille de TriPolaire
 	// donc, a l'appel initial, t vaut n-1.
 	// L'algo modifie TriPolaire et le retourne trie par angle polaire croissant par rapport au sommet 
 	// d'indice min.
@@ -134,15 +143,67 @@ void PointAuHasard(int n,int sommet[][2])
 	}
 }
 
-void Graham(int n, int sommet[][2],int envconv[]){
-	//
-	//A COMPLETER
-	//
+void Graham(int n, int sommet[][2], int envconv[])
+{
+	// PHASE 1
+	int p0 = 0, i;
+	int TriPolaire[n-1];
+	
+	for(i = 1 ; i < n ; i++)
+	{
+		if(sommet[i][1] < sommet[p0][1])
+			p0 = i;
+		else if(sommet[i][1] == sommet[p0][1])
+		{
+			if(sommet[i][0] < sommet[p0][0])
+				p0 = i;
+		}
+	}
+	
+	printf("Sommet min : %d\n", p0);
+	
+	for(i = 0 ; i < n-1 ; i++)
+	{
+		TriPolaire[i] = i;
+	}
+	if(p0 != n-1)
+		TriPolaire[p0] = n-1;
+	
+	TriRapidePolaire(p0, n, sommet, n-1, TriPolaire);
+	
+	printf("Tri polaire : ");
+	for(i = 0 ; i < n-1 ; i++)
+	{
+		printf("%d ", TriPolaire[i]);
+	}
+	printf("\n");
+	
+	// PHASE 2
+	int indiceEnv = 3;
+	envconv[0] = p0;
+	printf("Empile %d\n", envconv[0]);
+	envconv[1] = TriPolaire[0];
+	printf("Empile %d\n", envconv[1]);
+	envconv[2] = TriPolaire[1];
+	printf("Empile %d\n", envconv[2]);
+	for(i = 2 ; i < n-1 ; i++)
+	{
+		while (AnglePolaireInferieur(sommet[envconv[indiceEnv-2]], sommet[envconv[indiceEnv-1]], sommet[TriPolaire[i]]))
+		{
+			indiceEnv--;
+			printf("Depile %d\n", envconv[indiceEnv]);
+		}
+		envconv[indiceEnv] = TriPolaire[i];
+		printf("Empile %d\n", envconv[indiceEnv]);
+		indiceEnv++;
+	}
+	envconv[indiceEnv] = p0;
 }
 
 
 int main()
 {
+	srand(time(NULL));
 	int sommet[n][2];
 	int envconv[n+1];
 	for(int i=0;i<n+1;i++){envconv[i]=-1;}
