@@ -3,10 +3,11 @@
 #include "fonctionsSite.h"
 
 #define FREE()	free(netParamsNeighbors);
-#define CLEAN()	if(close(sdSend) == -1){perror("Erreur de close ");} \
-				if(close(sdRecv) == -1){perror("Erreur de close ");} \
+#define CLEAN()	close(sdSend); \
+				close(sdRecv); \
 				FREE()
 
+//array of known ip addresses
 struct sockaddr_in* netParamsNeighbors = NULL;
 int sdSend, sdRecv, continueB = 1;
 
@@ -37,10 +38,6 @@ int main(int argc, char* argv[])
 	struct sigaction action;
 	memset(&action, 0, sizeof(action));
 	action.sa_handler = end_handler;
-	/*for(i = 0 ; i < 32 ; i++)
-		if (sigaction(i,&action,NULL)){
-			perror ("sigaction ");
-		}*/
 	if (sigaction(SIGPIPE,&action,NULL)){
 		perror ("sigaction ");
 	}
@@ -87,18 +84,50 @@ int main(int argc, char* argv[])
 			exit(EXIT_FAILURE);
 		}
 		
-		printf("sortie select\n");
-		
 		
 		/* on standard input */
 		if(FD_ISSET(STDIN_FILENO, &socketRset))
 		{
-			printf("Entree standard\n");
-			char buf[10];
-			nbLus = read(STDIN_FILENO, buf, 9);
-			buf[nbLus] = 0;
+			char buf[50];
+			nbLus = read(STDIN_FILENO, buf, 49);
 			if(nbLus < 1)
 				perror("Erreur de reception sur l'entree standard");
+			else
+				buf[nbLus-1] = 0;
+			
+			printf("Entree standard ; recu : %s\n", buf);
+			
+			if(strcmp(buf, "BROADCAST")==0)
+			{
+				printf("Entrez le message : \n");
+				nbLus = read(STDIN_FILENO, buf, 49);
+				if(nbLus < 1)
+					perror("Erreur de reception sur l'entree standard");
+				else
+					buf[nbLus-1] = 0;
+				broadcast(buf, sdSend);
+			}
+			else if(strcmp(buf, "MESSAGE")==0)
+			{
+				printf("TO : \n");
+				nbLus = read(STDIN_FILENO, buf, 49);
+				if(nbLus < 1)
+					perror("Erreur de reception sur l'entree standard");
+				else
+					buf[nbLus-1] = 0;
+				
+				char add[256];
+				strcpy(add, buf);
+				
+				printf("CORPS DU TEXTE : \n");
+				nbLus = read(STDIN_FILENO, buf, 49);
+				if(nbLus < 1)
+					perror("Erreur de reception sur l'entree standard");
+				else
+					buf[nbLus-1] = 0;
+				
+				message(add, buf, sdSend);
+			}
 			
 			/* TODO */
 		}
@@ -118,7 +147,7 @@ int main(int argc, char* argv[])
 				recit[nbLus] = 0;
 			}
 			
-			printf("Message recu depuis l'adresse %s et le port %d\n", inet_ntoa(netParamsNeighbor.sin_addr), ntohs(netParamsNeighbor.sin_port));
+			printf("Message recu depuis l'adresse %s et le port %d : %s\n", inet_ntoa(netParamsNeighbor.sin_addr), ntohs(netParamsNeighbor.sin_port), recit);
 			
 			// message emmited toward the scanned port
 			
@@ -165,7 +194,7 @@ int main(int argc, char* argv[])
 				}
 				
 			}	
-				/* TODO traitement request*/
+				/* TODO request traitment*/
 		}
 	}
 	

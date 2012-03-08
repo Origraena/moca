@@ -2,6 +2,7 @@
 #include <arpa/inet.h>
 #include <errno.h>
 #include <ifaddrs.h>
+#include <math.h>
 #include <netdb.h>
 #include <net/ethernet.h>
 #include <netinet/in.h>
@@ -20,6 +21,8 @@
 #define PORT_SEND 31000
 #define PORT_RECV 31001
 
+in_addr_t broadcastAdd;
+
 
 int gstArgs(int argc, char* argv[], int* sdSend, int*sdRecv);
 char* itoa(long n);
@@ -27,5 +30,6 @@ int backupSocketNeighbors(struct sockaddr_in* neighbors, struct sockaddr_in** ne
 int recoverSocketNeighbors(struct sockaddr_in** neighbors, struct sockaddr_in** neighborsTmp, int nbNeighbors, struct sockaddr_in paramsNewNeighbor);
 
 int broadcast(char* message, int sdSend);
+int message(char* add, char* message, int sdSend);
 
 

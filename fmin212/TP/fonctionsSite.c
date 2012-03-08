@@ -39,7 +39,6 @@ char* getIPaddress()
 			 form of the latter for the common families) */
 			printf("%s", ifa->ifa_name);
 			
-			
 			s = getnameinfo(ifa->ifa_addr,
 							(family == AF_INET) ? sizeof(struct sockaddr_in) :
 							sizeof(struct sockaddr_in6),
@@ -53,10 +52,13 @@ char* getIPaddress()
 			{
 				res = malloc(sizeof(char)*NI_MAXHOST);
 				strcpy(res, host);
+				broadcastAdd = (((((struct sockaddr_in*)(ifa->ifa_netmask))->sin_addr.s_addr) ^ (unsigned int)(pow(2,32)-1)) | inet_addr(res));
 			}
 		}
 	}
 	
+    printf("Adresse choisie : %s\n", res);
+	printf("Adresse de broadcast : %s\n", inet_ntoa(*(struct in_addr *)&broadcastAdd));
 	freeifaddrs(ifaddr);
 	return res;
 }
@@ -76,28 +78,21 @@ int gstArgs(int argc, char* argv[], int* sdSend, int*sdRecv)
 	{
 		printf("Ce programme necessite des arguments. Essayez '--help' pour plus de precisions.\n\n");
 		return -1;
-	}*/
+	}
 	
-	/*while(i < argc)
-	 {
-	 if(strcmp(argv[i], "-n")==0)
-	 {
-	 hote = gethostbyname(argv[i+1]);
-	 if(hote == NULL)
-	 {
-	 herror("Hote inexistant ");
-	 exit(EXIT_FAILURE);
-	 }
-	 bcopy(hote->h_addr_list[0], &myAddr, sizeof(myAddr));
-	 myNetParams->sin_addr.s_addr = myAddr.s_addr;
-	 i+=2;
-	 }
-	 else
-	 {
-	 printf("Veuillez entrer des arguments coherents.\n");
-	 exit(EXIT_FAILURE);
-	 }
-	 }*/
+	while(i < argc)
+	{
+		if(inet_aton(argv[i], &addMask) != 0)
+		{
+			//printf("Mask : %s\n", inet_ntoa(addMask));
+			i++;
+		}
+		else
+		{
+			printf("Veuillez entrer des arguments coherents.\n");
+			exit(EXIT_FAILURE);
+		}
+	}*/
 	
 	*sdSend = socket(AF_INET, SOCK_DGRAM, 0);
 	if(*sdSend < 0)
@@ -124,7 +119,6 @@ int gstArgs(int argc, char* argv[], int* sdSend, int*sdRecv)
 	myNetParams.sin_addr.s_addr = inet_addr(addr);
 	myNetParams.sin_port = htons(PORT_SEND);
 	//memset(myNetParams->sin_zero,0,8);
-    printf("Adresse choisie : %s\n", addr);
 	free(addr);
 	
 	if(bind(*sdSend, (struct sockaddr*)&myNetParams, (socklen_t)sizeof(myNetParams)) == -1)
@@ -217,10 +211,25 @@ int broadcast(char* message, int sdSend)
 	bzero(&netParamsNeighbor,sizeof(netParamsNeighbor));
 	netParamsNeighbor.sin_family = AF_INET;
 	netParamsNeighbor.sin_port = htons(PORT_RECV);
-	netParamsNeighbor.sin_addr.s_addr = inet_addr("192.168.1.255");
+	netParamsNeighbor.sin_addr.s_addr = broadcastAdd;
 	if (sendto(sdSend, message, strlen(message), 0, (struct sockaddr *)&netParamsNeighbor,sizeof(netParamsNeighbor)) == -1)
 	{
 		perror("sendto broadcast ");
+		return -1;
+	}
+	return 0;
+}
+
+int message(char* add, char* message, int sdSend)
+{
+	struct sockaddr_in netParamsNeighbor;
+	bzero(&netParamsNeighbor,sizeof(netParamsNeighbor));
+	netParamsNeighbor.sin_family = AF_INET;
+	netParamsNeighbor.sin_port = htons(PORT_RECV);
+	netParamsNeighbor.sin_addr.s_addr = inet_addr(add);
+	if (sendto(sdSend, message, strlen(message), 0, (struct sockaddr *)&netParamsNeighbor,sizeof(netParamsNeighbor)) == -1)
+	{
+		perror("sendto message ");
 		return -1;
 	}
 	return 0;
