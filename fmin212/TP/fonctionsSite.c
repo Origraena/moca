@@ -167,7 +167,7 @@ char* itoa(long n)
 int backupSocketNeighbors(struct sockaddr_in* neighbors, struct sockaddr_in** neighborsTmp, int nbNeighbors)
 {
 	int j;
-	*neighborsTmp = malloc(sizeof(int)*nbNeighbors);
+	*neighborsTmp = malloc(sizeof(struct sockaddr_in)*nbNeighbors);
 	if(*neighborsTmp == NULL)
 	{
 		perror("Erreur d'allocation ");
@@ -184,7 +184,7 @@ int backupSocketNeighbors(struct sockaddr_in* neighbors, struct sockaddr_in** ne
 int recoverSocketNeighbors(struct sockaddr_in** neighbors, struct sockaddr_in** neighborsTmp, int nbNeighbors, struct sockaddr_in paramsNewNeighbor)
 {
 	int j;
-	*neighbors = realloc(*neighbors, sizeof(int)*nbNeighbors);
+	*neighbors = realloc(*neighbors, sizeof(struct sockaddr_in)*nbNeighbors);
 	if(*neighbors == NULL)
 	{
 		perror("Erreur de reallocation ");
