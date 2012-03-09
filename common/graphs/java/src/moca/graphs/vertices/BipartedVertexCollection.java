@@ -112,6 +112,10 @@ public class BipartedVertexCollection<Value> implements VertexCollection<Value> 
 		return new Iterator(_firstSet.iterator(), _secondSet.iterator());
 	}
 
+	public void clear() {
+		_firstSet.clear();
+		_secondSet.clear();
+	}
 
 	private VertexCollection<Value> _firstSet = null;
 	private VertexCollection<Value> _secondSet = null;
