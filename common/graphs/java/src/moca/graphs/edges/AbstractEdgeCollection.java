@@ -27,7 +27,7 @@ public abstract class AbstractEdgeCollection<E> implements EdgeCollection<E> {
 			getValue(edge.getIDU(),edge.getIDV());
 			return true;
 		}
-		catch (NoSuchElementException exception) {
+		catch (Exception exception) {
 			return false;
 		}
 	}
@@ -37,7 +37,7 @@ public abstract class AbstractEdgeCollection<E> implements EdgeCollection<E> {
 			getValue(idU, idV);
 			return true;
 		}
-		catch (NoSuchElementException exception) {
+		catch (Exception exception) {
 			return false;
 		}
 	}

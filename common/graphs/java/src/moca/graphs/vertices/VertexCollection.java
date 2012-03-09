@@ -6,6 +6,8 @@ import java.lang.UnsupportedOperationException;
 
 public interface VertexCollection<Value> extends Iterable<Vertex<Value> > {
 
+	void clear();
+
 	int size();
 
 	boolean add(Vertex<Value> v);

@@ -11,6 +11,7 @@ import moca.graphs.edges.EdgeCollection;
 import moca.graphs.edges.IllegalEdgeException;
 
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 public class BipartedGraph<V,E> extends Graph<V,E> {
 
@@ -48,7 +49,7 @@ public class BipartedGraph<V,E> extends Graph<V,E> {
 	}
 
 	public Vertex<V> getInFirstSet(int id) throws NoSuchElementException {
-		return _firstSet.get(id);
+		return bipartedVertices().getInFirstSet(id);
 	}
 
 	public void addInFirstSet(V value) {
