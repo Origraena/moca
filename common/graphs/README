@@ -1,0 +1,30 @@
+
++-------HowTo-----------------------------------------------+
+| How to use java graphs library ?                      [1] |
+|   1) get the graphs.jar file                              |
+|      ./java/target/graphs.jar                             |
+|   2) two options :                                        |
+|      2.a) add it into your CLASSPATH environment variable |
+|           you do not need to do step 3)                   |
+|      2.b) copy it into your project directory             |
+|   3) when compiling (resp. executing), add the graphs.jar |
+|      file to the javac (resp. java) binary --classpath or | 
+|      -cp argument                                         |
+|                                                           |
+| How to compile java graphs library ?                  [2] |
+|   1) get the source files                                 |
+|      ./java/src/                                          |
+|   2) cd into java directory                               |
+|   3) launch build.sh script file                          |
+|   4) if no error occured you can launch release.sh script |
+|      file to create the jar file                          |
+|   5) execute launch.sh to check if everything seems to be |
+|      ok
++-----------------------------------------------------------+
+
++-------ToDo------------------------------------------------+
+| Task (priority)                 state{OK,(user) PROGRESS} |
+| first task test (1)                                    OK |
+| second task test (3)                      (swan) PROGRESS |
++-----------------------------------------------------------+
+

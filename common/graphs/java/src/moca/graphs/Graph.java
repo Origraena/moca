@@ -26,8 +26,14 @@ import java.util.PriorityQueue;
 import java.util.Comparator;
 
 
-
+/**
+ * Generic graph class.
+ * It is instantiated by giving two parameters : the vertex collection (empty if possible), and the edge collection (same).
+ * The copy constructor may be overriden to provide more efficient copy for specific graphs.
+ */
 public class Graph<V,E> implements Iterable<V> {
+
+	/* CONSTRUCTORS */
 
 	public Graph(VertexCollection<V> vertices, EdgeCollection<E> edges) throws IllegalConstructionException {
 		if ((vertices == null) || (edges == null))
@@ -52,20 +58,33 @@ public class Graph<V,E> implements Iterable<V> {
 		}
 	}
 
-	public int getNbVertices() {
-		return _vertices.size();
+	public void clear() {
+		_vertices.clear();
+		_edges.clear();
 	}
 
-	public int getNbEdges() {
-		return _edges.size();
+
+	/* VERTICES */
+
+	public int getNbVertices() {
+		return _vertices.size();
 	}
 
 	public Vertex<V> getVertex(int id) throws NoSuchElementException {
 		return _vertices.get(id);
 	}
+	public void removeVertex(int id) {
+		_edges.onVertexRemoved(id);
+		_vertices.remove(id);
+	}
 
+	
 	public V get(int id) throws NoSuchElementException {
 		return getVertex(id).getValue();
+	}
+
+	public void add(V value) {
+		addVertex(value);
 	}
 
 	public void addVertex(V value) {
@@ -74,17 +93,31 @@ public class Graph<V,E> implements Iterable<V> {
 		_edges.onVertexAdded(v.getID());	// uses directly vertex class ?
 	}
 
-	public void removeVertex(int id) {
-		_edges.onVertexRemoved(id);
-		_vertices.remove(id);
+
+	/* EDGES */
+
+	public int getNbEdges() {
+		return _edges.size();
 	}
 
-	public Edge<E> getEdge(int idU, int idV) throws NoSuchElementException {
-		return _edges.get(idU,idV);
+	public boolean isEdge(int idU, int idV) {
+		return _edges.contains(idU,idV);
+	}
+
+	public E getEdgeValue(int idU, int idV) throws NoSuchElementException {
+		return _edges.getValue(idU,idV);
+	}
+	
+	public E getEdgeValue(Vertex<V> u, Vertex<V> v) throws NoSuchElementException {
+		return getEdgeValue(u.getID(),v.getID());
 	}
 
 	public Edge<E> getEdge(Vertex<V> u, Vertex<V> v) throws NoSuchElementException {
 		return _edges.get(u.getID(),v.getID());
+	}
+
+	public Edge<E> getEdge(int idU, int idV) throws NoSuchElementException {
+		return _edges.get(idU,idV);
 	}
 
 	public void addEdge(int idU, int idV, E value) throws NoSuchElementException, IllegalEdgeException {
@@ -93,14 +126,14 @@ public class Graph<V,E> implements Iterable<V> {
 		_edges.add(idU, idV, value);
 	}
 
+	public void addEdge(Vertex<V> u, Vertex<V> v, E value) throws NoSuchElementException, IllegalEdgeException {
+		addEdge(u.getID(),v.getID(),value);
+	}
+
 	public void addEdge(Edge<E> edge) throws NoSuchElementException, IllegalEdgeException {
 		if ((edge.getIDU() >= getNbVertices()) || (edge.getIDV() >= getNbVertices()))
 			throw new NoSuchElementException();
 		_edges.add(edge);
-	}
-
-	public void addEdge(Vertex<V> u, Vertex<V> v, E value) throws NoSuchElementException, IllegalEdgeException {
-		_edges.add(u.getID(),v.getID(),value);
 	}
 
 	public void removeEdge(int idU, int idV) throws NoSuchElementException {
@@ -110,8 +143,11 @@ public class Graph<V,E> implements Iterable<V> {
 	}
 
 	public void removeEdge(Vertex<V> u, Vertex<V> v) throws NoSuchElementException {
-		_edges.remove(u.getID(),v.getID());
+		removeEdge(u.getID(),v.getID());
 	}
+
+
+	/** ITERATORS */
 
 	public Iterator<V> iterator() {
 		return new VertexValueIterator(_vertices.iterator());
@@ -144,7 +180,6 @@ public class Graph<V,E> implements Iterable<V> {
 	}
 
 	public WalkIterator DFSIterator() {
-		System.out.println("test");
 		return new DFSIterator(this,0,null);
 	}
 
@@ -156,34 +191,38 @@ public class Graph<V,E> implements Iterable<V> {
 		return new DFSIterator(this,root,function);
 	}
 
-	public ParentFunction<V> Dijsktra(int root, E zeroValue, OperatorPlus1T<E> plus, Comparator<Vertex<V> > compareVertex, Comparator<E> compareEdge) {
+
+	/* ALGORITHMS */
+
+	public ParentFunction<V> Dijsktra(int root, E zeroValue, OperatorPlus1T<E> plus, Comparator<E> compareEdge) {
+		ArrayList<Vertex<V> > ends = new ArrayList<Vertex<V> >(0);
 		return AStar(root,
 					 zeroValue,
 					 plus,
-					 compareVertex,
 					 compareEdge,
+					 ends,
 					 null);
 	}
 
 	public ParentFunction<V> AStar(int root, 
 								   E zeroValue,
 								   OperatorPlus1T<E> plus,
-								   Comparator<Vertex<V> > compareVertex,
 								   Comparator<E> compareEdge,
-//								   ArrayList<Vertex<V> > ends, 
-								   VertexBinaryFunction<V> heuristique) {
+								   ArrayList<Vertex<V> > ends, 
+								   ArrayList<E> heuristique) {
 		ArrayList<E> weights = new ArrayList<E>(getNbVertices());	// contains the total weights of edges between root and index vertices
 		for (int i = 0 ; i < getNbVertices() ; i++)
 			weights.add(null);
 		weights.set(root,zeroValue);
 		Vertex<V> u = null;
 		NeighbourEdge<E> e = null;
+		Graph<V,E>.AStarVertexComparator compareVertex = new AStarVertexComparator(zeroValue,plus,compareEdge,weights,heuristique);
 		PriorityQueue<Vertex<V> > queue = new PriorityQueue<Vertex<V> >(11,compareVertex);
 		ParentFunction<V> parent = new ParentFunction<V>(getNbVertices());
 		u = getVertex(root);
 		while (u != null) {
-//			if (ends.contains(u))
-//				return parent;
+			if (ends.contains(u))
+				return parent;
 			for (Iterator<NeighbourEdge<E> > it = neighbourIterator(u.getID()) ; it.hasNext() ; ) {
 				e = it.next();
 				if ((weights.get(e.getIDV()) == null) || 
@@ -199,11 +238,51 @@ public class Graph<V,E> implements Iterable<V> {
 		}
 		return parent;
 	}
+	private class AStarVertexComparator implements Comparator<Vertex<V> > {
+		public AStarVertexComparator(E zeroValue, OperatorPlus1T<E> plus, Comparator<E> compareEdge, ArrayList<E> weights, ArrayList<E> heuristique) {
+			_zeroValue = zeroValue;
+			_weights = weights;
+			_heuristique = heuristique;
+			_plus = plus;
+			_compareEdge = compareEdge;
+		}
+		/* the specific check is here to avoid to find multiple paths.
+		 * furthermore it will reduce the number of iterations needed to find it.
+		 */
+		public int compare(Vertex<V> u, Vertex<V> v) {
+			int result = _compareEdge.compare(get(u.getID()),get(v.getID()));
+			if (result == 0)	// specific check against same values
+				result = _compareEdge.compare(heuristique(u.getID()),heuristique(v.getID()));
+			return result;
+		}
+		public E get(int id) {
+			return _plus.exec(_weights.get(id),heuristique(id));
+		}
+		public E heuristique(int id) {
+			try {
+				return _heuristique.get(id);
+			}
+			catch (Exception e) {
+				return _zeroValue;
+			}
+		}
+		private ArrayList<E> _weights;
+		private ArrayList<E> _heuristique;
+		private E _zeroValue;
+		private OperatorPlus1T<E> _plus;
+		private Comparator<E> _compareEdge;
+	}
+
 
 	protected VertexCollection<V> _vertices = null;
 	protected EdgeCollection<E> _edges = null;
 
 
+	/**
+	 * Graph vertex value iterator nested class.
+	 * It is used to provide a generic value iterator based on the vertex collection one.
+	 * You have just to override the vertexIterator() graph method to make this one works.
+	 */
 	protected class VertexValueIterator implements Iterator<V> {
 		
 		public VertexValueIterator(Iterator<Vertex<V> > iterator) {
@@ -226,7 +305,12 @@ public class Graph<V,E> implements Iterable<V> {
 
 	}
 
-	public class WalkIterator implements Iterator<Vertex<V> > {
+	/**
+	 * Graph walk iterator nested class.
+	 * This class is a generic walk algorithm iterator, its waiting list been unimplemented, 
+	 * this class cannot be instantiated, use BFSIterator or DFSIterator instead of.
+	 */
+	public abstract class WalkIterator implements Iterator<Vertex<V> > {
 
 		protected WalkIterator(Graph<V,E> source, int rootID, VertexBinaryFunction<V> function) {
 			if (source.getNbVertices() == 0)
@@ -241,20 +325,27 @@ public class Graph<V,E> implements Iterable<V> {
 					_neighbourIterators.add(_source.neighbourIterator(i));
 					_colors[i] = 0;
 				}
+				_colors[rootID] = 1;
 			}
 		}
 
 		protected WalkIterator(Graph<V,E> source, Vertex<V> root, VertexBinaryFunction<V> function) {
-			_source = source;
-			_current = root;
-			_function = function;
-			_colors = new int[source.getNbVertices()];
-			_neighbourIterators = new ArrayList<Iterator<NeighbourEdge<E> > >(source.getNbVertices());
-			for (int i = 0 ; i < source.getNbVertices() ; i++) {
-				_neighbourIterators.add(_source.neighbourIterator(i));
-				_colors[i] = 0;
+			if (source.getNbVertices() == 0)
+				_current = null;
+			else {
+				_source = source;
+				_current = root;
+				_function = function;
+				_colors = new int[source.getNbVertices()];
+				_neighbourIterators = new ArrayList<Iterator<NeighbourEdge<E> > >(source.getNbVertices());
+				for (int i = 0 ; i < source.getNbVertices() ; i++) {
+					_neighbourIterators.add(_source.neighbourIterator(i));
+					_colors[i] = 0;
+				}
+				_colors[root.getID()] = 1;
 			}
 		}
+
 
 		public VertexBinaryFunction<V> getFunction() {
 			return _function;
@@ -317,6 +408,10 @@ public class Graph<V,E> implements Iterable<V> {
 
 	};
 
+	/**
+	 * Graph breadth first search iterator nested class.
+	 * It extends the walk iterator, and provide a FIFO waiting list.
+	 */
 	protected class BFSIterator extends WalkIterator {
 		public BFSIterator(Graph<V,E> source, int root, VertexBinaryFunction<V> function) {
 			super(source,root,function);
@@ -325,6 +420,10 @@ public class Graph<V,E> implements Iterable<V> {
 		}
 	};
 
+	/**
+	 * Graph depth first search iterator nested class.
+	 * It extends the walk iterator, and provide a LIFO waiting list.
+	 */
 	protected class DFSIterator extends WalkIterator {
 		public DFSIterator(Graph<V,E> source, int root, VertexBinaryFunction<V> function) {
 			super(source,root,function);

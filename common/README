@@ -1,0 +1,16 @@
+
++-------ProjectTree-----------------------------------------+
+| /                                                    root |
+|   file_templates/             templates for file creation |
+|       ClassName.cpp                        cpp class file |
+|       ClassName.h                         cpp header file |
+|       ClassName.java                      java class file |
+|   graphs/                                     graphs root |
+|       java/                            java graph library |
+|          src/                           java source files |
+|          target/                        java target files |
+|             graphs.jar        java graph library jar file |
+|       README             informations about graph library |
+|   README                                        this file |
++-----------------------------------------------------------+
+
