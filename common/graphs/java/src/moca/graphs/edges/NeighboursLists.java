@@ -35,11 +35,13 @@ public class NeighboursLists<E> extends AbstractEdgeCollection<E> implements Edg
 	public void onVertexAdded(int idV) {
 		NeighbourEdge<E> edge = null;
 		_neighbours.add(idV,new ArrayList<NeighbourEdge<E> >());
-		for (int i = 0 ; i < _neighbours.size() ; i++) {
-			for (int j = 0 ; j < _neighbours.get(i).size() ; j++) {
-				edge = _neighbours.get(i).get(j);
-				if (edge.getIDV() >= idV)
-					edge.setIDV(edge.getIDV()+1);
+		if (idV < _neighbours.size()-1) {
+			for (int i = 0 ; i < _neighbours.size() ; i++) {
+				for (int j = 0 ; j < _neighbours.get(i).size() ; j++) {
+					edge = _neighbours.get(i).get(j);
+					if (edge.getIDV() >= idV)
+						edge.setIDV(edge.getIDV()+1);
+				}
 			}
 		}
 	}

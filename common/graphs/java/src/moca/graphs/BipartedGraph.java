@@ -41,6 +41,30 @@ public class BipartedGraph<V,E> extends Graph<V,E> {
 		super(g);
 	}
 
+	public BipartedGraph<V,E> subgraph(int idBegin1, int idEnd1, int idBegin2, int idEnd2) {
+		if (!((idBegin1 <= idEnd1) && (idEnd1 <= idBegin2) && (idBegin2 <= idEnd2)))
+			return null;
+		try {
+			BipartedGraph<V,E> result = new BipartedGraph<V,E>(bipartedVertices().subset(idBegin1,idEnd1,idBegin2,idEnd2),_edges.subset(0,0));
+			for (int i = 0 ; i < result.getNbVertices() ; i++) {
+				_edges.onVertexAdded(i);
+			}
+			for (int i = idBegin1 ; i < idEnd1 ; i++) {
+				for (Iterator<NeighbourEdge<E> > iterator = neighbourIterator(i) ; iterator.hasNext() ; ) {
+					NeighbourEdge<E> edge = iterator.next();
+					if ((edge.getIDV() >= idBegin2) && (edge.getIDV() < idEnd2)) {
+						try {
+							result.addEdge(i - idBegin1, edge.getIDV()-idBegin1-idBegin2+idEnd1, edge.getValue());
+						}
+						catch (IllegalEdgeException e) { }
+					}
+				}
+			}
+			return result;
+		}
+		catch (IllegalConstructionException e) { return null; }
+	}
+
 	public void addEdge(int idU, int idV, E value) throws IllegalEdgeException {
 		if (((idU >= bipartedVertices().firstSet().size()) && (idV >= bipartedVertices().firstSet().size()))
 		||  ((idU < bipartedVertices().firstSet().size()) && (idV < bipartedVertices().firstSet().size())))

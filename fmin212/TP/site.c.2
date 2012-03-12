@@ -7,9 +7,8 @@
 				close(sdRecv); \
 				FREE()
 
-//array of known ip addresses
-struct sockaddr_in* netParamsNeighbors = NULL;
-int sdSend, sdRecv, continueB = 1;
+site this_site;
+
 
 /* ending handler. Necessary to clean the environnement. */
 void end_handler(int sig)
@@ -19,9 +18,7 @@ void end_handler(int sig)
 		printf("Segmentation fault\n");
 	
 	/* TODO */
-	
-	
-	continueB = 0;
+	this_site.running = false;	
 }
 
 int main(int argc, char* argv[])

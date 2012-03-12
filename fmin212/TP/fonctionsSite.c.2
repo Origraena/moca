@@ -64,7 +64,7 @@ char* getIPaddress()
 }
 
 
-int gstArgs(int argc, char* argv[], int* sdSend, int*sdRecv)
+int gstArgs(int argc, char* argv[])
 {
 	//int i = 1;
 	
@@ -74,6 +74,7 @@ int gstArgs(int argc, char* argv[], int* sdSend, int*sdRecv)
 		printf("[masque_sous_reseau]\n");
 		return -1;
 	}
+
 	/*if(argc < 2)
 	{
 		printf("Ce programme necessite des arguments. Essayez '--help' pour plus de precisions.\n\n");
@@ -94,15 +95,15 @@ int gstArgs(int argc, char* argv[], int* sdSend, int*sdRecv)
 		}
 	}*/
 	
-	*sdSend = socket(AF_INET, SOCK_DGRAM, 0);
-	if(*sdSend < 0)
+	this_site.sdSend = socket(AF_INET, SOCK_DGRAM, 0);
+	if(this_site.sdSend < 0)
 	{
 		perror("Erreur d'ouverture de socket ");
 		return -1;
 	}
 	
-	*sdRecv = socket(AF_INET, SOCK_DGRAM, 0);
-	if(*sdRecv < 0)
+	this_site.sdRecv = socket(AF_INET, SOCK_DGRAM, 0);
+	if(this_site.sdRecv < 0)
 	{
 		perror("Erreur d'ouverture de socket ");
 		return -1;
