@@ -42,6 +42,7 @@ public class Main {
 			System.out.println("BIPARTED GRAPH");
 			BipartedGraph<Integer,Integer> bigraph = new BipartedGraph<Integer,Integer>(new VertexArrayList<Integer>(), new VertexArrayList<Integer>(), new NeighboursLists<Integer>());
 			
+			bigraph.addInSecondSet(23);
 			for (int i = 0 ; i < 10 ; i++)
 				bigraph.addInFirstSet(i);
 			for (int i = 10 ; i < 15 ; i++)
@@ -506,11 +507,28 @@ public class Main {
 //				if (geographParent.getParent(i) != null)
 //					System.out.println("parent["+i+"] = "+geographParent.getParent(i).getID());
 
+
+			System.out.println(new Labyrinth(labyrinth,new VertexIdentityFunction<Point>()));
+			labyrinth.contract(0,1);
+			labyrinth.contract(2,1);
+			System.out.println(new Labyrinth(labyrinth,new VertexIdentityFunction<Point>()));
+
 		}
 		catch (Exception e) {
 			System.out.println(e);
 		}
 
+
+
+		/** VERTICES CONTRACT **/
+		
+		try {
+			
+
+		}
+		catch (Exception e) {
+			System.out.println(e);
+		}
 
 	}
 };

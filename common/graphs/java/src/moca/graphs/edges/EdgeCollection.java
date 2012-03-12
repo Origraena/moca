@@ -11,11 +11,17 @@ public interface EdgeCollection<Value> extends Iterable<Edge<Value> > {
 
 	void onVertexRemoved(int idV);
 
+	void onVertexContracted(int idU, int idV);
+
+	EdgeCollection<Value> subset(int idBegin, int idEnd);
+
 	Edge<Value> get(int idU, int idV) throws NoSuchElementException;
 
 	Edge<Value> get(int id) throws NoSuchElementException, UnsupportedOperationException;
 
 	Value getValue(int idU, int idV) throws NoSuchElementException;
+
+	int getNeighbourAt(int idU, int index) throws UnsupportedOperationException, NoSuchElementException;
 
 	void add(int idU, int idV, Value v) throws NoSuchElementException, IllegalEdgeException;
 

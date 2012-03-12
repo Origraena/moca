@@ -48,8 +48,20 @@ public class BipartedGraph<V,E> extends Graph<V,E> {
 		super.addEdge(idU,idV,value);
 	}
 
+	public int getNbVerticesInFirstSet() {
+		return bipartedVertices().firstSet().size();
+	}
+
+	public int getNbVerticesInSecondSet() {
+		return bipartedVertices().secondSet().size();
+	}
+
 	public Vertex<V> getInFirstSet(int id) throws NoSuchElementException {
 		return bipartedVertices().getInFirstSet(id);
+	}
+
+	public Vertex<V> getInSecondSet(int id) throws NoSuchElementException {
+		return bipartedVertices().getInSecondSet(id);
 	}
 
 	public void addInFirstSet(V value) {
@@ -61,13 +73,11 @@ public class BipartedGraph<V,E> extends Graph<V,E> {
 	}
 
 	public void addVertexInFirstSet(Vertex<V> v) {
-		v.setID(bipartedVertices().firstSet().size());
 		bipartedVertices().addInFirstSet(v);
 		_edges.onVertexAdded(v.getID());
 	}
 
 	public void addVertexInSecondSet(Vertex<V> v) {
-		v.setID(bipartedVertices().size());
 		bipartedVertices().addInSecondSet(v);
 		_edges.onVertexAdded(v.getID());
 	}

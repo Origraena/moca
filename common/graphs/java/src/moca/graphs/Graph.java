@@ -42,27 +42,50 @@ public class Graph<V,E> implements Iterable<V> {
 		_edges = edges;
 	}
 
-	/**
-	 * The graph will be cloned but not vertices values.
-	 * An IllegalConstructionException is thrown whenever an incompatible graph is attempted to be copied.
-	 */
 	public Graph(Graph<V,E> g) throws IllegalConstructionException {
-		try {
-			for (V v : g)
-				addVertex(v/*.clone()*/);
-			for (Iterator<Edge<E> > e = g.edgeIterator() ; e.hasNext() ; )
-				addEdge(e.next());
-		}
-		catch (IllegalEdgeException e) {
-			throw new IllegalConstructionException();
-		}
+		Graph<V,E> gclone = g.clone();
+		this._vertices = gclone._vertices;
+		this._edges = gclone._edges;
 	}
 
 	public void clear() {
 		_vertices.clear();
 		_edges.clear();
 	}
+	
+	public Graph<V,E> clone() {
+		try {
+			VertexCollection<V> vertices = _vertices.getClass().newInstance();
+			EdgeCollection<E> edges = _edges.getClass().newInstance();
+			Graph<V,E> graph = new Graph<V,E>(vertices,edges);
+			for (V v : this)
+				graph.addVertex(v);
+			for (Iterator<Edge<E> > e = edgeIterator() ; e.hasNext() ; ) {
+				Edge<E> edge = e.next();
+				graph.addEdge(edge.getIDU(),edge.getIDV(),edge.getValue());
+			}
+			return graph;
+		}
+		catch (Exception e) {
+			return null;
+		}
+	}			
 
+	/**
+	 * @return A subgraph composed by the vertices between idBegin (included) and idEnd (not included) and all the remaining edges 
+	 */
+	public Graph<V,E> subgraph(int idBegin, int idEnd) {
+		try {
+			if (idEnd > getNbVertices())
+				idEnd = getNbVertices();
+			if (idBegin < 0)
+				idBegin = 0;
+			return new Graph<V,E>(_vertices.subset(idBegin,idEnd),_edges.subset(idBegin,idEnd));
+		}
+		catch (IllegalConstructionException e) {
+			return null;
+		}
+	}
 
 	/* VERTICES */
 
@@ -73,6 +96,15 @@ public class Graph<V,E> implements Iterable<V> {
 	public Vertex<V> getVertex(int id) throws NoSuchElementException {
 		return _vertices.get(id);
 	}
+
+	public Vertex<V> getNeighbour(int vertexID, int index) throws UnsupportedOperationException {
+		return getVertex(_edges.getNeighbourAt(vertexID,index));
+	}
+
+	public V getNeighbourValue(int vertexID, int index) throws UnsupportedOperationException {
+		return getNeighbour(vertexID,index).getValue();
+	}
+
 	public void removeVertex(int id) {
 		_edges.onVertexRemoved(id);
 		_vertices.remove(id);
@@ -93,6 +125,26 @@ public class Graph<V,E> implements Iterable<V> {
 		_edges.onVertexAdded(v.getID());	// uses directly vertex class ?
 	}
 
+	public void contract(Vertex<V> u, Vertex<V> v) {
+		contract(u.getID(),v.getID());
+	}
+
+	public void contract(int idU, int idV) {
+		NeighbourEdge<E> edge = null;
+		for (Iterator<NeighbourEdge<E> > iterator = neighbourIterator(idU) ; iterator.hasNext() ; ) {
+			edge = iterator.next();
+			try {addEdge(idV,edge.getIDV(),edge.getValue());}
+			catch (IllegalEdgeException e) { }
+		}
+		setVertex(idU,getVertex(idV));
+		_edges.onVertexContracted(idU,idV);
+	}
+	
+	/** protected because no real check 
+	 * (used by vertex contraction) */
+	protected void setVertex(int i, Vertex<V> u) {
+		_vertices.set(i,u);
+	}
 
 	/* EDGES */
 

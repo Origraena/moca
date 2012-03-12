@@ -15,8 +15,33 @@ public class NeighboursLists<E> extends AbstractEdgeCollection<E> implements Edg
 		return _size;
 	}
 
+	public NeighboursLists<E> subset(int idBegin, int idEnd) {
+		NeighboursLists<E> result = new NeighboursLists<E>();
+		int cpt = 0;
+		for (int i = idBegin ; i < idEnd ; i++) {
+			onVertexAdded(i-idBegin);
+			for (int j = 0 ; j < _neighbours.get(i).size() ; j++) {
+				if (_neighbours.get(i).get(j).getIDV() < idEnd) {
+					try {
+						result.add(i-idBegin,j-idBegin,_neighbours.get(i).get(j).getValue()/*.clone()*/);
+					}
+					catch (IllegalEdgeException e) { }
+				}
+			}
+		}
+		return result;
+	}
+
 	public void onVertexAdded(int idV) {
-		_neighbours.add(new ArrayList<NeighbourEdge<E> >());
+		NeighbourEdge<E> edge = null;
+		_neighbours.add(idV,new ArrayList<NeighbourEdge<E> >());
+		for (int i = 0 ; i < _neighbours.size() ; i++) {
+			for (int j = 0 ; j < _neighbours.get(i).size() ; j++) {
+				edge = _neighbours.get(i).get(j);
+				if (edge.getIDV() >= idV)
+					edge.setIDV(edge.getIDV()+1);
+			}
+		}
 	}
 
 	public void onVertexRemoved(int idV) {
@@ -34,11 +59,21 @@ public class NeighboursLists<E> extends AbstractEdgeCollection<E> implements Edg
 		}
 	}
 
+	public void onVertexContracted(int idU, int idV) {
+		_neighbours.set(idU,_neighbours.get(idV));
+	}
+
 	public E getValue(int idU, int idV) throws NoSuchElementException {
 		for (NeighbourEdge<E> edge : _neighbours.get(idU))
 			if (edge.getIDV() == idV)
 				return edge.getValue();
 		throw new NoSuchElementException();
+	}
+
+	public int getNeighbourAt(int idU, int index) throws NoSuchElementException {
+		if ((idU > _neighbours.size()) || (index > _neighbours.get(idU).size()))
+			throw new NoSuchElementException();
+		return _neighbours.get(idU).get(index).getIDV();
 	}
 
 	public void add(int idU, int idV, E value) throws NoSuchElementException, IllegalEdgeException {

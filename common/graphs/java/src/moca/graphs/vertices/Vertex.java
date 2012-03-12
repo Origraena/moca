@@ -36,6 +36,10 @@ public class Vertex<Value> {
 		return new String(_id + ":" + _value);
 	}
 
+	public Vertex<Value> clone() {
+		return new Vertex<Value>(_id,_value);
+	}
+
 	private int _id = ID_UNDEFINED;
 
 	private Value _value;

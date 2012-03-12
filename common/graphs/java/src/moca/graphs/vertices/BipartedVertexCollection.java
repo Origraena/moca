@@ -25,6 +25,23 @@ public class BipartedVertexCollection<Value> implements VertexCollection<Value> 
 		return _firstSet.size() + _secondSet.size();
 	}
 
+	public BipartedVertexCollection<Value> subset(int idBegin, int idEnd) {
+		if (idBegin > _firstSet.size())
+			return subset(0,0,idBegin-_firstSet.size(),idEnd-_firstSet.size());
+		if (idEnd <= _firstSet.size())
+			return subset(idBegin,idEnd,0,0);
+		return subset(idBegin,_firstSet.size(),0,idEnd-size());
+	}
+
+	public BipartedVertexCollection<Value> subset(int idBegin1, int idEnd1, int idBegin2, int idEnd2) {
+		try {
+			return new BipartedVertexCollection<Value>(_firstSet.subset(idBegin1,idEnd1),_secondSet.subset(idBegin2,idEnd2));
+		}
+		catch (IllegalConstructionException e) {
+			return null;
+		}
+	}
+
 	/**
 	 * this method should not be used since it is not really specific
 	 * the vertex will be added into the second set
@@ -73,6 +90,20 @@ public class BipartedVertexCollection<Value> implements VertexCollection<Value> 
 	/** local id **/
 	public Vertex<Value> removeInSecondSet(int id) throws NoSuchElementException {
 		return _secondSet.remove(id);
+	}
+
+	public Vertex<Value> set(int id, Vertex<Value> v) {
+		try {
+			Vertex<Value> result = get(id);
+			if (id < _firstSet.size())
+				_firstSet.set(id,v);
+			else if (id < size())
+				_secondSet.set(id - _firstSet.size(),v);
+			return result;
+		}
+		catch (Exception e) {
+			return null;
+		}
 	}
 
 	public Vertex<Value> get(int id) throws NoSuchElementException {
