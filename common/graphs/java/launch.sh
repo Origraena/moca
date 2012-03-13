@@ -1,1 +1,1 @@
-java -cp target/class/ Main 10 10
+java -cp target/class/ Main 20 20

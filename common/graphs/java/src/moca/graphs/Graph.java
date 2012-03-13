@@ -172,6 +172,10 @@ public class Graph<V,E> implements Iterable<V> {
 		return _edges.get(idU,idV);
 	}
 
+	public void addNeighbourEdge(int idU, NeighbourEdge<E> edge) throws NoSuchElementException, IllegalEdgeException {
+		addEdge(idU, edge.getIDV(), edge.getValue());
+	}
+
 	public void addEdge(int idU, int idV, E value) throws NoSuchElementException, IllegalEdgeException {
 		if ((idU >= getNbVertices()) || (idV >= getNbVertices()))
 			throw new NoSuchElementException();
