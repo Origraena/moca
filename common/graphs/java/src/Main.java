@@ -508,11 +508,11 @@ public class Main {
 //					System.out.println("parent["+i+"] = "+geographParent.getParent(i).getID());
 
 
-			System.out.println(new Labyrinth(labyrinth,new VertexIdentityFunction<Point>()));
+/*			System.out.println(new Labyrinth(labyrinth,new VertexIdentityFunction<Point>()));
 			labyrinth.contract(0,1);
 			labyrinth.contract(2,1);
 			System.out.println(new Labyrinth(labyrinth,new VertexIdentityFunction<Point>()));
-
+*/
 		}
 		catch (Exception e) {
 			System.out.println(e);
@@ -520,11 +520,10 @@ public class Main {
 
 
 
-		/** VERTICES CONTRACT **/
-		
 		try {
-			
-
+			Labyrinth l = new Labyrinth(new GeoGraph(new VertexArrayList<Point>(), new NeighboursLists<Long>()), 4, ' ', '|', '-', '+');
+			l.fromFile("labyrinthe.txt");
+			System.out.println(l);
 		}
 		catch (Exception e) {
 			System.out.println(e);
