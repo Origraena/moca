@@ -130,14 +130,21 @@ public class Graph<V,E> implements Iterable<V> {
 	}
 
 	public void contract(int idU, int idV) {
-		NeighbourEdge<E> edge = null;
-		for (Iterator<NeighbourEdge<E> > iterator = neighbourIterator(idU) ; iterator.hasNext() ; ) {
-			edge = iterator.next();
-			try {addEdge(idV,edge.getIDV(),edge.getValue());}
-			catch (IllegalEdgeException e) { }
+		if (idU != idV) {
+			NeighbourEdge<E> edge = null;
+			E loopValue = null;
+			for (Iterator<NeighbourEdge<E> > iterator = neighbourIterator(idU) ; iterator.hasNext() ; ) {
+				edge = iterator.next();
+				try {addEdge(idV,edge.getIDV(),edge.getValue());}
+				catch (IllegalEdgeException e) { }
+			}
+			setVertex(idU,getVertex(idV));
+			_edges.onVertexContracted(idU,idV);
 		}
-		setVertex(idU,getVertex(idV));
-		_edges.onVertexContracted(idU,idV);
+	}
+
+	public VertexCollection<V> getVertexCollection() {
+		return _vertices;
 	}
 	
 	/** protected because no real check 
@@ -202,6 +209,10 @@ public class Graph<V,E> implements Iterable<V> {
 		removeEdge(u.getID(),v.getID());
 	}
 
+	public EdgeCollection<E> getEdgeCollection() {
+		return _edges;
+	}
+
 
 	/** ITERATORS */
 
@@ -249,6 +260,20 @@ public class Graph<V,E> implements Iterable<V> {
 
 
 	/* ALGORITHMS */
+
+	public boolean isCyclic() {
+		WalkIterator iterator = BFSIterator();
+		while (iterator.hasNext()) {
+			iterator.next();
+			if (iterator.isCyclic())
+				return true;
+		}
+		return false;
+	}
+
+	public boolean isAcyclic() {
+		return !isCyclic();
+	}
 
 	public ParentFunction<V> Dijsktra(int root, E zeroValue, OperatorPlus1T<E> plus, Comparator<E> compareEdge) {
 		ArrayList<Vertex<V> > ends = new ArrayList<Vertex<V> >(0);
@@ -429,8 +454,10 @@ public class Graph<V,E> implements Iterable<V> {
 						_function.exec(head,neighbour);
 					return neighbour;
 				}
-				else
+				else {
+					_isCyclic = true;
 					return processNext();
+				}
 			}
 			else {
 				_waitingList.pop();
@@ -454,6 +481,10 @@ public class Graph<V,E> implements Iterable<V> {
 		public void remove() throws UnsupportedOperationException {
 			throw new UnsupportedOperationException();
 		}
+	
+		public boolean isCyclic() {
+			return _isCyclic;
+		}
 
 		protected Graph<V,E> _source = null;
 		protected Vertex<V> _current = null;
@@ -461,7 +492,7 @@ public class Graph<V,E> implements Iterable<V> {
 		protected LinkedList<Vertex<V> > _waitingList = null;
 		protected int _colors[];
 		protected ArrayList<Iterator<NeighbourEdge<E> > > _neighbourIterators = null;
-
+		protected boolean _isCyclic = false;
 	};
 
 	/**
@@ -487,6 +518,181 @@ public class Graph<V,E> implements Iterable<V> {
 			_waitingList.put(_current);
 		}
 	};
+
+	private StronglyConnectedComponents _stronglyConnectedComponents = null;
+	public void resetStronglyConnectedComponents() {
+		_stronglyConnectedComponents = new StronglyConnectedComponents();
+	}
+	public int getNbComponents() {
+		if ((_stronglyConnectedComponents == null) && (getNbVertices() > 0))
+			resetStronglyConnectedComponents();
+		return _stronglyConnectedComponents.getNbComponents();
+	}
+	public ArrayList<ArrayList<Vertex<V> > > getComponents() {
+		if ((_stronglyConnectedComponents == null) && (getNbVertices() > 0))
+			resetStronglyConnectedComponents();
+		return _stronglyConnectedComponents.getComponents();
+	}
+	public ArrayList<Vertex<V> > getComponent(int i) {
+		if ((_stronglyConnectedComponents == null) && (getNbVertices() > 0))
+			resetStronglyConnectedComponents();
+		return _stronglyConnectedComponents.getComponent(i);
+	}
+	public Vertex<V> getRootComponent(int vertexID) {
+		if ((_stronglyConnectedComponents == null) && (getNbVertices() > 0))
+			resetStronglyConnectedComponents();	
+		return _stronglyConnectedComponents.getRootComponent(vertexID);
+	}
+	public int getComponentID(int vertexID) {
+		return getComponentID(getVertex(vertexID));
+	}
+	public int getComponentID(Vertex<V> v) {
+		if ((_stronglyConnectedComponents == null) && (getNbVertices() > 0))
+			resetStronglyConnectedComponents();	
+		return _stronglyConnectedComponents.getComponentID(v);
+
+	}
+	private class StronglyConnectedComponents {
+		public StronglyConnectedComponents() {
+			init();
+			process();
+		}
+		public int getNbComponents() {
+			return _components.size();
+		}
+		public ArrayList<ArrayList<Vertex<V> > > getComponents() {
+			return _components;
+		}
+		public ArrayList<Vertex<V> > getComponent(int i) {
+			if ((i < 0) || (i >= _components.size()))
+				return null;
+			return _components.get(i);
+		}
+		public Vertex<V> getRootComponent(int vertexID) {
+			if ((vertexID < 0) || (vertexID >= _rootComponent.size()))
+				return null;
+			return _rootComponent.get(vertexID);
+		}
+		public int getComponentID(Vertex<V> v) {
+			Vertex<V> root = getRootComponent(v.getID());
+			for (int i = 0 ; i < _components.size() ; i++) {
+				if (_components.get(i).get(0) == root)
+					return i;
+			}
+			return -1;
+		}
+		protected void init() {
+			_components = new ArrayList<ArrayList<Vertex<V> > >();
+			_rootComponent = new ArrayList<Vertex<V> >(getNbVertices());
+			_prev = new ArrayList<ArrayList<Vertex<V> > >(getNbVertices());
+			_revList = new Fifo<Vertex<V> >();
+			_colors = new int[getNbVertices()];
+			for (int i = 0 ; i < getNbVertices() ; i++) {
+				_rootComponent.add(null);
+				_prev.add(new ArrayList<Vertex<V> >());
+				_colors[i] = WHITE;
+			}
+			for (int i = 0 ; i < getNbVertices() ; i++) {
+				for (Iterator<NeighbourEdge<E> > neighbourIterator = neighbourIterator(i) ; neighbourIterator.hasNext() ;)
+					_prev.get(neighbourIterator.next().getIDV()).add(getVertex(i));
+			}
+		}
+		protected void process() {
+			Vertex<V> current = null;
+			// first walk
+			for (Iterator<Vertex<V> > iterator = vertexIterator() ; iterator.hasNext() ;) {
+				current = iterator.next();
+				if (_colors[current.getID()] == WHITE)
+					firstVisit(current);
+			}
+			// vertex colors reinit for the second walk
+			for (int i = 0 ; i < getNbVertices() ; i++)
+				_colors[i] = WHITE;
+			// second walk
+			for (Iterator<Vertex<V> > iterator = _revList.iterator() ; iterator.hasNext() ; ) {
+				current = iterator.next();
+				if (_colors[current.getID()] == WHITE) {
+					_components.add(new ArrayList<Vertex<V> >());
+					secondVisit(current,current,_components.get(_components.size()-1));
+				}
+			}
+		}
+		protected void firstVisit(Vertex<V> root) {
+			_colors[root.getID()] = BLACK;
+			Vertex<V> current = null;
+			for (Iterator<NeighbourEdge<E> > neighbourIterator = neighbourIterator(root.getID()) ; neighbourIterator.hasNext() ; ) {
+				current = getVertex(neighbourIterator.next().getIDV());
+				if (_colors[current.getID()] == WHITE)
+					firstVisit(current);
+			}
+			_revList.addFirst(root);
+		}
+		protected void secondVisit(Vertex<V> u, Vertex<V> root, ArrayList<Vertex<V> > comp) {
+			Vertex<V> current = null;
+			comp.add(u);
+			_rootComponent.set(u.getID(),root);
+			_colors[u.getID()] = BLACK;
+			for (Iterator<Vertex<V> > iterator = _prev.get(u.getID()).iterator() ; iterator.hasNext() ;) {
+				current = iterator.next();
+				if (_colors[current.getID()] == WHITE)
+					secondVisit(current,root,comp);
+			}
+		}
+		private ArrayList<ArrayList<Vertex<V> > > _components;
+		private ArrayList<Vertex<V> > _rootComponent;
+		private ArrayList<ArrayList<Vertex<V> > > _prev;
+		private Fifo<Vertex<V> > _revList;
+		private int _colors[];
+		private static final int WHITE = 0;
+		private static final int BLACK = 1;
+	}
+
+	public void resetStrongConnectedComponentsGraph() {
+		try {
+			_stronglyConnectedComponentsGraph = new DirectedSimpleGraph<ArrayList<Vertex<V> >, Boolean>();
+			// vertices
+			for (int i = 0 ; i < getNbComponents() ; i++)
+				_stronglyConnectedComponentsGraph.addVertex(getComponent(i));
+			// edges
+			Vertex<V> root = null;
+			int componentID = -1;
+			int size = 0;
+			Vertex<ArrayList<Vertex<V> > > vertex = null;
+			Vertex<V> current = null;
+			int idV = -1;
+			for (Iterator<Vertex<ArrayList<Vertex<V> > > > vertexIterator = _stronglyConnectedComponentsGraph.vertexIterator() ; vertexIterator.hasNext() ; ) {
+				vertex = vertexIterator.next();
+				root = vertex.getValue().get(0);
+				componentID = getComponentID(root);
+				size = vertex.getValue().size();
+				for (int i = 1 ; i < size ; i++) {
+					current = vertex.getValue().get(i);
+					for (Iterator<NeighbourEdge<E> > neighbourIterator = neighbourIterator(current.getID()) ; neighbourIterator.hasNext() ; ) {
+						idV = neighbourIterator.next().getIDV();
+						if (getRootComponent(idV) != root) {
+							// there is an edge from the component to another one
+							try {
+								_stronglyConnectedComponentsGraph.addEdge(vertex.getID(),getComponentID(idV),new Boolean(true));
+							}
+							catch (IllegalEdgeException e) { /* edge already exists */ }
+						}
+					}
+				}
+			}
+		}
+		catch (IllegalConstructionException e) {
+			System.out.println(e);
+			e.printStackTrace();
+		}
+
+	}
+	public DirectedSimpleGraph<ArrayList<Vertex<V> >,Boolean> getStronglyConnectedComponentsGraph() {
+		if ((_stronglyConnectedComponentsGraph == null) && (getNbVertices() > 0))
+			resetStrongConnectedComponentsGraph();
+		return _stronglyConnectedComponentsGraph;
+	}
+	private DirectedSimpleGraph<ArrayList<Vertex<V> >,Boolean> _stronglyConnectedComponentsGraph = null;
+
 
 };
 

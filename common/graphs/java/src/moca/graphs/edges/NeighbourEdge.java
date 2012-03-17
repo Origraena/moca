@@ -23,6 +23,10 @@ public class NeighbourEdge<E> {
 			_value = value;
 		}
 
+		public String toString() {
+			return _idV+" [" + _value + "]";
+		}
+
 		private int _idV;
 
 		private E _value;
