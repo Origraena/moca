@@ -2,9 +2,9 @@
 
 #include "fonctionsSite.h"
 
-#define FREE()	free(netParamsNeighbors);
-#define CLEAN()	close(sdSend); \
-				close(sdRecv); \
+#define FREE()	free(this_site.neighbours);
+#define CLEAN()	close(this_site.sdSend); \
+				close(this_site.sdRecv); \
 				FREE()
 
 site this_site;
@@ -15,21 +15,24 @@ void end_handler(int sig)
 {
 	printf("\nSignal cought\n");
 	if(sig == 11)
+	{
 		printf("Segmentation fault\n");
+		exit(EXIT_FAILURE);
+	}
 	
 	/* TODO */
-	this_site.running = false;	
+	this_site.running = 0;	
 }
 
 int main(int argc, char* argv[])
 {
 	char recit[1024];
-	int i = 1, nbLus, nbNeighbors = 0, size = sizeof(struct sockaddr_in);
+	int i = 1, nbLus, size = sizeof(struct sockaddr_in);
 	int known;
 	fd_set socketRset;
-	struct sockaddr_in *neighborsTmp = NULL;
-	struct sockaddr_in netParamsNeighbor;
-	bzero(&netParamsNeighbor,sizeof(netParamsNeighbor));
+	struct sockaddr_in *neighboursTmp = NULL;
+	struct sockaddr_in netParamsNeighbour;
+	bzero(&netParamsNeighbour,sizeof(netParamsNeighbour));
 	
 	/* Signals attachment to the handler */
 	struct sigaction action;
@@ -47,7 +50,7 @@ int main(int argc, char* argv[])
 	}
 	
 	/* Setting network parameters */
-	if(gstArgs(argc, argv, &sdSend, &sdRecv) == -1)
+	if(gstArgs(argc, argv) == -1)
 	{
 		CLEAN()
 		exit(EXIT_FAILURE);
@@ -55,7 +58,7 @@ int main(int argc, char* argv[])
 	
 	/* HELLO message broadcasting */
 	printf("Broadcast HELLO\n");
-	if(broadcast("HELLO", sdSend) == -1)
+	if(broadcast("HELLO") == -1)
 	{
 		CLEAN()
 		exit(EXIT_FAILURE);
@@ -63,16 +66,16 @@ int main(int argc, char* argv[])
 	
 	
 	/* Execution loop */
-	while(continueB)
+	while(this_site.running)
 	{
 		/* select settings */
 		FD_ZERO(&socketRset);
 		FD_SET(STDIN_FILENO, &socketRset);
-		FD_SET(sdRecv, &socketRset);
+		FD_SET(this_site.sdRecv, &socketRset);
 		
 		
 		/* select on all reading descriptors */
-		if(select((sdSend > sdRecv ? sdSend : sdRecv)+1, &socketRset, NULL, NULL, NULL) == -1)
+		if(select((this_site.sdSend > this_site.sdRecv ? this_site.sdSend : this_site.sdRecv)+1, &socketRset, NULL, NULL, NULL) == -1)
 		{
 			if (errno == EINTR)
 				continue;
@@ -102,7 +105,7 @@ int main(int argc, char* argv[])
 					perror("Erreur de reception sur l'entree standard");
 				else
 					buf[nbLus-1] = 0;
-				broadcast(buf, sdSend);
+				broadcast(buf);
 			}
 			else if(strcmp(buf, "MESSAGE")==0)
 			{
@@ -123,7 +126,9 @@ int main(int argc, char* argv[])
 				else
 					buf[nbLus-1] = 0;
 				
-				message(add, buf, sdSend);
+				msg_type t = MESSAGE;
+				message m = {t,buf};
+				sendMessageWithAdd(add, m);
 			}
 			
 			/* TODO */
@@ -131,10 +136,10 @@ int main(int argc, char* argv[])
 		
 		
 		/* on request reception */
-		if(FD_ISSET(sdRecv, &socketRset))
+		if(FD_ISSET(this_site.sdRecv, &socketRset))
 		{
 			// receive message
-			nbLus = recvfrom(sdRecv, (void*)recit, 1023, 0, (struct sockaddr *)&netParamsNeighbor, (socklen_t *)&size);
+			nbLus = recvfrom(this_site.sdRecv, (void*)recit, 1023, 0, (struct sockaddr *)&netParamsNeighbour, (socklen_t *)&size);
 			if(nbLus == -1)
 			{
 				perror("recvfrom ");
@@ -144,14 +149,14 @@ int main(int argc, char* argv[])
 				recit[nbLus] = 0;
 			}
 			
-			printf("Message recu depuis l'adresse %s et le port %d : %s\n", inet_ntoa(netParamsNeighbor.sin_addr), ntohs(netParamsNeighbor.sin_port), recit);
+			printf("Message recu depuis l'adresse %s et le port %d : %s\n", inet_ntoa(netParamsNeighbour.sin_addr), ntohs(netParamsNeighbour.sin_port), recit);
 			
 			// message emmited toward the scanned port
 			
 			known = 0;
-			for(i = 0 ; i < nbNeighbors ; i++)
+			for(i = 0 ; i < this_site.nbNeighbours ; i++)
 			{
-				if(ntohs(netParamsNeighbor.sin_addr.s_addr) == ntohs(netParamsNeighbors[i].sin_addr.s_addr))
+				if(ntohs(netParamsNeighbour.sin_addr.s_addr) == ntohs(this_site.neighbours[i].sin_addr.s_addr))
 				{
 					known = 1;
 				}
@@ -159,17 +164,17 @@ int main(int argc, char* argv[])
 			if(known == 0)
 			{
 				printf("Hote inconnu.\n");
-				// backup neighbors sockets
-				if(backupSocketNeighbors(netParamsNeighbors, &neighborsTmp, nbNeighbors) == -1)
+				// backup neighbours sockets
+				if(backupSocketNeighbours(&neighboursTmp) == -1)
 				{
 					CLEAN()
 					exit(EXIT_FAILURE);
 				}
 				
-				nbNeighbors++;
+				this_site.nbNeighbours++;
 				
-				// recover neighbors sockets
-				if(recoverSocketNeighbors(&netParamsNeighbors, &neighborsTmp, nbNeighbors, netParamsNeighbor) == -1)
+				// recover neighbours sockets
+				if(recoverSocketNeighbours(&neighboursTmp, netParamsNeighbour) == -1)
 				{
 					CLEAN()
 					exit(EXIT_FAILURE);
@@ -184,7 +189,7 @@ int main(int argc, char* argv[])
 			if(strcmp(recit, "HELLO") == 0)
 			{
 				printf("Broadcast HELLOREP\n");
-				if(broadcast("HELLOREP", sdSend) == -1)
+				if(broadcast("HELLOREP") == -1)
 				{
 					CLEAN()
 					exit(EXIT_FAILURE);

@@ -52,13 +52,13 @@ char* getIPaddress()
 			{
 				res = malloc(sizeof(char)*NI_MAXHOST);
 				strcpy(res, host);
-				broadcastAdd = (((((struct sockaddr_in*)(ifa->ifa_netmask))->sin_addr.s_addr) ^ (unsigned int)(pow(2,32)-1)) | inet_addr(res));
+				this_site.broadcastAdd = (((((struct sockaddr_in*)(ifa->ifa_netmask))->sin_addr.s_addr) ^ (unsigned int)(pow(2,32)-1)) | inet_addr(res));
 			}
 		}
 	}
 	
     printf("Adresse choisie : %s\n", res);
-	printf("Adresse de broadcast : %s\n", inet_ntoa(*(struct in_addr *)&broadcastAdd));
+	printf("Adresse de broadcast : %s\n", inet_ntoa(*(struct in_addr *)&this_site.broadcastAdd));
 	freeifaddrs(ifaddr);
 	return res;
 }
@@ -110,8 +110,8 @@ int gstArgs(int argc, char* argv[])
 	}
 	
 	int enabled = 1;
-	setsockopt(*sdSend, SOL_SOCKET, SO_BROADCAST, &enabled, sizeof(enabled));
-	setsockopt(*sdRecv, SOL_SOCKET, SO_BROADCAST, &enabled, sizeof(enabled));
+	setsockopt(this_site.sdSend, SOL_SOCKET, SO_BROADCAST, &enabled, sizeof(enabled));
+	setsockopt(this_site.sdRecv, SOL_SOCKET, SO_BROADCAST, &enabled, sizeof(enabled));
 	
 	char* addr = getIPaddress();
 	struct sockaddr_in myNetParams;
@@ -122,7 +122,7 @@ int gstArgs(int argc, char* argv[])
 	//memset(myNetParams->sin_zero,0,8);
 	free(addr);
 	
-	if(bind(*sdSend, (struct sockaddr*)&myNetParams, (socklen_t)sizeof(myNetParams)) == -1)
+	if(bind(this_site.sdSend, (struct sockaddr*)&myNetParams, (socklen_t)sizeof(myNetParams)) == -1)
 	{
 		perror("Erreur de lien a la boite reseau ");
 		return -1;
@@ -132,11 +132,15 @@ int gstArgs(int argc, char* argv[])
 	myNetParams.sin_addr.s_addr = INADDR_ANY;
 	myNetParams.sin_port = htons(PORT_RECV);
 	
-	if(bind(*sdRecv, (struct sockaddr*)&myNetParams, (socklen_t)sizeof(myNetParams)) == -1)
+	if(bind(this_site.sdRecv, (struct sockaddr*)&myNetParams, (socklen_t)sizeof(myNetParams)) == -1)
 	{
 		perror("Erreur de lien a la boite reseau ");
 		return -1;
 	}
+	
+	this_site.neighbours = NULL;
+	this_site.nbNeighbours = 0;
+	this_site.running = 1;
 	printf("Lancement du site…\n");
 	
 	return 0;
@@ -165,55 +169,55 @@ char* itoa(long n)
 	return chaine;
 }
 
-int backupSocketNeighbors(struct sockaddr_in* neighbors, struct sockaddr_in** neighborsTmp, int nbNeighbors)
+int backupSocketNeighbours(struct sockaddr_in** neighboursTmp)
 {
 	int j;
-	*neighborsTmp = malloc(sizeof(struct sockaddr_in)*nbNeighbors);
-	if(*neighborsTmp == NULL)
+	*neighboursTmp = malloc(sizeof(struct sockaddr_in)*this_site.nbNeighbours);
+	if(*neighboursTmp == NULL)
 	{
 		perror("Erreur d'allocation ");
 		return -1;
 	}
-	for(j = 0 ; j < nbNeighbors ; j++)
+	for(j = 0 ; j < this_site.nbNeighbours ; j++)
 	{
-		(*neighborsTmp)[j] = neighbors[j];
+		(*neighboursTmp)[j] = this_site.neighbours[j];
 	}
 	
 	return 0;
 }
 
-int recoverSocketNeighbors(struct sockaddr_in** neighbors, struct sockaddr_in** neighborsTmp, int nbNeighbors, struct sockaddr_in paramsNewNeighbor)
+int recoverSocketNeighbours(struct sockaddr_in** neighboursTmp, struct sockaddr_in paramsNewNeighbour)
 {
 	int j;
-	*neighbors = realloc(*neighbors, sizeof(struct sockaddr_in)*nbNeighbors);
-	if(*neighbors == NULL)
+	this_site.neighbours = realloc(this_site.neighbours, sizeof(struct sockaddr_in)*this_site.nbNeighbours);
+	if(this_site.neighbours == NULL)
 	{
 		perror("Erreur de reallocation ");
 		return -1;
 	}
 	
-	bzero(&((*neighbors)[nbNeighbors-1]),sizeof((*neighbors)[nbNeighbors-1]));
-	((*neighbors)[nbNeighbors-1]).sin_family = paramsNewNeighbor.sin_family;
-	((*neighbors)[nbNeighbors-1]).sin_port = paramsNewNeighbor.sin_port;
-	((*neighbors)[nbNeighbors-1]).sin_addr.s_addr = paramsNewNeighbor.sin_addr.s_addr;
+	bzero(&((this_site.neighbours)[this_site.nbNeighbours-1]),sizeof((this_site.neighbours)[this_site.nbNeighbours-1]));
+	((this_site.neighbours)[this_site.nbNeighbours-1]).sin_family = paramsNewNeighbour.sin_family;
+	((this_site.neighbours)[this_site.nbNeighbours-1]).sin_port = paramsNewNeighbour.sin_port;
+	((this_site.neighbours)[this_site.nbNeighbours-1]).sin_addr.s_addr = paramsNewNeighbour.sin_addr.s_addr;
 	
-	for(j = 0 ; j < nbNeighbors-1 ; j++)
+	for(j = 0 ; j < this_site.nbNeighbours-1 ; j++)
 	{
-		(*neighbors)[j] = (*neighborsTmp)[j];
+		(this_site.neighbours)[j] = (*neighboursTmp)[j];
 	}
-	free(*neighborsTmp);
+	free(*neighboursTmp);
 	
 	return 0;
 }
 
-int broadcast(char* message, int sdSend)
+int broadcast(char* message)
 {
-	struct sockaddr_in netParamsNeighbor;
-	bzero(&netParamsNeighbor,sizeof(netParamsNeighbor));
-	netParamsNeighbor.sin_family = AF_INET;
-	netParamsNeighbor.sin_port = htons(PORT_RECV);
-	netParamsNeighbor.sin_addr.s_addr = broadcastAdd;
-	if (sendto(sdSend, message, strlen(message), 0, (struct sockaddr *)&netParamsNeighbor,sizeof(netParamsNeighbor)) == -1)
+	struct sockaddr_in netParamsNeighbour;
+	bzero(&netParamsNeighbour,sizeof(netParamsNeighbour));
+	netParamsNeighbour.sin_family = AF_INET;
+	netParamsNeighbour.sin_port = htons(PORT_RECV);
+	netParamsNeighbour.sin_addr.s_addr = this_site.broadcastAdd;
+	if (sendto(this_site.sdSend, message, strlen(message), 0, (struct sockaddr *)&netParamsNeighbour,sizeof(netParamsNeighbour)) == -1)
 	{
 		perror("sendto broadcast ");
 		return -1;
@@ -221,14 +225,27 @@ int broadcast(char* message, int sdSend)
 	return 0;
 }
 
-int message(char* add, char* message, int sdSend)
+int sendMessage(int siteID, message m)
 {
-	struct sockaddr_in netParamsNeighbor;
-	bzero(&netParamsNeighbor,sizeof(netParamsNeighbor));
-	netParamsNeighbor.sin_family = AF_INET;
-	netParamsNeighbor.sin_port = htons(PORT_RECV);
-	netParamsNeighbor.sin_addr.s_addr = inet_addr(add);
-	if (sendto(sdSend, message, strlen(message), 0, (struct sockaddr *)&netParamsNeighbor,sizeof(netParamsNeighbor)) == -1)
+	struct sockaddr_in netParamsNeighbour;
+	bzero(&netParamsNeighbour,sizeof(netParamsNeighbour));
+	netParamsNeighbour = this_site.neighbours[siteID];
+	if (sendto(this_site.sdSend, m.content, strlen(m.content), 0, (struct sockaddr *)&netParamsNeighbour,sizeof(netParamsNeighbour)) == -1)
+	{
+		perror("sendto message ");
+		return -1;
+	}
+	return 0;
+}
+
+int sendMessageWithAdd(char* add, message m)
+{
+	struct sockaddr_in netParamsNeighbour;
+	bzero(&netParamsNeighbour,sizeof(netParamsNeighbour));
+	netParamsNeighbour.sin_family = AF_INET;
+	netParamsNeighbour.sin_port = htons(PORT_RECV);
+	netParamsNeighbour.sin_addr.s_addr = inet_addr(add);
+	if (sendto(this_site.sdSend, m.content, strlen(m.content), 0, (struct sockaddr *)&netParamsNeighbour,sizeof(netParamsNeighbour)) == -1)
 	{
 		perror("sendto message ");
 		return -1;

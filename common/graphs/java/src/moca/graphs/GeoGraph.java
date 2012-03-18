@@ -9,8 +9,11 @@ import moca.graphs.vertices.ParentFunction;
 import moca.graphs.edges.Edge;
 import moca.graphs.edges.EdgeCollection;
 import moca.graphs.edges.IllegalEdgeException;
+import moca.graphs.edges.NeighbourEdge;
 
-
+import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.image.BufferedImage;
 import java.util.NoSuchElementException;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -48,6 +51,23 @@ public class GeoGraph extends Graph<Point,Long> {
 								   ArrayList<Long> heuristique) {
 		return super.AStar(root,new Long(0), new LongOperatorPlus(), new LongComparator(), ends, heuristique);
 	}
-
+	
+	public GeoGraph clone() {
+		try {
+			VertexCollection<Point> vertices = _vertices.getClass().newInstance();
+			EdgeCollection<Long> edges = _edges.getClass().newInstance();
+			GeoGraph graph = new GeoGraph(vertices,edges);
+			for (Point v : this)
+				graph.addVertex(v);
+			for (Iterator<Edge<Long> > e = edgeIterator() ; e.hasNext() ; ) {
+				Edge<Long> edge = e.next();
+				graph.addEdge(edge.getIDU(),edge.getIDV(),edge.getValue());
+			}
+			return graph;
+		}
+		catch (Exception e) {
+			return null;
+		}
+	}
 };
 
