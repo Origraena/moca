@@ -665,11 +665,11 @@ public class Graph<V,E> implements Iterable<V> {
 				root = vertex.getValue().get(0);
 				componentID = getComponentID(root);
 				size = vertex.getValue().size();
-				for (int i = 1 ; i < size ; i++) {
+				for (int i = 0 ; i < size ; i++) {
 					current = vertex.getValue().get(i);
 					for (Iterator<NeighbourEdge<E> > neighbourIterator = neighbourIterator(current.getID()) ; neighbourIterator.hasNext() ; ) {
 						idV = neighbourIterator.next().getIDV();
-						if (getRootComponent(idV) != root) {
+						if ((getComponent(componentID).size() == 1) || (getRootComponent(idV) != root)) {
 							// there is an edge from the component to another one
 							try {
 								_stronglyConnectedComponentsGraph.addEdge(vertex.getID(),getComponentID(idV),new Boolean(true));
