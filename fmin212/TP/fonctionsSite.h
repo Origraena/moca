@@ -38,6 +38,7 @@ typedef struct site {
 	int running;
 	struct sockaddr_in* neighbours;
 	size_t nbNeighbours;
+	struct sockaddr_in *neighboursTmp;
 } site;
 
 extern site this_site;
@@ -46,11 +47,15 @@ extern site this_site;
 char* getIPadress();
 int init(int argc, char** argv);
 char* itoa(long n);
-int backupSocketNeighbours(struct sockaddr_in** neighboursTmp);
-int recoverSocketNeighbours(struct sockaddr_in** neighboursTmp, struct sockaddr_in paramsNewNeighbour);
+int backupSocketNeighbours();
+int recoverSocketNeighbours(struct sockaddr_in paramsNewNeighbour);
 
-int broadcast(char* msg);
-int sendMessage(int siteID, message msg);
-int sendMessageWithAdd(char* add, message msg);
+int broadcast(message* msg);
+int sendMessage(int siteID, message* msg);
+int sendMessageWithAdd(char* add, message* msg);
+void standardInput();
+int hostsUpdate(struct sockaddr_in netParamsNeighbour);
+void requestTreatment();
+void printNeighbours();
 
 

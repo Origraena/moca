@@ -30,7 +30,7 @@ int main(int argc, char* argv[])
 	int i = 1, nbLus, size = sizeof(struct sockaddr_in);
 	int known;
 	fd_set socketRset;
-	struct sockaddr_in *neighboursTmp = NULL;
+	message m = {MESSAGE, NULL};
 	struct sockaddr_in netParamsNeighbour;
 	bzero(&netParamsNeighbour,sizeof(netParamsNeighbour));
 	
@@ -57,12 +57,17 @@ int main(int argc, char* argv[])
 	}
 	
 	/* HELLO message broadcasting */
+	m.type = MESSAGE;
+	m.content = malloc(sizeof(char)*1024);
+	strcpy(m.content, "HELLO");
 	printf("Broadcast HELLO\n");
-	if(broadcast("HELLO") == -1)
+	if(broadcast(&m) == -1)
 	{
+		free(m.content);
 		CLEAN()
 		exit(EXIT_FAILURE);
 	}
+	free(m.content);
 	
 	
 	/* Execution loop */
@@ -88,115 +93,60 @@ int main(int argc, char* argv[])
 		/* on standard input */
 		if(FD_ISSET(STDIN_FILENO, &socketRset))
 		{
-			char buf[50];
-			nbLus = read(STDIN_FILENO, buf, 49);
-			if(nbLus < 1)
-				perror("Erreur de reception sur l'entree standard");
-			else
-				buf[nbLus-1] = 0;
-			
-			printf("Entree standard ; recu : %s\n", buf);
-			
-			if(strcmp(buf, "BROADCAST")==0)
-			{
-				printf("Entrez le message : \n");
-				nbLus = read(STDIN_FILENO, buf, 49);
-				if(nbLus < 1)
-					perror("Erreur de reception sur l'entree standard");
-				else
-					buf[nbLus-1] = 0;
-				broadcast(buf);
-			}
-			else if(strcmp(buf, "MESSAGE")==0)
-			{
-				printf("TO : \n");
-				nbLus = read(STDIN_FILENO, buf, 49);
-				if(nbLus < 1)
-					perror("Erreur de reception sur l'entree standard");
-				else
-					buf[nbLus-1] = 0;
-				
-				char add[256];
-				strcpy(add, buf);
-				
-				printf("CORPS DU TEXTE : \n");
-				nbLus = read(STDIN_FILENO, buf, 49);
-				if(nbLus < 1)
-					perror("Erreur de reception sur l'entree standard");
-				else
-					buf[nbLus-1] = 0;
-				
-				msg_type t = MESSAGE;
-				message m = {t,buf};
-				sendMessageWithAdd(add, m);
-			}
-			
-			/* TODO */
+			standardInput();
 		}
 		
 		
-		/* on request reception */
+		/* on message reception */
 		if(FD_ISSET(this_site.sdRecv, &socketRset))
 		{
 			// receive message
-			nbLus = recvfrom(this_site.sdRecv, (void*)recit, 1023, 0, (struct sockaddr *)&netParamsNeighbour, (socklen_t *)&size);
+			m.content = malloc(sizeof(char)*1024);
+			nbLus = recvfrom(this_site.sdRecv, &m, 1023, 0, (struct sockaddr *)&netParamsNeighbour, (socklen_t *)&size);
 			if(nbLus == -1)
 			{
 				perror("recvfrom ");
 			}
 			else
 			{
-				recit[nbLus] = 0;
+				m.content[nbLus-sizeof(int)] = 0;
 			}
 			
-			printf("Message recu depuis l'adresse %s et le port %d : %s\n", inet_ntoa(netParamsNeighbour.sin_addr), ntohs(netParamsNeighbour.sin_port), recit);
+			printf("Message recu depuis l'adresse %s et le port %d. ", inet_ntoa(netParamsNeighbour.sin_addr), ntohs(netParamsNeighbour.sin_port));
 			
-			// message emmited toward the scanned port
-			
-			known = 0;
-			for(i = 0 ; i < this_site.nbNeighbours ; i++)
+			if(hostsUpdate(netParamsNeighbour) == -1)
 			{
-				if(ntohs(netParamsNeighbour.sin_addr.s_addr) == ntohs(this_site.neighbours[i].sin_addr.s_addr))
+				free(m.content);
+				CLEAN()
+				exit(EXIT_FAILURE);
+			}
+			
+			if(m.type == MESSAGE) /* on MESSAGE reception */
+			{
+				printf("Message recu : %s.\n", m.content);
+				
+				if(strcmp(m.content, "HELLO") == 0)
 				{
-					known = 1;
+					m.type = MESSAGE;
+					strcpy(m.content, "HELLOREP");
+					printf("Broadcast HELLOREP\n");
+					if(broadcast(&m) == -1)
+					{
+						free(m.content);
+						CLEAN()
+						exit(EXIT_FAILURE);
+					}
 				}
 			}
-			if(known == 0)
+			else if(m.type == REQUEST) /* on REQUEST reception */
 			{
-				printf("Hote inconnu.\n");
-				// backup neighbours sockets
-				if(backupSocketNeighbours(&neighboursTmp) == -1)
-				{
-					CLEAN()
-					exit(EXIT_FAILURE);
-				}
-				
-				this_site.nbNeighbours++;
-				
-				// recover neighbours sockets
-				if(recoverSocketNeighbours(&neighboursTmp, netParamsNeighbour) == -1)
-				{
-					CLEAN()
-					exit(EXIT_FAILURE);
-				}
+				requestTreatment();
 			}
 			else
 			{
-				printf("Hote connu.\n");
+				fprintf(stderr, "Probleme de reception du message.\n");
 			}
-			
-			
-			if(strcmp(recit, "HELLO") == 0)
-			{
-				printf("Broadcast HELLOREP\n");
-				if(broadcast("HELLOREP") == -1)
-				{
-					CLEAN()
-					exit(EXIT_FAILURE);
-				}
-				
-			}	
-				/* TODO request traitment*/
+			free(m.content);
 		}
 	}
 	
