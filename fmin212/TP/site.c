@@ -2,8 +2,9 @@
 
 #include "fonctionsSite.h"
 
-#define FREE()	free(this_site.neighbours);
-#define CLEAN()	close(this_site.sdSend); \
+#define FREE()	if(this_site.neighbours != NULL) free(this_site.neighbours);
+#define CLEAN()	printf("CLEAN...\n"); \
+				close(this_site.sdSend); \
 				close(this_site.sdRecv); \
 				FREE()
 
@@ -25,11 +26,9 @@ void end_handler(int sig)
 
 int main(int argc, char* argv[])
 {
-	char recit[1024];
-	int i = 1, nbLus, size = sizeof(struct sockaddr_in);
-	int known;
+	msg_type t;
+	int nbLus, size = sizeof(struct sockaddr_in);
 	fd_set socketRset;
-	message m = {MESSAGE, NULL};
 	struct sockaddr_in netParamsNeighbour;
 	bzero(&netParamsNeighbour,sizeof(netParamsNeighbour));
 	
@@ -49,24 +48,20 @@ int main(int argc, char* argv[])
 	}
 	
 	/* Setting network parameters */
-	if(gstArgs(argc, argv) == -1)
+	if(init(argc, argv) == -1)
 	{
 		CLEAN()
 		exit(EXIT_FAILURE);
 	}
 	
 	/* HELLO message broadcasting */
-	m.type = MESSAGE;
-	m.content = malloc(sizeof(char)*1024);
-	strcpy(m.content, "HELLO");
+	t = MESSAGE;
 	printf("Broadcast HELLO\n");
-	if(broadcast(&m) == -1)
+	if(broadcast(t, "HELLO") == -1)
 	{
-		free(m.content);
 		CLEAN()
 		exit(EXIT_FAILURE);
 	}
-	free(m.content);
 	
 	
 	/* Execution loop */
@@ -79,7 +74,7 @@ int main(int argc, char* argv[])
 		
 		
 		/* select on all reading descriptors */
-		if(select((this_site.sdSend > this_site.sdRecv ? this_site.sdSend : this_site.sdRecv)+1, &socketRset, NULL, NULL, NULL) == -1)
+		if(select(this_site.sdRecv+1, &socketRset, NULL, NULL, NULL) == -1)
 		{
 			if (errno == EINTR)
 				continue;
@@ -100,45 +95,47 @@ int main(int argc, char* argv[])
 		if(FD_ISSET(this_site.sdRecv, &socketRset))
 		{
 			// receive message
-			m.content = malloc(sizeof(char)*1024);
-			size = sizeof(struct sockaddr_in);
-			nbLus = recvfrom(this_site.sdRecv, &m, 1023, 0, (struct sockaddr *)&netParamsNeighbour, (socklen_t *)&size);
-			if(nbLus == -1)
+			size = sizeof(netParamsNeighbour);
+			char recit[1024];
+			nbLus = recvfrom(this_site.sdRecv, recit, (size_t)1023, 0, (struct sockaddr *)&netParamsNeighbour, (socklen_t *)&size);
+			if(nbLus < 1)
 			{
 				perror("recvfrom ");
 			}
 			else
 			{
-				//m.content[nbLus-sizeof(int)] = 0;
+				recit[nbLus] = 0;
 			}
+			
+			char* msg;
+			getMessageFromString(recit, &t, &msg);
 			
 			printf("Message recu depuis l'adresse %s et le port %d. ", inet_ntoa(netParamsNeighbour.sin_addr), ntohs(netParamsNeighbour.sin_port));
 			
+			
 			if(hostsUpdate(netParamsNeighbour) == -1)
 			{
-				free(m.content);
+				free(msg);
 				CLEAN()
 				exit(EXIT_FAILURE);
 			}
 			
-			if(m.type == MESSAGE) /* on MESSAGE reception */
+			if(t == MESSAGE)
 			{
-				printf("Message recu : %s.\n", m.content);
+				printf("Message recu : %s.\n", msg);
 				
-				if(strcmp(m.content, "HELLO") == 0)
+				if(strcmp(msg, "HELLO") == 0)
 				{
-					m.type = MESSAGE;
-					strcpy(m.content, "HELLOREP");
 					printf("Broadcast HELLOREP\n");
-					if(broadcast(&m) == -1)
+					if(broadcast(t, "HELLOREP") == -1)
 					{
-						free(m.content);
+						free(msg);
 						CLEAN()
 						exit(EXIT_FAILURE);
 					}
 				}
 			}
-			else if(m.type == REQUEST) /* on REQUEST reception */
+			else if(t == REQUEST)
 			{
 				requestTreatment();
 			}
@@ -146,7 +143,7 @@ int main(int argc, char* argv[])
 			{
 				fprintf(stderr, "Probleme de reception du message.\n");
 			}
-			free(m.content);
+			free(msg);
 		}
 	}
 	

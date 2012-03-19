@@ -64,7 +64,7 @@ char* getIPaddress()
 }
 
 
-int gstArgs(int argc, char* argv[])
+int init(int argc, char* argv[])
 {
 	//int i = 1;
 	
@@ -94,6 +94,9 @@ int gstArgs(int argc, char* argv[])
 			exit(EXIT_FAILURE);
 		}
 	}*/
+	
+	
+	bzero(&this_site.sdSend,sizeof(this_site.sdSend));
 	
 	this_site.sdSend = socket(AF_INET, SOCK_DGRAM, 0);
 	if(this_site.sdSend < 0)
@@ -211,7 +214,7 @@ int recoverSocketNeighbours(struct sockaddr_in paramsNewNeighbour)
 	return 0;
 }
 
-int broadcast(message* m)
+int broadcast(msg_type t, char* m)
 {
 	struct sockaddr_in netParamsNeighbour;
 	bzero(&netParamsNeighbour,sizeof(netParamsNeighbour));
@@ -221,7 +224,11 @@ int broadcast(message* m)
 	//printf("message type : %d\nmessage content : %s\n", m->type, m->content);
 	//printf("sizeof(message) : %lu\nsizeof(*m) : %lu\n", sizeof(message), sizeof(*m));
 	//printf("strlen(m->content) : %d\n", strlen(m->content));
-	if (sendto(this_site.sdSend, m, sizeof(int)+strlen(m->content)+1, 0, (struct sockaddr *)&netParamsNeighbour,sizeof(netParamsNeighbour)) == -1)
+	char sendit[1024];
+	sendit[0] = t+48;
+	sendit[1] = 0;
+	strcat(sendit, m);
+	if (sendto(this_site.sdSend, sendit, (size_t)(strlen(sendit)+1), 0, (struct sockaddr *)&netParamsNeighbour,sizeof(netParamsNeighbour)) == -1)
 	{
 		perror("sendto broadcast ");
 		return -1;
@@ -229,12 +236,18 @@ int broadcast(message* m)
 	return 0;
 }
 
-int sendMessage(int siteID, message* m)
+int sendMessage(int siteID, msg_type t, char* m)
 {
 	struct sockaddr_in netParamsNeighbour;
 	bzero(&netParamsNeighbour,sizeof(netParamsNeighbour));
 	netParamsNeighbour = this_site.neighbours[siteID];
-	if (sendto(this_site.sdSend, m, sizeof(int)+strlen(m->content)+1, 0, (struct sockaddr *)&netParamsNeighbour,sizeof(netParamsNeighbour)) == -1)
+	
+	char sendit[1024];
+	sendit[0] = t+48;
+	sendit[1] = 0;
+	strcat(sendit, m);
+	
+	if (sendto(this_site.sdSend, sendit, (size_t)(strlen(sendit)+1), 0, (struct sockaddr *)&netParamsNeighbour,sizeof(netParamsNeighbour)) == -1)
 	{
 		perror("sendto message ");
 		return -1;
@@ -242,14 +255,20 @@ int sendMessage(int siteID, message* m)
 	return 0;
 }
 
-int sendMessageWithAdd(char* add, message* m)
+int sendMessageWithAdd(char* add, msg_type t, char* m)
 {
 	struct sockaddr_in netParamsNeighbour;
 	bzero(&netParamsNeighbour,sizeof(netParamsNeighbour));
 	netParamsNeighbour.sin_family = AF_INET;
 	netParamsNeighbour.sin_port = htons(PORT_RECV);
 	netParamsNeighbour.sin_addr.s_addr = inet_addr(add);
-	if (sendto(this_site.sdSend, m, sizeof(int)+strlen(m->content)+1, 0, (struct sockaddr *)&netParamsNeighbour,sizeof(netParamsNeighbour)) == -1)
+	
+	char sendit[1024];
+	sendit[0] = t+48;
+	sendit[1] = 0;
+	strcat(sendit, m);
+	
+	if (sendto(this_site.sdSend, sendit, (size_t)(strlen(sendit)+1), 0, (struct sockaddr *)&netParamsNeighbour,sizeof(netParamsNeighbour)) == -1)
 	{
 		perror("sendto message ");
 		return -1;
@@ -260,9 +279,8 @@ int sendMessageWithAdd(char* add, message* m)
 void standardInput()
 {
 	int nbLus;
-	message msg = {MESSAGE, NULL};
-	msg.content = malloc(sizeof(char)*1024);
 	char buf[50];
+	msg_type t = MESSAGE;
 	nbLus = read(STDIN_FILENO, buf, 49);
 	if(nbLus < 1)
 		perror("Erreur de reception sur l'entree standard");
@@ -272,7 +290,9 @@ void standardInput()
 	
 	if(strstr(buf, "BROADCAST") != NULL)
 	{
-		if(strlen(buf) == strlen("BROADCAST"))
+		if((strlen(buf) == strlen("BROADCAST"))
+		   ||
+		   (strlen(buf) == strlen("BROADCAST")+1))
 		{
 			printf("Entrez le message : \n");
 			nbLus = read(STDIN_FILENO, buf, 49);
@@ -280,11 +300,13 @@ void standardInput()
 				perror("Erreur de reception sur l'entree standard");
 			else
 				buf[nbLus-1] = 0;
-			strcpy(msg.content, buf);
+			
+			broadcast(t, buf);
 		}
 		else
-			strcpy(msg.content, buf+strlen("BROADCAST")+1);
-		broadcast(&msg);
+		{
+			broadcast(t, buf+strlen("BROADCAST")+1);
+		}
 	}
 	else if(strstr(buf, "MESSAGE") != NULL)
 	{
@@ -305,8 +327,7 @@ void standardInput()
 		else
 			buf[nbLus-1] = 0;
 		
-		strcpy(msg.content, buf);
-		sendMessageWithAdd(add, &msg);
+		sendMessageWithAdd(add, t, buf);
 	}
 	else if(strcmp(buf, "NEIGHBOURS") == 0)
 	{
@@ -316,7 +337,6 @@ void standardInput()
 	{
 		printf("Entree standard recue non traitee.\n");
 	}
-	free(msg.content);
 }
 
 int hostsUpdate(struct sockaddr_in netParamsNeighbour)
@@ -369,6 +389,13 @@ void printNeighbours()
 		printf("%s ", inet_ntoa(this_site.neighbours[i].sin_addr));
 	}
 	printf("\n");
+}
+
+void getMessageFromString(char* string, msg_type* type, char** message)
+{
+	*type = string[0]-48;
+	*message = malloc(sizeof(char)*strlen(string));
+	strcpy(*message, string+1);
 }
 
 
