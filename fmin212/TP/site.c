@@ -109,7 +109,7 @@ int main(int argc, char* argv[])
 			}
 			else
 			{
-				m.content[nbLus-sizeof(int)] = 0;
+				//m.content[nbLus-sizeof(int)] = 0;
 			}
 			
 			printf("Message recu depuis l'adresse %s et le port %d. ", inet_ntoa(netParamsNeighbour.sin_addr), ntohs(netParamsNeighbour.sin_port));
