@@ -97,11 +97,11 @@ public class Graph<V,E> implements Iterable<V> {
 		return _vertices.get(id);
 	}
 
-	public Vertex<V> getNeighbour(int vertexID, int index) throws UnsupportedOperationException {
+	public Vertex<V> getNeighbour(int vertexID, int index) throws UnsupportedOperationException, NoSuchElementException {
 		return getVertex(_edges.getNeighbourAt(vertexID,index));
 	}
 
-	public V getNeighbourValue(int vertexID, int index) throws UnsupportedOperationException {
+	public V getNeighbourValue(int vertexID, int index) throws UnsupportedOperationException, NoSuchElementException {
 		return getNeighbour(vertexID,index).getValue();
 	}
 

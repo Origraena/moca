@@ -73,7 +73,7 @@ public class NeighboursLists<E> extends AbstractEdgeCollection<E> implements Edg
 	}
 
 	public int getNeighbourAt(int idU, int index) throws NoSuchElementException {
-		if ((idU > _neighbours.size()) || (index > _neighbours.get(idU).size()))
+		if ((idU >= _neighbours.size()) || (index >= _neighbours.get(idU).size()))
 			throw new NoSuchElementException();
 		return _neighbours.get(idU).get(index).getIDV();
 	}
