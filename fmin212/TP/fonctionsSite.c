@@ -345,7 +345,7 @@ int hostsUpdate(struct sockaddr_in netParamsNeighbour)
 	
 	for(i = 0 ; i < this_site.nbNeighbours ; i++)
 	{
-		if(ntohs(netParamsNeighbour.sin_addr.s_addr) == ntohs(this_site.neighbours[i].sin_addr.s_addr))
+		if(netParamsNeighbour.sin_addr.s_addr == this_site.neighbours[i].sin_addr.s_addr)
 		{
 			known = 1;
 		}
