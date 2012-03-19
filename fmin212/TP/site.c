@@ -20,7 +20,6 @@ void end_handler(int sig)
 		exit(EXIT_FAILURE);
 	}
 	
-	/* TODO */
 	this_site.running = 0;	
 }
 
@@ -102,6 +101,7 @@ int main(int argc, char* argv[])
 		{
 			// receive message
 			m.content = malloc(sizeof(char)*1024);
+			size = sizeof(struct sockaddr_in);
 			nbLus = recvfrom(this_site.sdRecv, &m, 1023, 0, (struct sockaddr *)&netParamsNeighbour, (socklen_t *)&size);
 			if(nbLus == -1)
 			{
