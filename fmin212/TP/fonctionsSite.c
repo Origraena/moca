@@ -218,7 +218,10 @@ int broadcast(message* m)
 	netParamsNeighbour.sin_family = AF_INET;
 	netParamsNeighbour.sin_port = htons(PORT_RECV);
 	netParamsNeighbour.sin_addr.s_addr = this_site.broadcastAdd;
-	if (sendto(this_site.sdSend, m, sizeof(*m)+1, 0, (struct sockaddr *)&netParamsNeighbour,sizeof(netParamsNeighbour)) == -1)
+	//printf("message type : %d\nmessage content : %s\n", m->type, m->content);
+	//printf("sizeof(message) : %lu\nsizeof(*m) : %lu\n", sizeof(message), sizeof(*m));
+	//printf("strlen(m->content) : %d\n", strlen(m->content));
+	if (sendto(this_site.sdSend, m, sizeof(int)+strlen(m->content)+1, 0, (struct sockaddr *)&netParamsNeighbour,sizeof(netParamsNeighbour)) == -1)
 	{
 		perror("sendto broadcast ");
 		return -1;
@@ -231,7 +234,7 @@ int sendMessage(int siteID, message* m)
 	struct sockaddr_in netParamsNeighbour;
 	bzero(&netParamsNeighbour,sizeof(netParamsNeighbour));
 	netParamsNeighbour = this_site.neighbours[siteID];
-	if (sendto(this_site.sdSend, m, sizeof(*m)+1, 0, (struct sockaddr *)&netParamsNeighbour,sizeof(netParamsNeighbour)) == -1)
+	if (sendto(this_site.sdSend, m, sizeof(int)+strlen(m->content)+1, 0, (struct sockaddr *)&netParamsNeighbour,sizeof(netParamsNeighbour)) == -1)
 	{
 		perror("sendto message ");
 		return -1;
@@ -246,7 +249,7 @@ int sendMessageWithAdd(char* add, message* m)
 	netParamsNeighbour.sin_family = AF_INET;
 	netParamsNeighbour.sin_port = htons(PORT_RECV);
 	netParamsNeighbour.sin_addr.s_addr = inet_addr(add);
-	if (sendto(this_site.sdSend, m, sizeof(*m)+1, 0, (struct sockaddr *)&netParamsNeighbour,sizeof(netParamsNeighbour)) == -1)
+	if (sendto(this_site.sdSend, m, sizeof(int)+strlen(m->content)+1, 0, (struct sockaddr *)&netParamsNeighbour,sizeof(netParamsNeighbour)) == -1)
 	{
 		perror("sendto message ");
 		return -1;
