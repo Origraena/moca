@@ -1,11 +1,13 @@
 package moca.graphs;
 
+import moca.graphs.vertices.ParentFunction;
 import moca.graphs.vertices.Vertex;
 import moca.graphs.vertices.VertexArrayList;
 import moca.graphs.vertices.VertexUnaryFunction;
 import moca.graphs.edges.Edge;
 import moca.graphs.edges.NeighboursLists;
 
+import java.util.ArrayList;
 import java.util.NoSuchElementException;
 import java.util.Iterator;
 import java.util.Scanner;
@@ -148,19 +150,49 @@ public class Echiquier {
 		return res.toString();
 	}
 
-	public int getSource()
+	public int getNumSource()
 	{
 		return _s;
 	}
 	
-	public int getDestination()
+	public Vertex<Point> getSource()
+	{
+		return _graph.getVertex(_s);
+	}
+	
+	public int getNumDestination()
 	{
 		return _t;
+	}
+	
+	public Vertex<Point> getDestination()
+	{
+		return _graph.getVertex(_t);
 	}
 	
 	public GeoGraph getGraph()
 	{
 		return _graph;
+	}
+	
+	public int getNbVertices()
+	{
+		return _graph.getNbVertices();
+	}
+	
+	public Point get(int i)
+	{
+		return _graph.get(i);
+	}
+	
+	public ParentFunction<Point> AStar(int root, 
+			   ArrayList<Vertex<Point>> ends, 
+			   ArrayList<Long> heuristique) {
+		return _graph.AStar(root, ends, heuristique);
+	}
+	
+	public Vertex<Point> getVertex(int id) throws NoSuchElementException {
+		return _graph.getVertex(id);
 	}
 	
 

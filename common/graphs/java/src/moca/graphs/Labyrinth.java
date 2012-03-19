@@ -97,14 +97,12 @@ public class Labyrinth {
 				if (c == ' ')	// en dessous
 				{
 					_graph.addEdge(j*(imax+1)+(k/_tileSize)-1,(j+1)*(imax+1)+(k/_tileSize)-1);
-					_graph.addEdge((j+1)*(imax+1)+(k/_tileSize)-1,j*(imax+1)+(k/_tileSize)-1);
 				}
 				
 				c = line1.charAt(k);
 				if (c == ' ')	// a droite
 				{
 					_graph.addEdge(j*(imax+1)+(k/_tileSize)-1,j*(imax+1)+(k/_tileSize));
-					_graph.addEdge(j*(imax+1)+(k/_tileSize),j*(imax+1)+(k/_tileSize)-1);
 				}
 				
 				i += _tileSize;
@@ -217,14 +215,24 @@ public class Labyrinth {
 		return _result.toString();
 	}
 
-	public int getSource()
+	public int getNumSource()
 	{
 		return _s;
 	}
 	
-	public int getDestination()
+	public Vertex<Point> getSource()
+	{
+		return _graph.getVertex(_s);
+	}
+	
+	public int getNumDestination()
 	{
 		return _t;
+	}
+	
+	public Vertex<Point> getDestination()
+	{
+		return _graph.getVertex(_t);
 	}
 	
 	
