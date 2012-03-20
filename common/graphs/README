@@ -24,7 +24,6 @@
 
 +-------ToDo------------------------------------------------+
 | Task (priority)                 state{OK,(user) PROGRESS} |
-| first task test (1)                                    OK |
-| second task test (3)                      (swan) PROGRESS |
+| SCC change edge type to list<Pair> ()                     |
 +-----------------------------------------------------------+
 
