@@ -303,7 +303,9 @@ public class Graph<V,E> implements Iterable<V> {
 		u = getVertex(root);
 		while (u != null) {
 			if (ends.contains(u))
+			{
 				return parent;
+			}
 			for (Iterator<NeighbourEdge<E> > it = neighbourIterator(u.getID()) ; it.hasNext() ; ) {
 				e = it.next();
 				if ((weights.get(e.getIDV()) == null) || 
@@ -694,5 +696,24 @@ public class Graph<V,E> implements Iterable<V> {
 	private DirectedSimpleGraph<ArrayList<Vertex<V> >,Boolean> _stronglyConnectedComponentsGraph = null;
 
 
+	
+	public String toString()
+	{
+		int i, j;
+		NeighbourEdge<E> edge;
+		StringBuilder res = new StringBuilder();
+		res.append("Nombre de noeuds : "+ getNbVertices());
+		res.append("\nNombre d'aretes : "+getNbEdges());
+		for(i = 0 ; i < getNbVertices() ; i++)
+		{
+			res.append("\nVoisins du sommet "+ getVertex(i).getID()+" : ");
+			for (Iterator<NeighbourEdge<E>> iterator = neighbourIterator(getVertex(i).getID()) ; iterator.hasNext() ; )
+			{
+				edge = iterator.next();
+				res.append(edge.getIDV()+" ");
+			}
+		}
+		return res.toString();
+	}
 };
 

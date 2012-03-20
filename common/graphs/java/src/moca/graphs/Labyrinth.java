@@ -49,8 +49,9 @@ public class Labyrinth {
 		/* init */
 		int i = 0;
 		int j = 0;
+		int k = 0;
 		int imax = 0;
-		int jmax = 0;
+		int nbLines = 0;
 		char c = '\0';
 		File file = new File(filename);
 		Scanner scan;
@@ -62,39 +63,48 @@ public class Labyrinth {
 
 		/* vertices */
 		line1 = scan.next();		// first line to be filtered
-//		line1 = scan.next();
-//		line2 = scan.next();
-		System.out.print(line1);
-		System.out.println(line1.length());
 		imax = (line1.length()-1) / _tileSize -1;
 		j = 0;
 		while (scan.hasNext()) {
-			for (i = 0 ; i <= imax ; i++)
-				_graph.addPoint(i,j-1);
-			j++;
 			line1 = scan.next(); 
 			line2 = scan.next();
+			for (i = 0 ; i <= imax ; i++) {
+				_graph.addPoint(i,j);
+			}
+			j++;
 		}
-		jmax = j;
-System.out.println("imax = "+imax+" jmax = "+jmax);
-System.out.println("nbVertices = "+_graph.getNbVertices());
+		nbLines = j;
+		scan.close();
+		
 		/* edges */
 		j = 0;
 		scan = new Scanner(file,"UTF-8");
 		scan.useDelimiter(Pattern.compile("[\n]"));
 		scan.next();		// first line to be filtered
-		line1 = scan.next();
-		line2 = scan.next();
-		for (j = 0 ; j < jmax ; j++) {
+		for (j = 0 ; j < nbLines ; j++) {
+			line1 = scan.next();
+			line2 = scan.next();
 			i = _tileSize/2;
-			int k = _tileSize;
+			k = _tileSize;
 			while (k < line1.length()) {
-				c = line2.charAt(k);
+				c = line1.charAt(i); // source & puits
+				if(c == 's')
+					_s = j*(imax+1)+(k/_tileSize)-1;
+				else if(c == 't')
+					_t = j*(imax+1)+(k/_tileSize)-1;
+				
+				c = line2.charAt(i);
 				if (c == ' ')	// en dessous
-					_graph.addEdge(j*imax+(k/_tileSize),(j+1)*imax+(k/_tileSize));
-				c = line1.charAt(i);
+				{
+					_graph.addEdge(j*(imax+1)+(k/_tileSize)-1,(j+1)*(imax+1)+(k/_tileSize)-1);
+				}
+				
+				c = line1.charAt(k);
 				if (c == ' ')	// a droite
-					_graph.addEdge(j*imax+(k/_tileSize),j*imax+(k/_tileSize)+1);
+				{
+					_graph.addEdge(j*(imax+1)+(k/_tileSize)-1,j*(imax+1)+(k/_tileSize));
+				}
+				
 				i += _tileSize;
 				k += _tileSize;
 			}
@@ -205,7 +215,27 @@ System.out.println("nbVertices = "+_graph.getNbVertices());
 		return _result.toString();
 	}
 
-
+	public int getNumSource()
+	{
+		return _s;
+	}
+	
+	public Vertex<Point> getSource()
+	{
+		return _graph.getVertex(_s);
+	}
+	
+	public int getNumDestination()
+	{
+		return _t;
+	}
+	
+	public Vertex<Point> getDestination()
+	{
+		return _graph.getVertex(_t);
+	}
+	
+	
 	
 	/* internal methods */
 	/* cannot be used outsite because of the non valid values before toString() operation. */
@@ -245,6 +275,7 @@ System.out.println("nbVertices = "+_graph.getNbVertices());
 	private StringBuilder _line2 = new StringBuilder();
 	private int imax = 0;
 	private int jmax = 0;
+	private int _s = -1, _t = -1;
 
 	/* skin */
 	private char _freespace = ' ';
