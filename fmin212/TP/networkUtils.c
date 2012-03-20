@@ -1,5 +1,7 @@
 
-#include "fonctionsSite.h"
+#include "networkUtils.h"
+
+
 
 char* getIPaddress()
 {
@@ -64,18 +66,18 @@ char* getIPaddress()
 }
 
 
-int init(int argc, char* argv[])
+int init_network(int argc, char* argv[])
 {
-	//int i = 1;
+	/*int i = 1;
 	
-	/*if(argc == 2 && strcmp(argv[1], "--help")==0)
+	if(argc == 2 && strcmp(argv[1], "--help")==0)
 	{
 		printf("Arguments : ");
 		printf("[masque_sous_reseau]\n");
 		return -1;
-	}*/
+	}
 
-	/*if(argc < 2)
+	if(argc < 2)
 	{
 		printf("Ce programme necessite des arguments. Essayez '--help' pour plus de precisions.\n\n");
 		return -1;
@@ -95,15 +97,16 @@ int init(int argc, char* argv[])
 		}
 	}*/
 	
+	int enabled = 1;
 	
-	bzero(&this_site.sdSend,sizeof(this_site.sdSend));
-	
+	/* sockets initialisation */
 	this_site.sdSend = socket(AF_INET, SOCK_DGRAM, 0);
 	if(this_site.sdSend < 0)
 	{
 		perror("Erreur d'ouverture de socket ");
 		return -1;
 	}
+	setsockopt(this_site.sdSend, SOL_SOCKET, SO_BROADCAST, &enabled, sizeof(enabled));
 	
 	this_site.sdRecv = socket(AF_INET, SOCK_DGRAM, 0);
 	if(this_site.sdRecv < 0)
@@ -111,20 +114,16 @@ int init(int argc, char* argv[])
 		perror("Erreur d'ouverture de socket ");
 		return -1;
 	}
-	
-	int enabled = 1;
-	setsockopt(this_site.sdSend, SOL_SOCKET, SO_BROADCAST, &enabled, sizeof(enabled));
 	setsockopt(this_site.sdRecv, SOL_SOCKET, SO_BROADCAST, &enabled, sizeof(enabled));
 	
+	/* sockets binding */
 	char* addr = getIPaddress();
 	struct sockaddr_in myNetParams;
 	bzero(&myNetParams,sizeof(myNetParams));
 	myNetParams.sin_family = AF_INET;
 	myNetParams.sin_addr.s_addr = inet_addr(addr);
 	myNetParams.sin_port = htons(PORT_SEND);
-	//memset(myNetParams->sin_zero,0,8);
 	free(addr);
-	
 	if(bind(this_site.sdSend, (struct sockaddr*)&myNetParams, (socklen_t)sizeof(myNetParams)) == -1)
 	{
 		perror("Erreur de lien a la boite reseau ");
@@ -134,43 +133,29 @@ int init(int argc, char* argv[])
 	myNetParams.sin_family = AF_INET;
 	myNetParams.sin_addr.s_addr = INADDR_ANY;
 	myNetParams.sin_port = htons(PORT_RECV);
-	
 	if(bind(this_site.sdRecv, (struct sockaddr*)&myNetParams, (socklen_t)sizeof(myNetParams)) == -1)
 	{
 		perror("Erreur de lien a la boite reseau ");
 		return -1;
 	}
 	
+	/* this_site variables init */
 	this_site.neighbours = NULL;
 	this_site.neighboursTmp = NULL;
 	this_site.nbNeighbours = 0;
 	this_site.running = 1;
-	printf("Lancement du site…\n");
+	
+	
+	/* HELLO message broadcasting */
+	msg_type t = MESSAGE;
+	if(broadcast(t, "HELLO") == -1)
+	{
+		return -1;
+	}
+	
+	printf("Lancement du site…\n\n");
 	
 	return 0;
-}
-
-char* itoa(long n)
-{
-	int i = 1, nbChiffres;
-	long trans = n;
-	while(trans > 10)
-	{
-		trans /= 10;
-		i++;
-	}
-	nbChiffres = i;
-	char* chaine = malloc((nbChiffres+1) * sizeof(char));
-	trans = n;
-	
-	for(i = 0 ; i < nbChiffres ; i++)
-	{
-		chaine[nbChiffres-1-i] = 48 + trans % 10;
-		trans /= 10;
-	}
-	chaine[nbChiffres] = 0;
-	
-	return chaine;
 }
 
 int backupSocketNeighbours()
@@ -221,18 +206,19 @@ int broadcast(msg_type t, char* m)
 	netParamsNeighbour.sin_family = AF_INET;
 	netParamsNeighbour.sin_port = htons(PORT_RECV);
 	netParamsNeighbour.sin_addr.s_addr = this_site.broadcastAdd;
-	//printf("message type : %d\nmessage content : %s\n", m->type, m->content);
-	//printf("sizeof(message) : %lu\nsizeof(*m) : %lu\n", sizeof(message), sizeof(*m));
-	//printf("strlen(m->content) : %d\n", strlen(m->content));
+	
 	char sendit[1024];
 	sendit[0] = t+48;
 	sendit[1] = 0;
 	strcat(sendit, m);
+	
 	if (sendto(this_site.sdSend, sendit, (size_t)(strlen(sendit)+1), 0, (struct sockaddr *)&netParamsNeighbour,sizeof(netParamsNeighbour)) == -1)
 	{
 		perror("sendto broadcast ");
 		return -1;
 	}
+	
+	printf("Broadcast d'un message de type %d et de contenu '%s'\n", t, m);
 	return 0;
 }
 
@@ -276,81 +262,10 @@ int sendMessageWithAdd(char* add, msg_type t, char* m)
 	return 0;
 }
 
-void standardInput()
-{
-	int nbLus;
-	char buf[50];
-	msg_type t = MESSAGE;
-	nbLus = read(STDIN_FILENO, buf, 49);
-	if(nbLus < 1)
-		perror("Erreur de reception sur l'entree standard");
-	else
-		buf[nbLus-1] = 0;
-	
-	
-	if(strstr(buf, "BROADCAST") != NULL)
-	{
-		if((strlen(buf) == strlen("BROADCAST"))
-		   ||
-		   (strlen(buf) == strlen("BROADCAST")+1))
-		{
-			printf("Entrez le message : \n");
-			nbLus = read(STDIN_FILENO, buf, 49);
-			if(nbLus < 1)
-				perror("Erreur de reception sur l'entree standard");
-			else
-				buf[nbLus-1] = 0;
-			
-			broadcast(t, buf);
-		}
-		else
-		{
-			broadcast(t, buf+strlen("BROADCAST")+1);
-		}
-	}
-	else if(strstr(buf, "MESSAGE") != NULL)
-	{
-		printf("TO : \n");
-		nbLus = read(STDIN_FILENO, buf, 49);
-		if(nbLus < 1)
-			perror("Erreur de reception sur l'entree standard");
-		else
-			buf[nbLus-1] = 0;
-		
-		char add[256];
-		strcpy(add, buf);
-		
-		printf("CORPS DU TEXTE : \n");
-		nbLus = read(STDIN_FILENO, buf, 49);
-		if(nbLus < 1)
-			perror("Erreur de reception sur l'entree standard");
-		else
-			buf[nbLus-1] = 0;
-		
-		sendMessageWithAdd(add, t, buf);
-	}
-	else if(strcmp(buf, "NEIGHBOURS") == 0)
-	{
-		printNeighbours();
-	}
-	else
-	{
-		printf("Entree standard recue non traitee.\n");
-	}
-}
-
 int hostsUpdate(struct sockaddr_in netParamsNeighbour)
 {
-	int known = 0, i;
-	
-	for(i = 0 ; i < this_site.nbNeighbours ; i++)
-	{
-		if(netParamsNeighbour.sin_addr.s_addr == this_site.neighbours[i].sin_addr.s_addr)
-		{
-			known = 1;
-		}
-	}
-	if(known == 0)
+	int indice = getNeighbour(netParamsNeighbour.sin_addr.s_addr);
+	if(indice == -1)
 	{
 		printf("Hote inconnu. ");
 		// backup neighbours sockets
@@ -375,11 +290,6 @@ int hostsUpdate(struct sockaddr_in netParamsNeighbour)
 	return 0;
 }
 
-void requestTreatment()
-{
-	
-}
-
 void printNeighbours()
 {
 	int i;
@@ -396,6 +306,50 @@ void getMessageFromString(char* string, msg_type* type, char** message)
 	*type = string[0]-48;
 	*message = malloc(sizeof(char)*strlen(string));
 	strcpy(*message, string+1);
+}
+
+int recvMessage(msg_type* type, char** message)
+{
+	struct sockaddr_in netParamsNeighbour;
+	bzero(&netParamsNeighbour,sizeof(netParamsNeighbour));
+	size_t size = sizeof(netParamsNeighbour);
+	char recit[1024];
+	
+	int nbLus = recvfrom(this_site.sdRecv, recit, (size_t)1023, 0, (struct sockaddr *)&netParamsNeighbour, (socklen_t *)&size);
+	if(nbLus < 1)
+	{
+		perror("recvfrom ");
+		return -1;
+	}
+	else
+	{
+		recit[nbLus] = 0;
+	}
+	
+	getMessageFromString(recit, type, message);
+	
+	printf("Message recu depuis l'adresse %s et le port %d. ", inet_ntoa(netParamsNeighbour.sin_addr), ntohs(netParamsNeighbour.sin_port));
+	
+	if(hostsUpdate(netParamsNeighbour) == -1)
+	{
+		free(*message);
+		return -1;
+	}
+	return 0;
+}
+
+int getNeighbour(unsigned long s_addr)
+{
+	int indice = -1, i;
+	
+	for(i = 0 ; i < this_site.nbNeighbours ; i++)
+	{
+		if(s_addr == this_site.neighbours[i].sin_addr.s_addr)
+		{
+			indice = i;
+		}
+	}
+	return indice;
 }
 
 
