@@ -88,6 +88,27 @@ void standardInput()
 	{
 		critSectionRequest();
 	}
+	else if(strcmp(buf, "LAST") == 0)
+	{
+		printf("Last : %d ", last);
+		if(last != -1)
+			printf("; %s", inet_ntoa(*&this_site.neighbours[last].sin_addr));
+		printf("\n");
+	}
+	else if(strcmp(buf, "NEXT") == 0)
+	{
+		printf("Next : %d ", next);
+		if(next != -1)
+			printf("; %s", inet_ntoa(*&this_site.neighbours[next].sin_addr));
+		printf("\n");
+	}
+	else if(strcmp(buf, "TOKEN") == 0)
+	{
+		if(tokenPresent)
+			printf("present\n");
+		else
+			printf("absent\n");
+	}
 	else
 	{
 		printf("Entree standard recue non traitee.\n");
@@ -165,16 +186,6 @@ int main(int argc, char* argv[])
 			if(t == MESSAGE)
 			{
 				printf("Message recu : %s.\n", msg);
-				
-				if(strcmp(msg, "HELLO") == 0)
-				{
-					if(broadcast(t, "HELLOREP") == -1)
-					{
-						free(msg);
-						CLEAN()
-						exit(EXIT_FAILURE);
-					}
-				}
 			}
 			else
 			{

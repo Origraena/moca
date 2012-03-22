@@ -29,13 +29,14 @@ int next;
 int tokenPresent;
 site_state state;
 
-void init_structures();
+int init_structures();
 int critSectionRequest();
 int handleMessage(int type, char* message);
 int handleRequest(char* ip);
 int handleToken(char* message);
 int takeCriticalSection();
 void execCS();
+int handleHelloRep(char* message);
 
 
 #endif

@@ -17,7 +17,9 @@
 typedef enum msg_type {
 	MESSAGE = 1,
 	REQUEST = 2,
-	TOKEN = 3
+	TOKEN = 3,
+	HELLO = 4,
+	HELLOREP = 5
 } msg_type;
 
 

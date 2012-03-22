@@ -8,20 +8,44 @@
 
 #include "naimiTrehel.h"
 
-void init_structures()
+int init_structures()
 {
-	next = -1;
+	int i;
 	last = -1;
-	tokenPresent = 0;
+	unsigned long int ip_max = 0;
+	for(i = 0 ; i < this_site.nbNeighbours ; i++)
+	{
+		if((unsigned long int)(this_site.neighbours[i].sin_addr.s_addr) > ip_max)
+		{
+			ip_max = this_site.neighbours[i].sin_addr.s_addr;
+			last = i;
+		}
+	}
+	
+	next = -1;
 	state = IDLE;
+	tokenPresent = (last == 0 ? 1 : 0);
+	if(last == 0)
+		last = -1;
+	
+	
+	/* HELLO message broadcasting */
+	msg_type t = HELLO;
+	return broadcast(t, "") == -1;
 }
 
 int critSectionRequest()
 {
+	state = WAITING;
 	msg_type t = REQUEST;
 	char* ipAddr;
 	
-	if(last != -1)
+	if(tokenPresent == 1)
+	{
+		printf("Prise de la section critique\n");
+		takeCriticalSection();
+	}
+	else if(last != -1)
 	{
 		// send a request to last
 		itoa(this_site.neighbours[0].sin_addr.s_addr, &ipAddr);
@@ -30,8 +54,7 @@ int critSectionRequest()
 			return -1;
 		}
 		free(ipAddr);
-		last = 0;
-		state = WAITING;
+		last = -1;
 	}
 	else
 	{
@@ -44,6 +67,8 @@ int critSectionRequest()
 
 int handleMessage(int type, char* message)
 {
+	msg_type t;
+	
 	switch (type)
 	{
 		case REQUEST:
@@ -52,6 +77,20 @@ int handleMessage(int type, char* message)
 			
 		case TOKEN:
 			return handleToken(message);
+			break;
+			
+		case HELLO:
+			printf("HELLO\n");
+			t = HELLOREP;
+			char* lastStr;
+			itoa(last, &lastStr);
+			int res = broadcast(t, lastStr);
+			free(lastStr);
+			return res;
+			break;
+			
+		case HELLOREP:
+			return handleHelloRep(message);
 			break;
 			
 		default:
@@ -72,12 +111,6 @@ int handleRequest(char* ip)
 		{
 			return -1;
 		}
-		last = getNeighbour(atoi(ip));
-		if(last == -1)
-		{
-			fprintf(stderr, "Request depuis un site inconnu...\n");
-			return -1;
-		}
 	}
 	else /* this site is NOT the root of the last tree */
 	{
@@ -94,6 +127,13 @@ int handleRequest(char* ip)
 		{
 			next = getNeighbour(atoi(ip));
 		}
+	}
+	
+	last = getNeighbour(atoi(ip));
+	if(last == -1)
+	{
+		fprintf(stderr, "Request depuis un site inconnu...\n");
+		return -1;
 	}
 	
 	return 0;
@@ -116,10 +156,11 @@ int takeCriticalSection()
 	
 	/* exec CS */
 	pthread_t thread_id;
-	if(pthread_create(&thread_id, NULL, (void*)(execCS), (void*)1) != 0)
+	if(pthread_create(&thread_id, NULL, (void*)(execCS), (void*)5) != 0)
 	{
 		fprintf(stderr, "Thread creation failure.\n");
 	}
+	pthread_join(thread_id, NULL);
 	
 	state = IDLE;
 	if(next != -1)
@@ -129,8 +170,10 @@ int takeCriticalSection()
 		{
 			return -1;
 		}
+		next = -1;
 		tokenPresent = 0;
 	}
+	printf("Section critique relachee\n");
 	
 	return 0;
 }
@@ -139,5 +182,20 @@ void execCS(void* arg)
 {
 	sleep((long int)arg);
 };
+
+int handleHelloRep(char* message)
+{
+	printf("HELLOREP\n");
+	int lastJ = atoi(message);
+	if(last == -1)
+	{
+		if(lastJ != -1)
+		{
+			last = lastJ;
+		}
+	}
+	
+	return 0;
+}
 
 

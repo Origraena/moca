@@ -290,7 +290,7 @@ public class Graph<V,E> implements Iterable<V> {
 								   OperatorPlus1T<E> plus,
 								   Comparator<E> compareEdge,
 								   ArrayList<Vertex<V> > ends, 
-								   ArrayList<E> heuristique) {
+								   Heuristique<E> heuristique) {
 		ArrayList<E> weights = new ArrayList<E>(getNbVertices());	// contains the total weights of edges between root and index vertices
 		for (int i = 0 ; i < getNbVertices() ; i++)
 			weights.add(null);
@@ -322,7 +322,7 @@ public class Graph<V,E> implements Iterable<V> {
 		return parent;
 	}
 	private class AStarVertexComparator implements Comparator<Vertex<V> > {
-		public AStarVertexComparator(E zeroValue, OperatorPlus1T<E> plus, Comparator<E> compareEdge, ArrayList<E> weights, ArrayList<E> heuristique) {
+		public AStarVertexComparator(E zeroValue, OperatorPlus1T<E> plus, Comparator<E> compareEdge, ArrayList<E> weights, Heuristique<E> heuristique) {
 			_zeroValue = zeroValue;
 			_weights = weights;
 			_heuristique = heuristique;
@@ -350,7 +350,7 @@ public class Graph<V,E> implements Iterable<V> {
 			}
 		}
 		private ArrayList<E> _weights;
-		private ArrayList<E> _heuristique;
+		private Heuristique<E> _heuristique;
 		private E _zeroValue;
 		private OperatorPlus1T<E> _plus;
 		private Comparator<E> _compareEdge;

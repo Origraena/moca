@@ -16,6 +16,8 @@
 #include <sys/socket.h>
 #include <sys/wait.h>
 #include <unistd.h>
+#include <time.h>
+#include <fcntl.h>
 
 #include "utils.h"
 
@@ -48,6 +50,7 @@ int backupSocketNeighbours();
 int recoverSocketNeighbours(struct sockaddr_in paramsNewNeighbour);
 int hostsUpdate(struct sockaddr_in netParamsNeighbour);
 int recvMessage(msg_type* type, char** message);
+int waitForHellorep(int waitingPeriod);
 
 int broadcast(msg_type t, char* msg);
 int sendMessage(int siteID, msg_type t, char* msg);

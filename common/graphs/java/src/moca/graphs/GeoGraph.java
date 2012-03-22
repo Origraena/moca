@@ -48,7 +48,7 @@ public class GeoGraph extends Graph<Point,Long> {
 
 	public ParentFunction<Point> AStar(int root, 
 								   ArrayList<Vertex<Point> > ends, 
-								   ArrayList<Long> heuristique) {
+								   Heuristique<Long> heuristique) {
 		return super.AStar(root,new Long(0), new LongOperatorPlus(), new LongComparator(), ends, heuristique);
 	}
 	
@@ -69,5 +69,43 @@ public class GeoGraph extends Graph<Point,Long> {
 			return null;
 		}
 	}
-};
+	
+	public void printParents(ParentFunction<Point> parent, Vertex<Point> s) {
+		Long cost;
+		Vertex<Point> t;
+		for (int i = 0 ; i < getNbVertices() ; i++) {
+			t = getVertex(i);
+			cost = new Long(0);
+			if (parent.getParent(t) == null)
+				;//System.out.println("pas besoin de parcourir " + t.getID());
+			else {
+				while (t != s) {
+					System.out.print("\t"+t.getID()+" <-- ");
+					cost += getEdgeValue(parent.getParent(t),t);
+					t = parent.getParent(t);
+				}
+				System.out.print("racine    ("+cost+")");
+				System.out.println(" ");
+			}
+		}
+	}
+	
+	public void printWay(ParentFunction<Point> parent, Vertex<Point> s, Vertex<Point> t) {
+			Long cost;
+			Vertex<Point> tmp = t;
+			cost = new Long(0);
+			if (parent.getParent(tmp) == null)
+				System.out.println("Aucun chemin trouvé jusqu'a " + t.getID());
+			else {
+				while (tmp != s) {
+					System.out.print("\t"+tmp.getID()+" <-- ");
+					cost += getEdgeValue(parent.getParent(tmp),tmp);
+					tmp = parent.getParent(tmp);
+				}
+				System.out.print("racine    ("+cost+")");
+				System.out.println(" ");
+			}
+		}
+	
+	};
 
