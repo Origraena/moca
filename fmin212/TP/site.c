@@ -109,6 +109,10 @@ void standardInput()
 		else
 			printf("absent\n");
 	}
+	else if(strcmp(buf, "TOKEN") == 0)
+	{
+		printf("state %d\n", state);
+	}
 	else
 	{
 		printf("Entree standard recue non traitee.\n");

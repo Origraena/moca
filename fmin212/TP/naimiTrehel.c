@@ -116,7 +116,7 @@ int handleRequest(char* ip)
 {
 	msg_type t;
 	
-	if(last != 0) /* this site is the root of the last tree */
+	if(last != 0) /* this site is NOT the root of the last tree */
 	{
 		t = REQUEST;
 		if(sendMessage(last, t, ip) == -1)
@@ -124,10 +124,11 @@ int handleRequest(char* ip)
 			return -1;
 		}
 	}
-	else /* this site is NOT the root of the last tree */
+	else /* this site is the root of the last tree */
 	{
 		if(tokenPresent == 1 && state == IDLE)
 		{
+			printf("getNeighbour(atoi(ip)) : %d\n", getNeighbour(atoi(ip)));
 			t = TOKEN;
 			if(sendMessage(getNeighbour(atoi(ip)), t, "") == -1)
 			{
