@@ -354,3 +354,10 @@ int getNeighbour(unsigned long s_addr)
 }
 
 
+void getIPstrFromNb(int nb, char** ipStr)
+{
+	unsigned long int ip = this_site.neighbours[nb].sin_addr.s_addr;
+	itoa(ip, ipStr);
+}
+
+

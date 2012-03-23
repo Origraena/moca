@@ -79,8 +79,6 @@ int critSectionRequest()
 
 int handleMessage(int type, char* message)
 {
-	msg_type t;
-	
 	switch (type)
 	{
 		case REQUEST:
@@ -92,13 +90,7 @@ int handleMessage(int type, char* message)
 			break;
 			
 		case HELLO:
-			printf("HELLO\n");
-			t = HELLOREP;
-			char* lastStr;
-			itoa(last, &lastStr);
-			int res = broadcast(t, lastStr);
-			free(lastStr);
-			return res;
+			return handleHello(message);
 			break;
 			
 		case HELLOREP:
@@ -194,17 +186,36 @@ int takeCriticalSection()
 void execCS(void* arg)
 {
 	sleep((long int)arg);
-};
+}
+
+int handleHello(char* message)
+{
+	printf("HELLO\n");
+	msg_type t = HELLOREP;
+	char* ipLastStr;
+	if(last == -1)
+		itoa(last, &ipLastStr);
+	else
+		getIPstrFromNb(last, &ipLastStr);
+	int res = broadcast(t, ipLastStr);
+	free(ipLastStr);
+	return res;
+}
 
 int handleHelloRep(char* message)
 {
 	printf("HELLOREP\n");
-	int lastJ = atoi(message);
-	if(last == -1)
+	long long int ipLastJ = atoi(message);
+	int lastJ = -1, i;
+	
+	if(ipLastJ != -1)
 	{
-		if(lastJ != -1)
+		for(i = 0 ; i < this_site.nbNeighbours ; i++)
 		{
-			last = lastJ;
+			if((unsigned long int)(this_site.neighbours[i].sin_addr.s_addr) == (unsigned long int)(ipLastJ))
+			{
+				lastJ = i;
+			}
 		}
 	}
 	

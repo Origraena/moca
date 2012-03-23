@@ -57,6 +57,7 @@ int sendMessageWithAdd(char* add, msg_type t, char* msg);
 void printNeighbours();
 void getMessageFromString(char* string, msg_type* type, char** message);
 int getNeighbour(unsigned long s_addr);
+void getIPstrFromNb(int nb, char** ipStr);
 
 #endif
 

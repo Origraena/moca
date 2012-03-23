@@ -36,6 +36,7 @@ int handleRequest(char* ip);
 int handleToken(char* message);
 int takeCriticalSection();
 void execCS();
+int handleHello(char* message);
 int handleHelloRep(char* message);
 int waitForHellorep(int waitingPeriod);
 
