@@ -109,7 +109,7 @@ void standardInput()
 		else
 			printf("absent\n");
 	}
-	else if(strcmp(buf, "TOKEN") == 0)
+	else if(strcmp(buf, "STATE") == 0)
 	{
 		printf("state %d\n", state);
 	}

@@ -35,7 +35,7 @@ int handleMessage(int type, char* message);
 int handleRequest(char* ip);
 int handleToken(char* message);
 int takeCriticalSection();
-void execCS();
+void liberation(void* arg);
 int handleHello(char* message);
 int handleHelloRep(char* message);
 int waitForHellorep(int waitingPeriod);

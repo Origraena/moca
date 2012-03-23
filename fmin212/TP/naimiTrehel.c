@@ -161,11 +161,19 @@ int takeCriticalSection()
 	
 	/* exec CS */
 	pthread_t thread_id;
-	if(pthread_create(&thread_id, NULL, (void*)(execCS), (void*)5) != 0)
+	if(pthread_create(&thread_id, NULL, (void*)(liberation), (void*)5) != 0)
 	{
 		fprintf(stderr, "Thread creation failure.\n");
 	}
-	pthread_join(thread_id, NULL);
+	
+	return 0;
+}
+
+void liberation(void* arg)
+{
+	sleep((long int)arg);
+	
+	pthread_detach(pthread_self());
 	
 	state = IDLE;
 	if(next != -1)
@@ -173,19 +181,12 @@ int takeCriticalSection()
 		msg_type t = TOKEN;
 		if(sendMessage(next, t, "") == -1)
 		{
-			return -1;
+			
 		}
 		next = -1;
 		tokenPresent = 0;
 	}
 	printf("Section critique relachee\n");
-	
-	return 0;
-}
-
-void execCS(void* arg)
-{
-	sleep((long int)arg);
 }
 
 int handleHello(char* message)
