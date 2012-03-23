@@ -268,7 +268,7 @@ int hostsUpdate(struct sockaddr_in netParamsNeighbour)
 	int indice = getNeighbour(netParamsNeighbour.sin_addr.s_addr);
 	if(indice == -1)
 	{
-		printf("Hote inconnu.\n");
+		printf("Hote inconnu. ");
 		// backup neighbours sockets
 		if(backupSocketNeighbours() == -1)
 		{
@@ -285,7 +285,7 @@ int hostsUpdate(struct sockaddr_in netParamsNeighbour)
 	}
 	else
 	{
-		printf("Hote connu.\n");
+		printf("Hote connu. ");
 	}
 	
 	return 0;
@@ -340,6 +340,9 @@ int recvMessage(msg_type* type, char** message)
 		free(*message);
 		return -1;
 	}
+	
+	printf("Message de type %d et de contenu '%s'.\n", *type, *message);
+	
 	return 0;
 }
 

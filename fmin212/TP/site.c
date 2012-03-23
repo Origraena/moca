@@ -189,7 +189,7 @@ int main(int argc, char* argv[])
 			
 			if(t == MESSAGE)
 			{
-				printf("Message recu : %s.\n", msg);
+				
 			}
 			else
 			{

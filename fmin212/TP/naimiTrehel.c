@@ -191,7 +191,6 @@ void liberation(void* arg)
 
 int handleHello(char* message)
 {
-	printf("HELLO\n");
 	msg_type t = HELLOREP;
 	char* ipLastStr;
 	if(last == -1)
@@ -206,7 +205,6 @@ int handleHello(char* message)
 
 int handleHelloRep(char* message)
 {
-	printf("HELLOREP\n");
 	long long int ipLastJ = atoi(message);
 	int lastJ = -1, i;
 	
