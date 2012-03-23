@@ -210,16 +210,19 @@ int handleHelloRep(char* message)
 	long long int ipLastJ = atoi(message);
 	int lastJ = -1, i;
 	
-	if(ipLastJ != -1)
+	if(last == -1)
 	{
-		for(i = 0 ; i < this_site.nbNeighbours ; i++)
+		if(ipLastJ != -1)
 		{
-			if((unsigned long int)(this_site.neighbours[i].sin_addr.s_addr) == (unsigned long int)(ipLastJ))
+			for(i = 0 ; i < this_site.nbNeighbours ; i++)
 			{
-				lastJ = i;
+				if((unsigned long int)(this_site.neighbours[i].sin_addr.s_addr) == (unsigned long int)(ipLastJ))
+				{
+					lastJ = i;
+				}
 			}
+			last = lastJ;
 		}
-		last = lastJ;
 	}
 	
 	return 0;
