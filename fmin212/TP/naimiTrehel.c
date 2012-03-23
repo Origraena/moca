@@ -10,9 +10,21 @@
 
 int init_structures()
 {
-	int i;
+	//int i;
+	
 	last = -1;
-	unsigned long int ip_max = 0;
+	next = -1;
+	state = IDLE;
+	tokenPresent = 0;
+	/* HELLO message broadcasting */
+	msg_type t = HELLO;
+	broadcast(t, "");
+	
+	printf("\nAttente d'autres sites...\n");
+	waitForHellorep(5);
+	
+	
+	/*unsigned long int ip_max = 0;
 	for(i = 0 ; i < this_site.nbNeighbours ; i++)
 	{
 		if((unsigned long int)(this_site.neighbours[i].sin_addr.s_addr) > ip_max)
@@ -20,18 +32,12 @@ int init_structures()
 			ip_max = this_site.neighbours[i].sin_addr.s_addr;
 			last = i;
 		}
-	}
+	}*/
 	
-	next = -1;
-	state = IDLE;
-	tokenPresent = (last == 0 ? 1 : 0);
-	if(last == 0)
-		last = -1;
+	if(this_site.nbNeighbours == 1)
+		tokenPresent = 1;
 	
-	
-	/* HELLO message broadcasting */
-	msg_type t = HELLO;
-	return broadcast(t, "") == -1;
+	return 0;
 }
 
 int critSectionRequest()
@@ -197,5 +203,54 @@ int handleHelloRep(char* message)
 	
 	return 0;
 }
+
+int waitForHellorep(int waitingPeriod)
+ {
+ time_t timeStart, timeCur;
+ timeStart = time(&timeStart);
+ timeCur = time(&timeCur);
+ 
+ char* msg;
+ msg_type t;
+ 
+ int flags = fcntl(this_site.sdRecv, F_GETFL);
+ int flags2 = flags | O_NONBLOCK;
+ fcntl(this_site.sdRecv, F_SETFL, flags2);
+	 
+	 //while((this_site.nbNeighbours < 2) || (timeCur - timeStart < waitingPeriod))
+	 while(timeCur - timeStart < waitingPeriod)
+	 {
+		 timeCur = time(&timeCur);
+		 msg = NULL;
+		 
+		 if(recvMessage(&t, &msg) == -1)
+		 {
+			 if(msg != NULL)
+				 free(msg);
+			 continue;
+		 }
+		 
+		 
+		 
+		 if(t == MESSAGE)
+		 {
+			 printf("Message recu : %s.\n", msg);
+		 }
+		 else
+		 {
+			 handleMessage(t, msg);
+		 }
+		 if(msg != NULL)
+			 free(msg);
+		 
+		 printf("Attente d'autres sites...\n");
+	 }
+	 
+	 fcntl(this_site.sdRecv, F_SETFL, flags);
+	 
+	 printf("Phase d'initialisation du reseau terminee.\n%ld sites trouves.\n\n", (long int)this_site.nbNeighbours);
+	 
+	 return 0;
+ }
 
 

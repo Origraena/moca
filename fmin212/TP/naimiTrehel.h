@@ -37,6 +37,7 @@ int handleToken(char* message);
 int takeCriticalSection();
 void execCS();
 int handleHelloRep(char* message);
+int waitForHellorep(int waitingPeriod);
 
 
 #endif
