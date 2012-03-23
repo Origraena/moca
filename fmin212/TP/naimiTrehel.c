@@ -54,7 +54,6 @@ int critSectionRequest()
 	
 	if(tokenPresent == 1)
 	{
-		printf("Prise de la section critique\n");
 		takeCriticalSection();
 	}
 	else if(last != -1)
@@ -157,6 +156,7 @@ int handleToken(char* message)
 
 int takeCriticalSection()
 {
+	printf("Prise de la section critique\n");
 	state = WORKING;
 	
 	/* exec CS */
