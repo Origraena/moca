@@ -197,6 +197,7 @@ int handleHello(char* message)
 		itoa(last, &ipLastStr);
 	else
 		getIPstrFromNb(last, &ipLastStr);
+	printf("last ip : %s\n", ipLastStr);
 	int res = broadcast(t, ipLastStr);
 	free(ipLastStr);
 	return res;
@@ -217,6 +218,7 @@ int handleHelloRep(char* message)
 				lastJ = i;
 			}
 		}
+		last = lastJ;
 	}
 	
 	return 0;
