@@ -54,6 +54,7 @@ int critSectionRequest()
 	
 	if(tokenPresent == 1)
 	{
+		last = 0;
 		takeCriticalSection();
 	}
 	else if(last != -1)
@@ -65,7 +66,7 @@ int critSectionRequest()
 			return -1;
 		}
 		free(ipAddr);
-		last = -1;
+		last = 0;
 	}
 	else
 	{
