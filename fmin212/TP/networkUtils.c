@@ -223,7 +223,9 @@ int sendMessage(int siteID, msg_type t, char* m)
 {
 	struct sockaddr_in netParamsNeighbour;
 	bzero(&netParamsNeighbour,sizeof(netParamsNeighbour));
-	netParamsNeighbour = this_site.neighbours[siteID];
+	netParamsNeighbour.sin_family = AF_INET;
+	netParamsNeighbour.sin_port = htons(PORT_RECV);
+	netParamsNeighbour.sin_addr.s_addr = this_site.neighbours[siteID].sin_addr.s_addr;
 	
 	char sendit[1024];
 	sendit[0] = t+48;
