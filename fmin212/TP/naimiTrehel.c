@@ -10,8 +10,7 @@
 
 int init_structures()
 {
-	//int i;
-	
+	int i;
 	last = -1;
 	next = -1;
 	state = IDLE;
@@ -24,18 +23,23 @@ int init_structures()
 	waitForHellorep(5);
 	
 	
-	/*unsigned long int ip_max = 0;
-	for(i = 0 ; i < this_site.nbNeighbours ; i++)
-	{
-		if((unsigned long int)(this_site.neighbours[i].sin_addr.s_addr) > ip_max)
-		{
-			ip_max = this_site.neighbours[i].sin_addr.s_addr;
-			last = i;
-		}
-	}*/
-	
 	if(this_site.nbNeighbours == 1)
 		tokenPresent = 1;
+	else if(last == -1)
+	{
+		unsigned long int ip_max = 0;
+		for(i = 0 ; i < this_site.nbNeighbours ; i++)
+		{
+			if((unsigned long int)(this_site.neighbours[i].sin_addr.s_addr) > ip_max)
+			{
+				ip_max = this_site.neighbours[i].sin_addr.s_addr;
+				last = i;
+			}
+		}
+		tokenPresent = (last == 0 ? 1 : 0);
+		last = -1;
+	}
+	
 	
 	return 0;
 }
