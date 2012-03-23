@@ -24,7 +24,10 @@ int init_structures()
 	
 	
 	if(this_site.nbNeighbours == 1)
+	{
 		tokenPresent = 1;
+		last = 0;
+	}
 	else if(last == -1)
 	{
 		unsigned long int ip_max = 0;
@@ -37,7 +40,6 @@ int init_structures()
 			}
 		}
 		tokenPresent = (last == 0 ? 1 : 0);
-		last = -1;
 	}
 	
 	
