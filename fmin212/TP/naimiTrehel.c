@@ -119,7 +119,6 @@ int handleRequest(char* ip)
 	{
 		if(tokenPresent == 1 && state == IDLE)
 		{
-			printf("getNeighbour(atoi(ip)) : %d\n", getNeighbour(atoi(ip)));
 			t = TOKEN;
 			if(sendMessage(getNeighbour(atoi(ip)), t, "") == -1)
 			{
