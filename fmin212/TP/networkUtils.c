@@ -235,6 +235,7 @@ int sendMessage(int siteID, msg_type t, char* m)
 		perror("sendto message ");
 		return -1;
 	}
+	printf("Envoi d'un message de type %d et de contenu '%s' a %s\n", t, m, inet_ntoa(this_site.neighbours[siteID].sin_addr));
 	return 0;
 }
 
@@ -256,6 +257,7 @@ int sendMessageWithAdd(char* add, msg_type t, char* m)
 		perror("sendto message ");
 		return -1;
 	}
+	printf("Envoi d'un message de type %d et de contenu '%s' a %s\n", t, m, inet_ntoa(netParamsNeighbour.sin_addr));
 	return 0;
 }
 
