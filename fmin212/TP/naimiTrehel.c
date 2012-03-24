@@ -60,6 +60,7 @@ int critSectionRequest()
 	{
 		// send a request to last
 		itoa(this_site.neighbours[0].sin_addr.s_addr, &ipAddr);
+		printf("addr %ul ; apres itoa %s\n", this_site.neighbours[0].sin_addr.s_addr, ipAddr);
 		if(sendMessage(last, t, ipAddr) == -1)
 		{
 			free(ipAddr);
