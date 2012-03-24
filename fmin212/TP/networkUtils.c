@@ -222,12 +222,15 @@ int broadcast(msg_type t, char* m)
 
 int sendMessage(int siteID, msg_type t, char* m)
 {
+	printf("Send message to num %d ; ", siteID);
 	struct sockaddr_in netParamsNeighbour;
 	bzero(&netParamsNeighbour,sizeof(netParamsNeighbour));
 	netParamsNeighbour.sin_family = AF_INET;
 	netParamsNeighbour.sin_port = htons(PORT_RECV);
 	netParamsNeighbour.sin_addr.s_addr = this_site.neighbours[siteID].sin_addr.s_addr;
-	
+	printf("addr neighbours[siteID] %ul ; ", this_site.neighbours[siteID].sin_addr.s_addr);
+	printf("addr envoyee %ul ; ", netParamsNeighbour.sin_addr.s_addr);
+		
 	char sendit[1024];
 	sendit[0] = t+48;
 	sendit[1] = 0;
