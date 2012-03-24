@@ -211,6 +211,7 @@ int broadcast(msg_type t, char* m)
 	
 	if (sendto(this_site.sdSend, sendit, (size_t)(strlen(sendit)+1), 0, (struct sockaddr *)&netParamsNeighbour,sizeof(netParamsNeighbour)) == -1)
 	{
+		printf("Broadcast d'un message de type %d et de contenu '%s'\n", t, m);
 		perror("sendto broadcast ");
 		return -1;
 	}
@@ -234,6 +235,7 @@ int sendMessage(int siteID, msg_type t, char* m)
 	
 	if (sendto(this_site.sdSend, sendit, (size_t)(strlen(sendit)+1), 0, (struct sockaddr *)&netParamsNeighbour,sizeof(netParamsNeighbour)) == -1)
 	{
+		printf("Envoi d'un message de type %d et de contenu '%s' a %s\n", t, m, inet_ntoa(this_site.neighbours[siteID].sin_addr));
 		perror("sendto message ");
 		return -1;
 	}
@@ -256,6 +258,7 @@ int sendMessageWithAdd(char* add, msg_type t, char* m)
 	
 	if (sendto(this_site.sdSend, sendit, (size_t)(strlen(sendit)+1), 0, (struct sockaddr *)&netParamsNeighbour,sizeof(netParamsNeighbour)) == -1)
 	{
+		printf("Envoi d'un message de type %d et de contenu '%s' a %s\n", t, m, inet_ntoa(netParamsNeighbour.sin_addr));
 		perror("sendto message ");
 		return -1;
 	}
