@@ -119,7 +119,7 @@ int handleRequest(char* ip)
 	
 	if(last == -1)
 	{
-		if(state == WAITING)
+		if(state == WAITING || state == WORKING)
 		{
 			next = getNeighbour(atoi(ip));
 		}
