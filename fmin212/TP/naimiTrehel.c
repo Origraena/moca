@@ -113,6 +113,9 @@ int handleRequest(char* ip)
 {
 	msg_type t;
 	
+	if(getNeighbour(atoi(ip)) == 0)
+		return 0;
+	
 	if(last == -1)
 	{
 		if(state == WAITING)
@@ -170,9 +173,11 @@ int takeCriticalSection()
 
 void liberation(void* arg)
 {
+	pthread_detach(pthread_self());
+	
+	
 	sleep((long int)arg);
 	
-	pthread_detach(pthread_self());
 	
 	state = IDLE;
 	if(next != -1)
