@@ -125,8 +125,9 @@ int handleRequest(char* ip)
 		}
 		else if(tokenPresent == 1)
 		{
+			printf("request answer atoll(ip) %lu\n", (unsigned long int)atoll(ip));
 			t = TOKEN;
-			if(sendMessage(getNeighbour(atoi(ip)), t, "") == -1)
+			if(sendMessage(getNeighbour((unsigned long int)atoll(ip)), t, "") == -1)
 			{
 				return -1;
 			}
