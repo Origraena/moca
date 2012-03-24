@@ -26,7 +26,6 @@ int init_structures()
 	if(this_site.nbNeighbours == 1)
 	{
 		tokenPresent = 1;
-		last = 0;
 	}
 	else if(last == -1)
 	{
@@ -40,6 +39,7 @@ int init_structures()
 			}
 		}
 		tokenPresent = (last == 0 ? 1 : 0);
+		last = -1;
 	}
 	
 	
@@ -54,7 +54,6 @@ int critSectionRequest()
 	
 	if(tokenPresent == 1)
 	{
-		last = 0;
 		takeCriticalSection();
 	}
 	else if(last != -1)
@@ -63,16 +62,22 @@ int critSectionRequest()
 		itoa(this_site.neighbours[0].sin_addr.s_addr, &ipAddr);
 		if(sendMessage(last, t, ipAddr) == -1)
 		{
+			free(ipAddr);
 			return -1;
 		}
 		free(ipAddr);
-		last = 0;
 	}
 	else
 	{
-		fprintf(stderr, "L'arbre logique n'est pas construit\n");
-		return -1;
+		itoa(this_site.neighbours[0].sin_addr.s_addr, &ipAddr);
+		if(broadcast(t, ipAddr) == -1)
+		{
+			free(ipAddr);
+			return -1;
+		}
+		free(ipAddr);
 	}
+	last = -1;
 	
 	return 0;
 }
@@ -108,17 +113,13 @@ int handleRequest(char* ip)
 {
 	msg_type t;
 	
-	if(last != 0) /* this site is NOT the root of the last tree */
+	if(last == -1)
 	{
-		t = REQUEST;
-		if(sendMessage(last, t, ip) == -1)
+		if(state == WAITING)
 		{
-			return -1;
+			next = getNeighbour(atoi(ip));
 		}
-	}
-	else /* this site is the root of the last tree */
-	{
-		if(tokenPresent == 1 && state == IDLE)
+		else if(tokenPresent == 1)
 		{
 			t = TOKEN;
 			if(sendMessage(getNeighbour(atoi(ip)), t, "") == -1)
@@ -127,18 +128,16 @@ int handleRequest(char* ip)
 			}
 			tokenPresent = 0;
 		}
-		else
+	}
+	else
+	{
+		t = REQUEST;
+		if(sendMessage(last, t, ip) == -1)
 		{
-			next = getNeighbour(atoi(ip));
+			return -1;
 		}
 	}
-	
 	last = getNeighbour(atoi(ip));
-	if(last == -1)
-	{
-		fprintf(stderr, "Request depuis un site inconnu...\n");
-		return -1;
-	}
 	
 	return 0;
 }
@@ -197,7 +196,6 @@ int handleHello(char* message)
 		itoa(last, &ipLastStr);
 	else
 		getIPstrFromNb(last, &ipLastStr);
-	printf("last ip : %s\n", ipLastStr);
 	int res = broadcast(t, ipLastStr);
 	free(ipLastStr);
 	return res;
@@ -256,7 +254,7 @@ int waitForHellorep(int waitingPeriod)
 		 
 		 if(t == MESSAGE)
 		 {
-			 printf("Message recu : %s.\n", msg);
+			 
 		 }
 		 else
 		 {

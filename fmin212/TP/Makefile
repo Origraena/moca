@@ -1,6 +1,6 @@
 CC 	= gcc -D_REENTRANT -pthread
 CFLAGS  = -Wall -c
-OFLAGS  = -lncurses -o
+OFLAGS  = -o
 
 OBJECTS = utils.o networkUtils.o naimiTrehel.o site.o
 
