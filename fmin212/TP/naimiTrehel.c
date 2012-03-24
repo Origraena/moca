@@ -60,7 +60,7 @@ int critSectionRequest()
 	{
 		// send a request to last
 		itoa(this_site.neighbours[0].sin_addr.s_addr, &ipAddr);
-		printf("addr %ul ; apres itoa %s\n", this_site.neighbours[0].sin_addr.s_addr, ipAddr);
+		//printf("addr %ul ; apres itoa %s\n", this_site.neighbours[0].sin_addr.s_addr, ipAddr);
 		if(sendMessage(last, t, ipAddr) == -1)
 		{
 			free(ipAddr);
@@ -125,7 +125,7 @@ int handleRequest(char* ip)
 		}
 		else if(tokenPresent == 1)
 		{
-			printf("request answer atoll(ip) %lu\n", (unsigned long int)atoll(ip));
+			//printf("request answer atoll(ip) %lu\n", (unsigned long int)atoll(ip));
 			t = TOKEN;
 			if(sendMessage(getNeighbour((unsigned long int)atoll(ip)), t, "") == -1)
 			{
@@ -165,7 +165,7 @@ int takeCriticalSection()
 	
 	/* exec CS */
 	pthread_t thread_id;
-	if(pthread_create(&thread_id, NULL, (void*)(liberation), (void*)5) != 0)
+	if(pthread_create(&thread_id, NULL, (void*)(liberation), (void*)20) != 0)
 	{
 		fprintf(stderr, "Thread creation failure.\n");
 	}
