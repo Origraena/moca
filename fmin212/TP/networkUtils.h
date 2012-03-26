@@ -49,7 +49,7 @@ int init_network(int argc, char** argv);
 int backupSocketNeighbours();
 int recoverSocketNeighbours(struct sockaddr_in paramsNewNeighbour);
 int hostsUpdate(struct sockaddr_in netParamsNeighbour);
-int recvMessage(msg_type* type, char** message);
+int recvMessage(msg_type* type, char** message, struct sockaddr_in* add);
 
 int broadcast(msg_type t, char* msg);
 int sendMessage(int siteID, msg_type t, char* msg);

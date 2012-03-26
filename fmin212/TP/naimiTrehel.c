@@ -16,12 +16,16 @@ int init_structures()
 	next = -1;
 	state = IDLE;
 	tokenPresent = 0;
+	
 	/* HELLO message broadcasting */
 	msg_type t = HELLO;
 	broadcast(t, "");
 	
 	printf("\nAttente d'autres sites...\n");
-	waitForHellorep(5);
+	waitForHellorep(WAITING_PERIOD);
+	
+	/* HELLO message broadcasting */
+	//broadcast(t, "");
 	
 	
 	if(this_site.nbNeighbours == 1)
@@ -101,7 +105,7 @@ int handleMessage(int type, char* message)
 			break;
 			
 		case HELLOREP:
-			return handleHelloRep(message);
+			return handleHelloRep(message, NULL);
 			break;
 			
 		default:
@@ -201,7 +205,13 @@ int handleHello(char* message)
 	msg_type t = HELLOREP;
 	char* ipLastStr;
 	if(last == -1)
-		itoa(last, &ipLastStr);
+	{
+		ipLastStr = malloc(4*sizeof(char));
+		ipLastStr[0] = '-';
+		ipLastStr[1] = '1';
+		ipLastStr[2] = 48+tokenPresent;
+		ipLastStr[3] = 0;
+	}
 	else
 		getIPstrFromNb(last, &ipLastStr);
 	int res = broadcast(t, ipLastStr);
@@ -209,14 +219,14 @@ int handleHello(char* message)
 	return res;
 }
 
-int handleHelloRep(char* message)
+int handleHelloRep(char* message, struct sockaddr_in* netParamsNeighbour)
 {
 	long long int ipLastJ = atoi(message);
 	int lastJ = -1, i;
 	
 	if(last == -1)
 	{
-		if(ipLastJ != -1)
+		if(ipLastJ > 0)
 		{
 			for(i = 0 ; i < this_site.nbNeighbours ; i++)
 			{
@@ -227,58 +237,87 @@ int handleHelloRep(char* message)
 			}
 			last = lastJ;
 		}
+		else
+		{
+			if(ipLastJ == -10)
+			{
+				
+			}
+			else if(ipLastJ == -11)
+			{
+				if(netParamsNeighbour != NULL)
+				{
+					printf("Hellorep recu et token present chez l'autre\n");
+					for(i = 0 ; i < this_site.nbNeighbours ; i++)
+					{
+						if((unsigned long int)(this_site.neighbours[i].sin_addr.s_addr) == (unsigned long int)(netParamsNeighbour->sin_addr.s_addr))
+						{
+							lastJ = i;
+						}
+					}
+					last = lastJ;
+				}
+			}
+		}
 	}
 	
 	return 0;
 }
 
 int waitForHellorep(int waitingPeriod)
- {
- time_t timeStart, timeCur;
- timeStart = time(&timeStart);
- timeCur = time(&timeCur);
- 
- char* msg;
- msg_type t;
- 
- int flags = fcntl(this_site.sdRecv, F_GETFL);
- int flags2 = flags | O_NONBLOCK;
- fcntl(this_site.sdRecv, F_SETFL, flags2);
-	 
-	 //while((this_site.nbNeighbours < 2) || (timeCur - timeStart < waitingPeriod))
-	 while(timeCur - timeStart < waitingPeriod)
-	 {
-		 timeCur = time(&timeCur);
-		 msg = NULL;
-		 
-		 if(recvMessage(&t, &msg) == -1)
-		 {
-			 if(msg != NULL)
-				 free(msg);
-			 continue;
-		 }
-		 
-		 
-		 
-		 if(t == MESSAGE)
-		 {
-			 
-		 }
-		 else
-		 {
-			 handleMessage(t, msg);
-		 }
-		 if(msg != NULL)
-			 free(msg);
-		 
-		 printf("Attente d'autres sites...\n");
-	 }
-	 
-	 fcntl(this_site.sdRecv, F_SETFL, flags);
-	 
-	 printf("Phase d'initialisation du reseau terminee.\n%ld sites trouves.\n\n", (long int)this_site.nbNeighbours);
-	 
-	 return 0;
- }
+{
+	struct sockaddr_in netParamsNeighbour;
+	time_t timeStart, timeCur;
+	timeStart = time(&timeStart);
+	timeCur = time(&timeCur);
+	
+	char* msg;
+	msg_type t;
+	
+	int flags = fcntl(this_site.sdRecv, F_GETFL);
+	int flags2 = flags | O_NONBLOCK;
+	fcntl(this_site.sdRecv, F_SETFL, flags2);
+	
+	//while((this_site.nbNeighbours < 2) || (timeCur - timeStart < waitingPeriod))
+	while(timeCur - timeStart < waitingPeriod)
+	{
+		timeCur = time(&timeCur);
+		msg = NULL;
+		
+		if(recvMessage(&t, &msg, &netParamsNeighbour) == -1)
+		{
+			if(msg != NULL)
+				free(msg);
+			continue;
+		}
+		
+		
+		switch (t)
+		{
+			case HELLO:
+				handleHello(msg);
+				break;
+				
+			case HELLOREP:
+				handleHelloRep(msg, &netParamsNeighbour);
+				break;
+				
+			default:
+				fprintf(stderr, "Type de message receptionne inconnu...\n");
+				break;
+		}
+		
+		if(msg != NULL)
+			free(msg);
+		
+		printf("Attente d'autres sites...\n");
+	}
+	
+	fcntl(this_site.sdRecv, F_SETFL, flags);
+	
+	printf("Phase d'initialisation du reseau terminee.\n%ld sites trouves.\n\n", (long int)this_site.nbNeighbours);
+	
+	return 0;
+}
 
 

@@ -315,7 +315,7 @@ void getMessageFromString(char* string, msg_type* type, char** message)
 	strcpy(*message, string+1);
 }
 
-int recvMessage(msg_type* type, char** message)
+int recvMessage(msg_type* type, char** message, struct sockaddr_in* add)
 {
 	struct sockaddr_in netParamsNeighbour;
 	bzero(&netParamsNeighbour,sizeof(netParamsNeighbour));
@@ -345,6 +345,14 @@ int recvMessage(msg_type* type, char** message)
 	{
 		free(*message);
 		return -1;
+	}
+	
+	if(add != NULL)
+	{
+		bzero(add,sizeof(add));
+		add->sin_family = AF_INET;
+		add->sin_port = netParamsNeighbour.sin_port;
+		add->sin_addr = netParamsNeighbour.sin_addr;
 	}
 	
 	printf("Message de type %d et de contenu '%s'.\n", *type, *message);

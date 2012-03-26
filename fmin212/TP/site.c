@@ -2,6 +2,7 @@
 
 #include <sys/select.h>
 #include <signal.h>
+#include <time.h>
 
 
 #include "networkUtils.h"
@@ -17,7 +18,7 @@ site this_site;
 /* ending handler. Necessary to clean the environnement. */
 void end_handler(int sig)
 {
-	printf("\nSignal cought\n");
+	printf("\nSignal caught\n");
 	if(sig == 11)
 	{
 		printf("Segmentation fault\n");
@@ -37,6 +38,7 @@ void standardInput()
 		perror("Erreur de reception sur l'entree standard");
 	else
 		buf[nbLus-1] = 0;
+	srand(time(NULL));
 	
 	
 	if(strstr(buf, "BROADCAST") != NULL)
@@ -180,7 +182,7 @@ int main(int argc, char* argv[])
 		/* on message reception */
 		if(FD_ISSET(this_site.sdRecv, &socketRset))
 		{
-			if(recvMessage(&t, &msg) == -1)
+			if(recvMessage(&t, &msg, NULL) == -1)
 			{
 				free(msg);
 				CLEAN()

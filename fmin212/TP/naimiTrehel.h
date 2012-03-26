@@ -16,6 +16,8 @@
 #include "networkUtils.h"
 #include "utils.h"
 
+#define WAITING_PERIOD 5
+
 
 typedef enum site_state
 {
@@ -37,7 +39,7 @@ int handleToken(char* message);
 int takeCriticalSection();
 void liberation(void* arg);
 int handleHello(char* message);
-int handleHelloRep(char* message);
+int handleHelloRep(char* message, struct sockaddr_in* netParamsNeighbour);
 int waitForHellorep(int waitingPeriod);
 
 
