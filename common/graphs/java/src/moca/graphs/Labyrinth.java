@@ -248,10 +248,10 @@ public class Labyrinth {
 	
 	public void computeVertexDrawFunction(ParentFunction<Point> geographParent) {
 		VertexArrayListUnaryFunction<Point> parentFunction = new VertexArrayListUnaryFunction<Point>(_graph.getNbVertices());
-		parentFunction.set(getSource()," >>");
+		parentFunction.set(getSource()," s");
 		
 		Vertex<Point> q = getDestination();
-		parentFunction.set(q," X");
+		parentFunction.set(q," t");
 		Vertex<Point> current = geographParent.getParent(q);
 		while ((current != null) && (current != getSource())) {
 			parentFunction.set(current," .");

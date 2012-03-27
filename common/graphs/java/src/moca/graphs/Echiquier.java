@@ -81,13 +81,13 @@ public class Echiquier {
 	
 	public void createEdgesForApawn() {
 		int i, j, xmax = _nbColumns-1, ymax = _nbRaws-1;
-		for(i = 0 ; i < ymax ; i++)
+		for(i = 1 ; i < ymax ; i++)
 		{
 			for(j = 0 ; j <= xmax ; j++)
 			{
 				try {
 					_graph.addEdge(i*_nbColumns+j, (i+1)*_nbColumns+j);
-					if(i == 0)
+					if(i == 1)
 						_graph.addEdge(i*_nbColumns+j, (i+2)*_nbColumns+j);
 				}
 				catch (Exception e) {
