@@ -1,12 +1,16 @@
 
 
-#include "fonctionsSite.h"
+#include <sys/select.h>
+#include <signal.h>
+#include <time.h>
 
-#define FREE()	if(this_site.neighbours != NULL) free(this_site.neighbours);
+
+#include "networkUtils.h"
+#include "naimiTrehel.h"
+#include "utils.h"
+
 #define CLEAN()	printf("CLEAN...\n"); \
-				close(this_site.sdSend); \
-				close(this_site.sdRecv); \
-				FREE()
+				CLEAN_NETWORK()
 
 site this_site;
 
@@ -14,7 +18,7 @@ site this_site;
 /* ending handler. Necessary to clean the environnement. */
 void end_handler(int sig)
 {
-	printf("\nSignal cought\n");
+	printf("\nSignal caught\n");
 	if(sig == 11)
 	{
 		printf("Segmentation fault\n");
@@ -24,13 +28,104 @@ void end_handler(int sig)
 	this_site.running = 0;	
 }
 
+void standardInput()
+{
+	int nbLus;
+	char buf[50];
+	msg_type t = MESSAGE;
+	nbLus = read(STDIN_FILENO, buf, 49);
+	if(nbLus < 1)
+		perror("Erreur de reception sur l'entree standard");
+	else
+		buf[nbLus-1] = 0;
+	srand(time(NULL));
+	
+	
+	if(strstr(buf, "BROADCAST") != NULL)
+	{
+		if((strlen(buf) == strlen("BROADCAST"))
+		   ||
+		   (strlen(buf) == strlen("BROADCAST")+1))
+		{
+			printf("Entrez le message : \n");
+			nbLus = read(STDIN_FILENO, buf, 49);
+			if(nbLus < 1)
+				perror("Erreur de reception sur l'entree standard");
+			else
+				buf[nbLus-1] = 0;
+			
+			broadcast(t, buf);
+		}
+		else
+		{
+			broadcast(t, buf+strlen("BROADCAST")+1);
+		}
+	}
+	else if(strstr(buf, "MESSAGE") != NULL)
+	{
+		printf("TO : \n");
+		nbLus = read(STDIN_FILENO, buf, 49);
+		if(nbLus < 1)
+			perror("Erreur de reception sur l'entree standard");
+		else
+			buf[nbLus-1] = 0;
+		
+		char add[256];
+		strcpy(add, buf);
+		
+		printf("CORPS DU TEXTE : \n");
+		nbLus = read(STDIN_FILENO, buf, 49);
+		if(nbLus < 1)
+			perror("Erreur de reception sur l'entree standard");
+		else
+			buf[nbLus-1] = 0;
+		
+		sendMessageWithAdd(add, t, buf);
+	}
+	else if(strcmp(buf, "NEIGHBOURS") == 0)
+	{
+		printNeighbours();
+	}
+	else if(strcmp(buf, "CRITSECTION") == 0)
+	{
+		critSectionRequest();
+	}
+	else if(strcmp(buf, "LAST") == 0)
+	{
+		printf("Last : %d ", last);
+		if(last != -1)
+			printf("; %s", inet_ntoa(*&this_site.neighbours[last].sin_addr));
+		printf("\n");
+	}
+	else if(strcmp(buf, "NEXT") == 0)
+	{
+		printf("Next : %d ", next);
+		if(next != -1)
+			printf("; %s", inet_ntoa(*&this_site.neighbours[next].sin_addr));
+		printf("\n");
+	}
+	else if(strcmp(buf, "TOKEN") == 0)
+	{
+		if(tokenPresent)
+			printf("present\n");
+		else
+			printf("absent\n");
+	}
+	else if(strcmp(buf, "STATE") == 0)
+	{
+		printf("state %d\n", state);
+	}
+	else
+	{
+		printf("Entree standard recue non traitee.\n");
+	}
+}
+
 int main(int argc, char* argv[])
 {
 	msg_type t;
-	int nbLus, size = sizeof(struct sockaddr_in);
+	char* msg;
 	fd_set socketRset;
-	struct sockaddr_in netParamsNeighbour;
-	bzero(&netParamsNeighbour,sizeof(netParamsNeighbour));
 	
 	/* Signals attachment to the handler */
 	struct sigaction action;
@@ -47,22 +142,15 @@ int main(int argc, char* argv[])
 		exit(EXIT_FAILURE);
 	}
 	
-	/* Setting network parameters */
-	if(init(argc, argv) == -1)
+	/* network initialisation */
+	if(init_network(argc, argv) == -1)
 	{
 		CLEAN()
 		exit(EXIT_FAILURE);
 	}
 	
-	/* HELLO message broadcasting */
-	t = MESSAGE;
-	printf("Broadcast HELLO\n");
-	if(broadcast(t, "HELLO") == -1)
-	{
-		CLEAN()
-		exit(EXIT_FAILURE);
-	}
-	
+	/* Naimi-Trehel structures init */
+	init_structures();
 	
 	/* Execution loop */
 	while(this_site.running)
@@ -94,26 +182,7 @@ int main(int argc, char* argv[])
 		/* on message reception */
 		if(FD_ISSET(this_site.sdRecv, &socketRset))
 		{
-			// receive message
-			size = sizeof(netParamsNeighbour);
-			char recit[1024];
-			nbLus = recvfrom(this_site.sdRecv, recit, (size_t)1023, 0, (struct sockaddr *)&netParamsNeighbour, (socklen_t *)&size);
-			if(nbLus < 1)
-			{
-				perror("recvfrom ");
-			}
-			else
-			{
-				recit[nbLus] = 0;
-			}
-			
-			char* msg;
-			getMessageFromString(recit, &t, &msg);
-			
-			printf("Message recu depuis l'adresse %s et le port %d. ", inet_ntoa(netParamsNeighbour.sin_addr), ntohs(netParamsNeighbour.sin_port));
-			
-			
-			if(hostsUpdate(netParamsNeighbour) == -1)
+			if(recvMessage(&t, &msg, NULL) == -1)
 			{
 				free(msg);
 				CLEAN()
@@ -122,26 +191,11 @@ int main(int argc, char* argv[])
 			
 			if(t == MESSAGE)
 			{
-				printf("Message recu : %s.\n", msg);
 				
-				if(strcmp(msg, "HELLO") == 0)
-				{
-					printf("Broadcast HELLOREP\n");
-					if(broadcast(t, "HELLOREP") == -1)
-					{
-						free(msg);
-						CLEAN()
-						exit(EXIT_FAILURE);
-					}
-				}
-			}
-			else if(t == REQUEST)
-			{
-				requestTreatment();
 			}
 			else
 			{
-				fprintf(stderr, "Probleme de reception du message.\n");
+				handleMessage(t, msg);
 			}
 			free(msg);
 		}

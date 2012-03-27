@@ -1,7 +1,9 @@
 package moca.graphs;
 
+import moca.graphs.vertices.ParentFunction;
 import moca.graphs.vertices.Vertex;
 import moca.graphs.vertices.VertexUnaryFunction;
+import moca.graphs.vertices.VertexArrayListUnaryFunction;
 import moca.graphs.edges.Edge;
 
 import java.util.NoSuchElementException;
@@ -122,6 +124,15 @@ public class Labyrinth {
 
 
 	public String toString() {
+		if(_result != null)
+			return _result.toString();
+		else
+		{
+			_result = new StringBuilder();
+			_line1 = new StringBuilder();
+			_line2 = new StringBuilder();
+		}
+		
 		Vertex<Point> v = null;
 		for (int i = 0 ; (imax == 0) && (i < _graph.getNbVertices()) ; i++) {
 			if ((i == _graph.getNbVertices()-2) || (_graph.get(i).x > _graph.get(i+1).x))
@@ -235,6 +246,21 @@ public class Labyrinth {
 		return _graph.getVertex(_t);
 	}
 	
+	public void computeVertexDrawFunction(ParentFunction<Point> geographParent) {
+		VertexArrayListUnaryFunction<Point> parentFunction = new VertexArrayListUnaryFunction<Point>(_graph.getNbVertices());
+		parentFunction.set(getSource()," >>");
+		
+		Vertex<Point> q = getDestination();
+		parentFunction.set(q," X");
+		Vertex<Point> current = geographParent.getParent(q);
+		while ((current != null) && (current != getSource())) {
+			parentFunction.set(current," .");
+			current = geographParent.getParent(current);
+		}
+		_vertexDrawFunction = parentFunction;
+		_result = null;
+	}
+	
 	
 	
 	/* internal methods */
@@ -270,9 +296,9 @@ public class Labyrinth {
 
 	/* internal processing variables */
 	private GeoGraph _graph = null;
-	private StringBuilder _result = new StringBuilder();
-	private StringBuilder _line1 = new StringBuilder();
-	private StringBuilder _line2 = new StringBuilder();
+	private StringBuilder _result = null;
+	private StringBuilder _line1 = null;
+	private StringBuilder _line2 = null;
 	private int imax = 0;
 	private int jmax = 0;
 	private int _s = -1, _t = -1;

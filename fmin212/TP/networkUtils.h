@@ -9,24 +9,27 @@
 #include <netdb.h>
 #include <net/ethernet.h>
 #include <netinet/in.h>
-#include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/types.h>
 #include <sys/socket.h>
-#include <sys/select.h>
 #include <sys/wait.h>
 #include <unistd.h>
+#include <time.h>
+#include <fcntl.h>
+
+#include "utils.h"
 
 
 #define PORT_SEND 31000
 #define PORT_RECV 31001
 
-typedef enum msg_type {
-	MESSAGE = 1,
-	REQUEST = 2
-} msg_type;
+#define FREE_NETWORK()	if(this_site.neighbours != NULL) free(this_site.neighbours);
+#define CLEAN_NETWORK()	close(this_site.sdSend); \
+						close(this_site.sdRecv); \
+						FREE_NETWORK()
+
 
 typedef struct site {
 	in_addr_t broadcastAdd;
@@ -41,20 +44,20 @@ typedef struct site {
 extern site this_site;
 
 
-char* getIPadress();
-int init(int argc, char** argv);
-char* itoa(long n);
+char* getIPaddress();
+int init_network(int argc, char** argv);
 int backupSocketNeighbours();
 int recoverSocketNeighbours(struct sockaddr_in paramsNewNeighbour);
+int hostsUpdate(struct sockaddr_in netParamsNeighbour);
+int recvMessage(msg_type* type, char** message, struct sockaddr_in* add);
 
 int broadcast(msg_type t, char* msg);
 int sendMessage(int siteID, msg_type t, char* msg);
 int sendMessageWithAdd(char* add, msg_type t, char* msg);
-void standardInput();
-int hostsUpdate(struct sockaddr_in netParamsNeighbour);
-void requestTreatment();
 void printNeighbours();
 void getMessageFromString(char* string, msg_type* type, char** message);
+int getNeighbour(unsigned long s_addr);
+void getIPstrFromNb(int nb, char** ipStr);
 
 #endif
 

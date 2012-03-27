@@ -4,6 +4,7 @@ import moca.graphs.vertices.ParentFunction;
 import moca.graphs.vertices.Vertex;
 import moca.graphs.vertices.VertexArrayList;
 import moca.graphs.vertices.VertexUnaryFunction;
+import moca.graphs.vertices.VertexArrayListUnaryFunction;
 import moca.graphs.edges.Edge;
 import moca.graphs.edges.NeighboursLists;
 
@@ -32,8 +33,6 @@ public class Echiquier {
 		_t = t.x + t.y*nbColumns;
 		
 		createVertices();
-		
-		createEdgesForApawn();
 	}
 	
 	public Echiquier(int nbRaws, int nbColumns, Point s, Point t, VertexUnaryFunction<String,Point> vertexDrawFunction) {
@@ -80,7 +79,7 @@ public class Echiquier {
 		}
 	}
 	
-	private void createEdgesForApawn() {
+	public void createEdgesForApawn() {
 		int i, j, xmax = _nbColumns-1, ymax = _nbRaws-1;
 		for(i = 0 ; i < ymax ; i++)
 		{
@@ -187,12 +186,30 @@ public class Echiquier {
 	
 	public ParentFunction<Point> AStar(int root, 
 			   ArrayList<Vertex<Point>> ends, 
-			   ArrayList<Long> heuristique) {
+			   Heuristique<Long> heuristique) {
 		return _graph.AStar(root, ends, heuristique);
 	}
 	
 	public Vertex<Point> getVertex(int id) throws NoSuchElementException {
 		return _graph.getVertex(id);
+	}
+	
+	public void setVertexDrawFunction(VertexArrayListUnaryFunction<Point> parentFunction) {
+		_vertexDrawFunction = parentFunction;
+	}
+	
+	public void computeVertexDrawFunction(ParentFunction<Point> geographParent) {
+		VertexArrayListUnaryFunction<Point> parentFunction = new VertexArrayListUnaryFunction<Point>(getNbVertices());
+		parentFunction.set(getSource()," >>");
+		Vertex<Point> current;
+		Vertex<Point> q = getDestination();
+		parentFunction.set(q," X");
+		current = geographParent.getParent(q);
+		while ((current != null) && (current != getSource())) {
+			parentFunction.set(current," .");
+			current = geographParent.getParent(current);
+		}
+		_vertexDrawFunction = parentFunction;
 	}
 	
 

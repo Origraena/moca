@@ -382,15 +382,8 @@ public class Main {
 			geographEnds.add(geograph2.getVertex(83));
 			geographEnds.add(geograph2.getVertex(56));
 			geographEnds.add(geograph2.getVertex(88));
-			ArrayList<Long> heuristique = new ArrayList<Long>(geograph2.getNbVertices());
-			for (int i = 0 ; i < geograph2.getNbVertices() ; i++) {
-				Long min = new Long(-1);
-				for (Vertex<Point> q : geographEnds) {
-					if ((min < 0) || (Point.euclidianDistance(q.getValue(),geograph2.get(i)) < min))
-						min = Point.euclidianDistance(q.getValue(),geograph2.get(i));
-				}
-				heuristique.add(min);
-			}
+			Heuristique<Long> heuristique = new Heuristique<Long>(geograph2.getNbVertices());
+			heuristique.setEuclidianDistance(geograph2, geographEnds);
 			
 			geographParent = geograph2.AStar(0,geographEnds,heuristique);
 			System.out.println("AStar ended!");
@@ -454,16 +447,9 @@ public class Main {
 			}
 
 //			System.out.println(new Labyrinth(labyrinth,new VertexIdentityFunction<Point>()));
-			heuristique = new ArrayList<Long>(labyrinth.getNbVertices());
-			for (int i = 0 ; i < labyrinth.getNbVertices() ; i++) {
-				Long min = new Long(-1);
-				for (Vertex<Point> q : labyrinthExits) {
-					if ((min < 0) || (Point.euclidianDistance(q.getValue(),labyrinth.get(i)) < min))
-						min = Point.euclidianDistance(q.getValue(),labyrinth.get(i));
-				}
-				heuristique.add(min);
-//				System.out.println("heuristique("+i+")="+heuristique.get(i));
-			}
+			heuristique = new Heuristique<Long>(labyrinth.getNbVertices());
+			heuristique.setEuclidianDistance(labyrinth, labyrinthExits);
+			
 			
 			geographParent = labyrinth.AStar(0,labyrinthExits,heuristique);
 			parentFunction = new VertexArrayListUnaryFunction<Point>(labyrinth.getNbVertices());

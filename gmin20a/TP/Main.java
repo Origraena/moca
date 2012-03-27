@@ -1,5 +1,7 @@
+
 import java.util.ArrayList;
 
+import moca.graphs.Heuristique;
 import moca.graphs.Echiquier;
 import moca.graphs.GeoGraph;
 import moca.graphs.Labyrinth;
@@ -21,18 +23,18 @@ public class Main {
 			GeoGraph geograph = new GeoGraph(new VertexArrayList<Point>(), new UndirectedNeighboursLists<Long>());
 
 			/* Vertices */
-			geograph.addPoint(0,1);		// s
-			geograph.addPoint(1,0);		// v1
-			geograph.addPoint(1,2);		// v2
-			geograph.addPoint(2,0);		// v3
-			geograph.addPoint(2,1);		// v4
-			geograph.addPoint(2,2);		// v5
-			geograph.addPoint(3,0);		// v6
-			geograph.addPoint(4,1);		// v7
-			geograph.addPoint(3,2);		// v8
-			geograph.addPoint(4,0);		// v9
-			geograph.addPoint(4,2);		// v10 
-			geograph.addPoint(5,1);		// t
+			geograph.addPoint(25,125);		// s
+			geograph.addPoint(100,25);		// v1
+			geograph.addPoint(100,225);		// v2
+			geograph.addPoint(200,25);		// v3
+			geograph.addPoint(200,125);		// v4
+			geograph.addPoint(200,225);		// v5
+			geograph.addPoint(300,25);		// v6
+			geograph.addPoint(400,125);		// v7
+			geograph.addPoint(300,225);		// v8
+			geograph.addPoint(400,25);		// v9
+			geograph.addPoint(400,225);		// v10 
+			geograph.addPoint(475,125);		// t
 
 			/* Edges */
 			geograph.addEdge(0,1,7L);		// s -> v1
@@ -62,61 +64,30 @@ public class Main {
 			
 			Vertex<Point> s = geograph.getVertex(0);
 			Vertex<Point> t = geograph.getVertex(11);
-			Long cost;
 			ArrayList<Vertex<Point>> ends = new ArrayList<Vertex<Point>>();
-			
 			ends.add(geograph.getVertex(t.getID()));
-			ParentFunction<Point> parent = geograph.AStar(s.getID(),ends,null);
-			System.out.println("AStar depuis la racine "+s.getID());
-			for (int i = 0 ; i < geograph.getNbVertices() ; i++) {
-				t = geograph.getVertex(i);
-				cost = new Long(0);
-				if (parent.getParent(t) == null)
-					System.out.println("pas besoin de parcourir " + t.getID());
-				else {
-					while (t != s) {
-						System.out.print("\t"+t.getID()+" <-- ");
-						cost += geograph.getEdgeValue(parent.getParent(t),t);
-						t = parent.getParent(t);
-					}
-					System.out.print("racine    ("+cost+")");
-					System.out.println(" ");
-				}
-			}
+			Heuristique<Long> h = new Heuristique<Long>();
+			h.setEuclidianDistance(geograph, ends);
 			
+			ParentFunction<Point> parent = geograph.AStar(s.getID(),ends,h);
+			System.out.println("AStar depuis la racine "+s.getID()+" avec une heuristique de distance euclidienne. Chemin obtenu :");
+			geograph.printWay(parent, s, t);
+			parent = geograph.AStar(s.getID(),ends,null);
+			System.out.println("Dikjstra depuis la racine "+s.getID()+". Chemin obtenu :");
+			geograph.printWay(parent, s, t);
 			
 			
 			
 			System.out.println("\n\nQuestion 4 : échiquier");
 			Echiquier echiquier = new Echiquier(10, 10, new Point(4,0), new Point(4, 9));
-			
+			echiquier.createEdgesForApawn();
 			ends = new ArrayList<Vertex<Point>>();
 			ends.add(echiquier.getDestination());
-			ArrayList<Long> heuristique = new ArrayList<Long>(echiquier.getNbVertices());
-			for (int i = 0 ; i < echiquier.getNbVertices() ; i++) {
-				Long min = new Long(-1);
-				for (Vertex<Point> q : ends) {
-					if ((min < 0) || (Point.euclidianDistance(q.getValue(),echiquier.get(i)) < min))
-						min = Point.euclidianDistance(q.getValue(),echiquier.get(i));
-				}
-				heuristique.add(min);
-			}
-			
-			ParentFunction<Point> geographParent = echiquier.AStar(echiquier.getNumSource(),ends,heuristique);
-		
-			VertexArrayListUnaryFunction<Point> parentFunction = new VertexArrayListUnaryFunction<Point>(echiquier.getNbVertices());
-			parentFunction.set(echiquier.getSource()," >>");
-			Vertex<Point> current;
-			for (Vertex<Point> q : ends) {
-				parentFunction.set(q," X");
-				current = geographParent.getParent(q);
-				while ((current != null) && (current != echiquier.getSource())) {
-					parentFunction.set(current," .");
-					current = geographParent.getParent(current);
-				}
-			}
-			System.out.println("A* d'un pion dans un échiquier de 10 sur 10 :\n"+new Echiquier(echiquier,parentFunction));
-			
+			h = new Heuristique<Long>(echiquier.getNbVertices());
+			h.setEuclidianDistance(echiquier.getGraph(), ends);
+			ParentFunction<Point> geographParent = echiquier.AStar(echiquier.getNumSource(),ends,h);
+			echiquier.computeVertexDrawFunction(geographParent);
+			System.out.println("A* d'un pion dans un échiquier de 10 sur 10 :\n"+echiquier);
 			
 			
 			
@@ -131,30 +102,12 @@ public class Main {
 			
 			ends = new ArrayList<Vertex<Point>>();
 			ends.add(l.getDestination());
-			heuristique = new ArrayList<Long>(geograph2.getNbVertices());
-			for (int i = 0 ; i < geograph2.getNbVertices() ; i++) {
-				Long min = new Long(-1);
-				for (Vertex<Point> q : ends) {
-					if ((min < 0) || (Point.euclidianDistance(q.getValue(),geograph2.get(i)) < min))
-						min = Point.euclidianDistance(q.getValue(),geograph2.get(i));
-				}
-				heuristique.add(min);
-			}
+			h = new Heuristique<Long>(geograph2.getNbVertices());
+			h.setEuclidianDistance(geograph2, ends);
 			
-			geographParent = geograph2.AStar(l.getNumSource(),ends,heuristique);
-		
-			parentFunction = new VertexArrayListUnaryFunction<Point>(geograph2.getNbVertices());
-			parentFunction.set(l.getSource()," >>");
-			
-			for (Vertex<Point> q : ends) {
-				parentFunction.set(q," X");
-				current = geographParent.getParent(q);
-				while ((current != null) && (current != l.getSource())) {
-					parentFunction.set(current," .");
-					current = geographParent.getParent(current);
-				}
-			}
-			System.out.println("Chemin emprunté jusqu'à la sortie :\n"+new Labyrinth(geograph2,4,' ','|','-','+',parentFunction));
+			geographParent = geograph2.AStar(l.getNumSource(),ends,h);
+			l.computeVertexDrawFunction(geographParent);
+			System.out.println("Chemin emprunté jusqu'à la sortie :\n"+l);
 
 		}
 		catch (Exception e) {
