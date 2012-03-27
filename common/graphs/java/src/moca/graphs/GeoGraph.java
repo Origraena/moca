@@ -57,10 +57,11 @@ public class GeoGraph extends Graph<Point,Long> {
 			VertexCollection<Point> vertices = _vertices.getClass().newInstance();
 			EdgeCollection<Long> edges = _edges.getClass().newInstance();
 			GeoGraph graph = new GeoGraph(vertices,edges);
+			Edge<Long> edge = null;
 			for (Point v : this)
 				graph.addVertex(v);
 			for (Iterator<Edge<Long> > e = edgeIterator() ; e.hasNext() ; ) {
-				Edge<Long> edge = e.next();
+				edge = e.next();
 				graph.addEdge(edge.getIDU(),edge.getIDV(),edge.getValue());
 			}
 			return graph;

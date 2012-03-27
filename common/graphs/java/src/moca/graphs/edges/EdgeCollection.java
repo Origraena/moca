@@ -41,7 +41,7 @@ public interface EdgeCollection<Value> extends Iterable<Edge<Value> > {
 
 	boolean remove(Edge<Value> edge);
 
-	Iterator<Edge<Value> > iterator();
+	Iterator<Edge<Value> > iterator() throws UnsupportedOperationException;
 
 	Iterator<NeighbourEdge<Value> > neighbourIterator(int id);
 

@@ -48,5 +48,9 @@ public class Point {
 		return (p.x * q.y) - (p.y * q.x);
 	}
 
+	public static Point vector(Point p, Point q) {
+		return new Point(q.x - p.x, q.y - p.y);
+	}
+
 };
 

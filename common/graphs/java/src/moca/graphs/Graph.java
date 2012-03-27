@@ -48,6 +48,11 @@ public class Graph<V,E> implements Iterable<V> {
 		this._edges = gclone._edges;
 	}
 
+	protected Graph() {
+		_vertices = null;
+		_edges = null;
+	}
+
 	public void clear() {
 		_vertices.clear();
 		_edges.clear();
@@ -113,6 +118,10 @@ public class Graph<V,E> implements Iterable<V> {
 	
 	public V get(int id) throws NoSuchElementException {
 		return getVertex(id).getValue();
+	}
+
+	public void set(int id, V value) throws NoSuchElementException {
+		getVertex(id).setValue(value);
 	}
 
 	public void add(V value) {
@@ -262,7 +271,20 @@ public class Graph<V,E> implements Iterable<V> {
 	/* ALGORITHMS */
 
 	public boolean isCyclic() {
-		WalkIterator iterator = BFSIterator();
+		if (getNbComponents() < getNbVertices())
+			return true;
+		for (int i = 0 ; i < getNbVertices() ; i++)
+			if (isEdge(i,i))
+				return true;
+		return false;
+	}
+
+	public boolean isAcyclic() {
+		return !isCyclic();
+	}
+
+	public boolean isUndirectedCyclic() {
+		WalkIterator iterator = DFSIterator();
 		while (iterator.hasNext()) {
 			iterator.next();
 			if (iterator.isCyclic())
@@ -271,8 +293,8 @@ public class Graph<V,E> implements Iterable<V> {
 		return false;
 	}
 
-	public boolean isAcyclic() {
-		return !isCyclic();
+	public boolean isUndirectedAcyclic() {
+		return !isUndirectedCyclic();
 	}
 
 	public ParentFunction<V> Dijsktra(int root, E zeroValue, OperatorPlus1T<E> plus, Comparator<E> compareEdge) {
@@ -671,13 +693,13 @@ public class Graph<V,E> implements Iterable<V> {
 					current = vertex.getValue().get(i);
 					for (Iterator<NeighbourEdge<E> > neighbourIterator = neighbourIterator(current.getID()) ; neighbourIterator.hasNext() ; ) {
 						idV = neighbourIterator.next().getIDV();
-						if ((getComponent(componentID).size() == 1) || (getRootComponent(idV) != root)) {
+//						if ((getComponent(componentID).size() == 1) || (getRootComponent(idV) != root)) {
 							// there is an edge from the component to another one
 							try {
 								_stronglyConnectedComponentsGraph.addEdge(vertex.getID(),getComponentID(idV),new Boolean(true));
 							}
 							catch (IllegalEdgeException e) { /* edge already exists */ }
-						}
+//						}
 					}
 				}
 			}
@@ -715,5 +737,66 @@ public class Graph<V,E> implements Iterable<V> {
 		}
 		return res.toString();
 	}
+
+	public class Path implements Iterable<Vertex<V> >, Iterator<Vertex<V> > {
+		
+		/* Constructors */
+		public Path() { }
+		public Path(ParentFunction<V> parentFunction, Vertex<V> begin, Vertex<V> end) {
+			Vertex<V> current = end;
+			while (current != begin) {
+				add(0,current);
+				current = parentFunction.getParent(current);
+			}
+			add(0,begin);
+		}
+
+		/* Collection */
+		public int length() {
+			return _vertices.size();
+		}
+		public Vertex<V> get(int id) {
+			if (id < 0 || id >= length())
+				return null;
+			return _vertices.get(id);
+		}
+		public void add(int id, Vertex<V> v) {
+			if (id >= length())
+				id = length();
+			_vertices.add(id,v);
+		}
+		public void add(Vertex<V> v) {
+			_vertices.add(v);
+		}
+		public Vertex<V> remove(int id) {
+			if (id < length())
+				return _vertices.remove(id);
+			return null;
+		}
+		
+		/* Iterable */
+		public Iterator<Vertex<V> > iterator() {
+			return this;
+		}
+
+		/* Iterator */
+		public boolean hasNext() {
+			return _current < length()-1;
+		}
+		public Vertex<V> next() throws NoSuchElementException {
+			if (!hasNext())
+				throw new NoSuchElementException();
+			_current++;
+			return _vertices.get(_current-1);
+		}
+		public void remove() {
+			_vertices.remove(_current);
+		}
+
+		/* Members */
+		protected int _current = 0;
+		private ArrayList<Vertex<V> > _vertices = new ArrayList<Vertex<V> >();
+	};
+
 };
 

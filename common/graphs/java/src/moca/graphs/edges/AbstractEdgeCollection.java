@@ -2,7 +2,7 @@ package moca.graphs.edges;
 
 import java.lang.UnsupportedOperationException;
 import java.util.NoSuchElementException;
-import java.util.Collection;
+import java.util.Iterator;
 
 public abstract class AbstractEdgeCollection<E> implements EdgeCollection<E> {
 
@@ -63,5 +63,10 @@ public abstract class AbstractEdgeCollection<E> implements EdgeCollection<E> {
 		add(edge.getIDU(),edge.getIDV(),edge.getValue());
 	}
 
+	public Iterator<Edge<E> > iterator() throws UnsupportedOperationException {
+		throw new UnsupportedOperationException();
+	}
+
 };
+
 
