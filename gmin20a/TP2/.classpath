@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<classpath>
-	<classpathentry kind="src" path=""/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="/Users/Clo/Documents/Fac/M1/S2/moca/common/graphs/java/target/graphs.jar"/>
-	<classpathentry kind="output" path=""/>
-</classpath>
