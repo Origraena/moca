@@ -80,6 +80,14 @@ public class BipartedGraph<V,E> extends Graph<V,E> {
 		return bipartedVertices().secondSet().size();
 	}
 
+	public VertexCollection<V> getFirstSet() {
+		return bipartedVertices().firstSet();
+	}
+
+	public VertexCollection<V> getSecondSet() {
+		return bipartedVertices().secondSet();
+	}
+
 	public Vertex<V> getInFirstSet(int id) throws NoSuchElementException {
 		return bipartedVertices().getInFirstSet(id);
 	}
