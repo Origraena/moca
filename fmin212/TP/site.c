@@ -8,6 +8,7 @@
 #include "networkUtils.h"
 #include "naimiTrehel.h"
 #include "utils.h"
+#include "faultTolerantExt.h"
 
 #define CLEAN()	printf("CLEAN...\n"); \
 				CLEAN_NETWORK()
