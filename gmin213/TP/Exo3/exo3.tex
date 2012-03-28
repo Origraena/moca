@@ -1,0 +1,45 @@
+% !TEX encoding = UTF-8 Unicode
+% !TEX root = ../Rapport/rapport.tex
+
+\section{Exercice 3 - Sur le problème du couplage maximum de poids minimum}
+
+\subsection{Modélisation du problème}
+Soit un graphe $G = (V,E)$ avec $V$ l'ensemble de ses sommets et $E$ l'ensemble de ses arêtes. Soit $\{ \forall{(i,j) \in E}, X_{(i,j)}\}$ un ensemble de variables booléennes qui indiquent le choix de l'arête $(i,j)$ correspondante dans le couplage. Soit $P_{(i,j)}$ le poids de l'arête $(i,j)$.
+
+Le problème du couplage maximum de poids minimum peut être modélisé de la façon suivante :
+
+$ Minimiser $ $$ \sum\limits_{(i,j) \in E} (X_{(i,j)} \times P_{(i,j)}) $$
+$ Sous\ contraintes $
+$$ \forall{i \in V}, \sum\limits_{(i,j) \in E} X_{(i,j)} = 1 $$
+$$ \forall{(i,j) \in E}, X_{(i,j))} \in \{0,1\} $$
+$$ \forall{(i,j) \in E}, P_{(i,j))} \geq 0 $$
+
+En effet, les contraintes forcent le couplage à être maximum tandis que la fonction objectif le force à tendre vers le poids minimum.
+
+\subsection{Modélisation du problème appliquée au graphe de la figure 2}
+$ Minimiser $ $$ \epsilon \times X_{ab} + \epsilon \times X_{bc} + \epsilon \times X_{ac} + M \times X_{ae} + M \times X_{cd} + M \times X_{bf} + \epsilon \times X_{df} + \epsilon \times X_{de} + \epsilon \times X_{fe}$$
+$ Sous\ contraintes $
+$$ X_{ab} + X_{ac} + X_{ae} = 1 $$
+$$ X_{ab} + X_{bc} + X_{bf} = 1 $$
+$$ X_{ac} + X_{bc} + X_{cd} = 1 $$
+$$ X_{cd} + X_{de} + X_{df} = 1 $$
+$$ X_{ae} + X_{de} + X_{df} = 1 $$
+$$ X_{ef} + X_{df} + X_{bf} = 1 $$
+$$ \forall{(i,j) \in E}, X_{(i,j))} \in \{0,1\} $$
+$$ \epsilon \geq 0 $$
+$$ M \geq 0 $$
+
+\subsection{Solution optimale entière $z(ILP)$}
+Sur un exemple de cette taille, il est facile de trouver une solution à la main. Il y a plusieurs solutions optimales de poids total $M+2\epsilon$ sur cet exemple ; l'une d'entre elles est le couplage $\{(a,b), (c,d), (e,f)\}$.
+
+La résolution de ce PLNE par $glpsol$ (solveur de $GLPK$) donne bien la même solution.
+
+\subsection{Solution optimale $z(LP)$ pour le programme relaxé}
+Relaxer le programme revient à transformer la contrainte d'intégrité des $X_{(i,j)}$ en la contrainte suivante :
+$$ \forall{(i,j) \in E},  0 \leq X_{(i,j))} \leq 1 $$
+
+En rentrant le PL relaxé dans $glpsol$, nous obtenons le couplage de poids total $3\epsilon$ : $$\{X_{ab} = 0.5 ; X_{ac} = 0.5 ; X_{bc} = 0.5 ; X_{df} = 0.5 ; X_{ef} = 0.5 ; X_{de} = 0.5\}$$ 
+
+\subsection{Conclusion sur la pertinence de la formulation}
+
+
