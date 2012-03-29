@@ -46,58 +46,44 @@ int init_structures() {
 
 int critSectionRequest() {
 	state = WAITING;
-	msg_type t = REQUEST;
-	char* ipAddr;
+	msg_t msg;
+	type(msg) = REQUEST;
 	
 	if(tokenPresent == 1)
-	{
 		takeCriticalSection();
-	}
-	else if(last != -1)
-	{
+	else if(last != -1) {
 		// send a request to last
-		itoa(this_site.neighbours[0].sin_addr.s_addr, &ipAddr);
+		sprintf (ip(msg), "%d", this_site.neighbours[0].sin_addr.s_addr);
 		//printf("addr %ul ; apres itoa %s\n", this_site.neighbours[0].sin_addr.s_addr, ipAddr);
-		if(sendMessage(last, t, ipAddr) == -1)
-		{
-			free(ipAddr);
+		if(sendMessage(last, msg) == -1)
 			return -1;
-		}
-		free(ipAddr);
 	}
-	else
-	{
-		itoa(this_site.neighbours[0].sin_addr.s_addr, &ipAddr);
-		if(broadcast(t, ipAddr) == -1)
-		{
-			free(ipAddr);
+	else {
+		sprintf (ip(msg), "%d", this_site.neighbours[0].sin_addr.s_addr);
+		if(broadcast(msg) == -1)
 			return -1;
-		}
-		free(ipAddr);
 	}
 	last = -1;
 	
 	return 0;
 }
 
-int handleMessage(int type, char* message)
-{
-	switch (type)
-	{
+int handleMessage(msg_t msg) {
+	switch (type(msg)) {
 		case REQUEST:
-			return handleRequest(message);
+			return handleRequest(msg);
 			break;
 			
 		case TOKEN:
-			return handleToken(message);
+			return handleToken(msg);
 			break;
 			
 		case HELLO:
-			return handleHello(message);
+			return handleHello(msg);
 			break;
 			
 		case HELLOREP:
-			return handleHelloRep(message, NULL);
+			return handleHelloRep(msg, NULL);
 			break;
 			
 		default:
@@ -107,71 +93,53 @@ int handleMessage(int type, char* message)
 	}
 }
 
-int handleRequest(char* ip)
-{
-	msg_type t;
+int handleRequest(msg_t msg) {
 	
-	if(getNeighbour(atoi(ip)) == 0)
+	if(!getNeighbour(atoi(ip(msg))))
 		return 0;
 	
-	if(last == -1)
-	{
+	if(last == -1) {
 		if(state == WAITING || state == WORKING)
-		{
-			next = getNeighbour(atoi(ip));
-		}
-		else if(tokenPresent == 1)
-		{
+			next = getNeighbour(atoi(ip(msg)));
+		else if(tokenPresent == 1) {
 			//printf("request answer atoll(ip) %lu\n", (unsigned long int)atoll(ip));
-			t = TOKEN;
-			if(sendMessage(getNeighbour((unsigned long int)atoll(ip)), t, "") == -1)
-			{
+			type(msg) = TOKEN;
+			if(sendMessage(getNeighbour((unsigned long int)atoll(ip(msg))), msg) == -1)
 				return -1;
-			}
 			tokenPresent = 0;
 		}
 	}
-	else
-	{
-		t = REQUEST;
-		if(sendMessage(last, t, ip) == -1)
-		{
+	else {
+		type(msg) = REQUEST;
+		if(sendMessage(last, msg) == -1)
 			return -1;
-		}
 	}
-	last = getNeighbour(atoi(ip));
+	last = getNeighbour(atoi(ip(msg)));
 	
 	return 0;
 }
 
-int handleToken(char* message)
-{
+int handleToken(msg_t message) {
 	tokenPresent = 1;
 	if(state == WAITING)
-	{
 		takeCriticalSection();
-	}
 	
 	return 0;
 }
 
-int takeCriticalSection()
-{
+int takeCriticalSection() {
 	printf("Prise de la section critique\n");
 	state = WORKING;
 	
 	/* exec CS */
 	pthread_t thread_id;
 	if(pthread_create(&thread_id, NULL, (void*)(liberation), (void*)20) != 0)
-	{
 		fprintf(stderr, "Thread creation failure.\n");
-	}
 	
 	return 0;
 }
 
-void liberation(void* arg)
-{
+void liberation(void* arg) {
 	pthread_detach(pthread_self());
 	
 	
@@ -179,13 +147,10 @@ void liberation(void* arg)
 	
 	
 	state = IDLE;
-	if(next != -1)
-	{
-		msg_type t = TOKEN;
-		if(sendMessage(next, t, "") == -1)
-		{
-			
-		}
+	if(next != -1) {
+		msg_t mes;
+		type(mes) = TOKEN;
+		if(sendMessage(next, mes) == -1) {}
 		next = -1;
 		tokenPresent = 0;
 	}

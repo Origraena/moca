@@ -17,11 +17,9 @@ site this_site;
 
 
 /* ending handler. Necessary to clean the environnement. */
-void end_handler(int sig)
-{
+void end_handler(int sig) {
 	printf("\nSignal caught\n");
-	if(sig == 11)
-	{
+	if(sig == 11) {
 		printf("Segmentation fault\n");
 		exit(EXIT_FAILURE);
 	}
@@ -29,11 +27,12 @@ void end_handler(int sig)
 	this_site.running = 0;	
 }
 
-void standardInput()
-{
+void standardInput() {
 	int nbLus;
 	char buf[50];
-	msg_type t = MESSAGE;
+
+	msg_t envoi;
+	type(envoi) = MESSAGE;
 	nbLus = read(STDIN_FILENO, buf, 49);
 	if(nbLus < 1)
 		perror("Erreur de reception sur l'entree standard");
@@ -42,12 +41,8 @@ void standardInput()
 	srand(time(NULL));
 	
 	
-	if(strstr(buf, "BROADCAST") != NULL)
-	{
-		if((strlen(buf) == strlen("BROADCAST"))
-		   ||
-		   (strlen(buf) == strlen("BROADCAST")+1))
-		{
+	if(strstr(buf, "BROADCAST") != NULL) {
+		if((strlen(buf) == strlen("BROADCAST")) || (strlen(buf) == strlen("BROADCAST")+1)) {
 			printf("Entrez le message : \n");
 			nbLus = read(STDIN_FILENO, buf, 49);
 			if(nbLus < 1)
@@ -132,20 +127,17 @@ int main(int argc, char* argv[])
 	struct sigaction action;
 	memset(&action, 0, sizeof(action));
 	action.sa_handler = end_handler;
-	if (sigaction(SIGPIPE,&action,NULL)){
+	if (sigaction(SIGPIPE,&action,NULL))
 		perror ("sigaction ");
-	}
-	if (sigaction(SIGINT,&action,NULL)){
+	if (sigaction(SIGINT,&action,NULL))
 		perror ("sigaction ");
-	}
 	if (sigaction(11,&action,NULL)){
 		perror ("sigaction");
 		exit(EXIT_FAILURE);
 	}
 	
 	/* network initialisation */
-	if(init_network(argc, argv) == -1)
-	{
+	if(init_network(argc, argv) == -1) {
 		CLEAN()
 		exit(EXIT_FAILURE);
 	}
@@ -154,8 +146,7 @@ int main(int argc, char* argv[])
 	init_structures();
 	
 	/* Execution loop */
-	while(this_site.running)
-	{
+	while(this_site.running) {
 		/* select settings */
 		FD_ZERO(&socketRset);
 		FD_SET(STDIN_FILENO, &socketRset);
@@ -163,8 +154,7 @@ int main(int argc, char* argv[])
 		
 		
 		/* select on all reading descriptors */
-		if(select(this_site.sdRecv+1, &socketRset, NULL, NULL, NULL) == -1)
-		{
+		if(select(this_site.sdRecv+1, &socketRset, NULL, NULL, NULL) == -1) {
 			if (errno == EINTR)
 				continue;
 			perror("select ");
@@ -175,29 +165,20 @@ int main(int argc, char* argv[])
 		
 		/* on standard input */
 		if(FD_ISSET(STDIN_FILENO, &socketRset))
-		{
 			standardInput();
-		}
 		
 		
 		/* on message reception */
-		if(FD_ISSET(this_site.sdRecv, &socketRset))
-		{
-			if(recvMessage(&t, &msg, NULL) == -1)
-			{
+		if(FD_ISSET(this_site.sdRecv, &socketRset)) {
+			if(recvMessage(&t, &msg, NULL) == -1) {
 				free(msg);
 				CLEAN()
 				exit(EXIT_FAILURE);
 			}
 			
-			if(t == MESSAGE)
-			{
-				
-			}
+			if(t == MESSAGE) {}
 			else
-			{
 				handleMessage(t, msg);
-			}
 			free(msg);
 		}
 	}
