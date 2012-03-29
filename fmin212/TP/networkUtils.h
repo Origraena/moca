@@ -54,7 +54,7 @@ int recvMessage(msg_t *message, struct sockaddr_in* add);
 
 int broadcast(msg_t t);
 int sendMessage(int siteID, msg_t msg);
-int sendMessageWithAdd(char* add, msg_t msg);
+int sendMessageWithAdd(msg_t msg);
 void printNeighbours();
 void getMessageFromString(char* string, msg_type* type, char** message);
 int getNeighbour(unsigned long s_addr);

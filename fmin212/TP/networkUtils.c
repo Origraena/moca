@@ -213,12 +213,12 @@ int sendMessage(int siteID, msg_t m) {
 	return 0;
 }
 
-int sendMessageWithAdd(char* add, msg_t m) {
+int sendMessageWithAdd(msg_t m) {
 	struct sockaddr_in netParamsNeighbour;
 	bzero(&netParamsNeighbour,sizeof(netParamsNeighbour));
 	netParamsNeighbour.sin_family = AF_INET;
 	netParamsNeighbour.sin_port = htons(PORT_RECV);
-	netParamsNeighbour.sin_addr.s_addr = inet_addr(add);
+	netParamsNeighbour.sin_addr.s_addr = inet_addr(ip(m));
 
 	printf("Envoi d'un message de type %d a %s\n", type(m), inet_ntoa(netParamsNeighbour.sin_addr));
 	if (sendto(this_site.sdSend, &m, sizeof(m), 0, (struct sockaddr *)&netParamsNeighbour,sizeof(netParamsNeighbour)) == -1) {
