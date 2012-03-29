@@ -9,8 +9,7 @@
 
 #include "naimiTrehel.h"
 
-int init_structures()
-{
+int init_structures() {
 	int i;
 	last = -1;
 	next = -1;
@@ -18,8 +17,9 @@ int init_structures()
 	tokenPresent = 0;
 	
 	/* HELLO message broadcasting */
-	msg_type t = HELLO;
-	broadcast(t, "");
+	msg_t broad;
+	type(broad) = HELLO;
+	broadcast(broad);
 	
 	printf("\nAttente d'autres sites...\n");
 	waitForHellorep(WAITING_PERIOD);
@@ -29,30 +29,22 @@ int init_structures()
 	
 	
 	if(this_site.nbNeighbours == 1)
-	{
 		tokenPresent = 1;
-	}
-	else if(last == -1)
-	{
+	else if(last == -1) {
 		unsigned long int ip_max = 0;
 		for(i = 0 ; i < this_site.nbNeighbours ; i++)
-		{
-			if((unsigned long int)(this_site.neighbours[i].sin_addr.s_addr) > ip_max)
-			{
+			if((unsigned long int)(this_site.neighbours[i].sin_addr.s_addr) > ip_max) {
 				ip_max = this_site.neighbours[i].sin_addr.s_addr;
 				last = i;
 			}
-		}
-		tokenPresent = (last == 0 ? 1 : 0);
+		tokenPresent = (!last ? 1 : 0);
 		last = -1;
 	}
-	
 	
 	return 0;
 }
 
-int critSectionRequest()
-{
+int critSectionRequest() {
 	state = WAITING;
 	msg_type t = REQUEST;
 	char* ipAddr;
@@ -200,12 +192,10 @@ void liberation(void* arg)
 	printf("Section critique relachee\n");
 }
 
-int handleHello(char* message)
-{
-	msg_type t = HELLOREP;
+int handleHello(msg_t mes) {
+	type(mes) = HELLOREP;
 	char* ipLastStr;
-	if(last == -1)
-	{
+	if(last == -1) {
 		ipLastStr = malloc(4*sizeof(char));
 		ipLastStr[0] = '-';
 		ipLastStr[1] = '1';
@@ -214,47 +204,33 @@ int handleHello(char* message)
 	}
 	else
 		getIPstrFromNb(last, &ipLastStr);
-	int res = broadcast(t, ipLastStr);
+
+	memcpy (&(ip(mes)), ipLastStr, (strlen(ipLastStr) + 1) * sizeof(char));
+
+	int res = broadcast(mes);
 	free(ipLastStr);
 	return res;
 }
 
-int handleHelloRep(char* message, struct sockaddr_in* netParamsNeighbour)
-{
-	long long int ipLastJ = atoi(message);
+int handleHelloRep(msg_t message, struct sockaddr_in* netParamsNeighbour) {
+	long long int ipLastJ = atoi(ip(message));
 	int lastJ = -1, i;
 	
-	if(last == -1)
-	{
-		if(ipLastJ > 0)
-		{
+	if(last == -1) {
+		if(ipLastJ > 0) {
 			for(i = 0 ; i < this_site.nbNeighbours ; i++)
-			{
 				if((unsigned long int)(this_site.neighbours[i].sin_addr.s_addr) == (unsigned long int)(ipLastJ))
-				{
 					lastJ = i;
-				}
-			}
 			last = lastJ;
 		}
-		else
-		{
-			if(ipLastJ == -10)
-			{
-				
-			}
-			else if(ipLastJ == -11)
-			{
-				if(netParamsNeighbour != NULL)
-				{
+		else {
+//			if(ipLastJ == -10)
+			if(ipLastJ == -11) {
+				if(netParamsNeighbour != NULL) {
 					printf("Hellorep recu et token present chez l'autre\n");
 					for(i = 0 ; i < this_site.nbNeighbours ; i++)
-					{
 						if((unsigned long int)(this_site.neighbours[i].sin_addr.s_addr) == (unsigned long int)(netParamsNeighbour->sin_addr.s_addr))
-						{
 							lastJ = i;
-						}
-					}
 					last = lastJ;
 				}
 			}
@@ -264,36 +240,27 @@ int handleHelloRep(char* message, struct sockaddr_in* netParamsNeighbour)
 	return 0;
 }
 
-int waitForHellorep(int waitingPeriod)
-{
+int waitForHellorep(int waitingPeriod) {
 	struct sockaddr_in netParamsNeighbour;
 	time_t timeStart, timeCur;
 	timeStart = time(&timeStart);
 	timeCur = time(&timeCur);
 	
-	char* msg;
-	msg_type t;
+	msg_t msg;
 	
 	int flags = fcntl(this_site.sdRecv, F_GETFL);
 	int flags2 = flags | O_NONBLOCK;
 	fcntl(this_site.sdRecv, F_SETFL, flags2);
 	
 	//while((this_site.nbNeighbours < 2) || (timeCur - timeStart < waitingPeriod))
-	while(timeCur - timeStart < waitingPeriod)
-	{
+	while(timeCur - timeStart < waitingPeriod) {
 		timeCur = time(&timeCur);
-		msg = NULL;
+		memset (&msg, 0, sizeof(msg));
 		
-		if(recvMessage(&t, &msg, &netParamsNeighbour) == -1)
-		{
-			if(msg != NULL)
-				free(msg);
+		if(recvMessage(&msg, &netParamsNeighbour) == -1) 
 			continue;
-		}
 		
-		
-		switch (t)
-		{
+		switch (type(msg)) {
 			case HELLO:
 				handleHello(msg);
 				break;
@@ -306,9 +273,6 @@ int waitForHellorep(int waitingPeriod)
 				fprintf(stderr, "Type de message receptionne inconnu...\n");
 				break;
 		}
-		
-		if(msg != NULL)
-			free(msg);
 		
 		printf("Attente d'autres sites...\n");
 	}

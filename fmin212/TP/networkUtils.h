@@ -41,6 +41,7 @@ typedef struct site {
 	struct sockaddr_in *neighboursTmp;
 } site;
 
+// ??????? ou comment faire de la prog objet en C ^^
 extern site this_site;
 
 
@@ -49,11 +50,11 @@ int init_network(int argc, char** argv);
 int backupSocketNeighbours();
 int recoverSocketNeighbours(struct sockaddr_in paramsNewNeighbour);
 int hostsUpdate(struct sockaddr_in netParamsNeighbour);
-int recvMessage(msg_type* type, char** message, struct sockaddr_in* add);
+int recvMessage(msg_t *message, struct sockaddr_in* add);
 
-int broadcast(msg_type t, char* msg);
-int sendMessage(int siteID, msg_type t, char* msg);
-int sendMessageWithAdd(char* add, msg_type t, char* msg);
+int broadcast(msg_t t);
+int sendMessage(int siteID, msg_t msg);
+int sendMessageWithAdd(char* add, msg_t msg);
 void printNeighbours();
 void getMessageFromString(char* string, msg_type* type, char** message);
 int getNeighbour(unsigned long s_addr);

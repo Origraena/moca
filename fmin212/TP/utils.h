@@ -15,6 +15,7 @@
 #include <string.h>
 
 #define TOLERANCE 5
+#define IPLONG    16
 
 // {{{ Data Structures
 typedef enum msg_type {
@@ -38,7 +39,8 @@ typedef struct message {
 	int _id_sender;
 	int _pos_next_queue; // if msg_type == SEARCH_QUEUE, it is used to store number of access to cs
 	int _pred[TOLERANCE];
-} mess_t;
+	char _ip[IPLONG];
+} msg_t;
 // }}}
 
 // {{{ Macros
@@ -46,6 +48,7 @@ typedef struct message {
 #define pos(m) m._pos_next_queue
 #define pred(m) m._pred
 #define type(m) m._typ_mes
+#define ip(m) m._ip
 // }}}
 
 void itoa(long n, char** res);
