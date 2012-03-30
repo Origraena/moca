@@ -16,6 +16,7 @@
 
 #define TOLERANCE 5
 #define IPLONG    16
+#define SIZE (3+TOLERANCE)*sizeof(int)+IPLONG*sizeof(char)
 
 // {{{ Data Structures
 typedef enum msg_type {

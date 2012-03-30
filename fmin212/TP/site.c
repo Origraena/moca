@@ -90,7 +90,7 @@ void standardInput() {
 			if (tokenPresent)
 				printf("Present\n");
 			else 
-				printf("Present");
+				printf("Absent\n");
 			break;
 		case 8:
 			printf("State %d\n", state);

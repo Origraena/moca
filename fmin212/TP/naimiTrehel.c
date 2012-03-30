@@ -53,13 +53,21 @@ int critSectionRequest() {
 		takeCriticalSection();
 	else if(last != -1) {
 		// send a request to last
-		sprintf (ip(msg), "%d", this_site.neighbours[0].sin_addr.s_addr);
+		char *tmpmes;
+		itoa (this_site.neighbours[0].sin_addr.s_addr, &tmpmes);
+		strncpy(ip(msg), tmpmes, 16);
+		free(tmpmes);
+		printf ("Addr %s\n", ip(msg));
 		//printf("addr %ul ; apres itoa %s\n", this_site.neighbours[0].sin_addr.s_addr, ipAddr);
 		if(sendMessage(last, msg) == -1)
 			return -1;
 	}
 	else {
-		sprintf (ip(msg), "%d", this_site.neighbours[0].sin_addr.s_addr);
+		char *tmpmes;
+		itoa (this_site.neighbours[0].sin_addr.s_addr, &tmpmes);
+		strncpy(ip(msg), tmpmes, 16);
+		free(tmpmes);
+		printf ("Addr %s\n", ip(msg));
 		if(broadcast(msg) == -1)
 			return -1;
 	}
@@ -99,6 +107,7 @@ int handleRequest(msg_t msg) {
 		return 0;
 	
 	if(last == -1) {
+		printf("%s \n", ip(msg));
 		if(state == WAITING || state == WORKING)
 			next = getNeighbour(atoi(ip(msg)));
 		else if(tokenPresent == 1) {
@@ -220,7 +229,7 @@ int waitForHellorep(int waitingPeriod) {
 	//while((this_site.nbNeighbours < 2) || (timeCur - timeStart < waitingPeriod))
 	while(timeCur - timeStart < waitingPeriod) {
 		timeCur = time(&timeCur);
-		memset (&msg, 0, sizeof(msg));
+		memset (&msg, 0, SIZE);
 		
 		if(recvMessage(&msg, &netParamsNeighbour) == -1) 
 			continue;

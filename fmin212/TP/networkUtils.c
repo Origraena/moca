@@ -186,7 +186,7 @@ int broadcast(msg_t message) {
 	netParamsNeighbour.sin_addr.s_addr = this_site.broadcastAdd;
 
 	printf("Broadcast d'un message de type %d'\n", type(message));
-	if (sendto(this_site.sdSend, (void *)&message, sizeof(msg_t), 0, (struct sockaddr *)&netParamsNeighbour,sizeof(netParamsNeighbour)) == -1) {
+	if (sendto(this_site.sdSend, (void *)&message, SIZE, 0, (struct sockaddr *)&netParamsNeighbour,sizeof(netParamsNeighbour)) == -1) {
 		perror("sendto broadcast ");
 		return -1;
 	}
@@ -206,7 +206,7 @@ int sendMessage(int siteID, msg_t m) {
 
 
 	printf("Envoi d'un message de type %d a %s\n", type(m), inet_ntoa(this_site.neighbours[siteID].sin_addr));
-	if (sendto(this_site.sdSend, (void *)&m, sizeof(msg_t), 0, (struct sockaddr *)&netParamsNeighbour,sizeof(netParamsNeighbour)) == -1) {
+	if (sendto(this_site.sdSend, (void *)&m, SIZE, 0, (struct sockaddr *)&netParamsNeighbour,sizeof(netParamsNeighbour)) == -1) {
 		perror("sendto message ");
 		return -1;
 	}
@@ -221,7 +221,7 @@ int sendMessageWithAdd(msg_t m) {
 	netParamsNeighbour.sin_addr.s_addr = inet_addr(ip(m));
 
 	printf("Envoi d'un message de type %d a %s\n", type(m), inet_ntoa(netParamsNeighbour.sin_addr));
-	if (sendto(this_site.sdSend, &m, sizeof(m), 0, (struct sockaddr *)&netParamsNeighbour,sizeof(netParamsNeighbour)) == -1) {
+	if (sendto(this_site.sdSend, &m, SIZE, 0, (struct sockaddr *)&netParamsNeighbour,sizeof(netParamsNeighbour)) == -1) {
 		perror("sendto message ");
 		return -1;
 	}
@@ -268,8 +268,8 @@ int recvMessage(msg_t* message, struct sockaddr_in* add) {
 	bzero(&netParamsNeighbour,sizeof(netParamsNeighbour));
 	size_t size = sizeof(netParamsNeighbour);
 
-	int nbLus = recvfrom(this_site.sdRecv, message, sizeof(msg_t), 0, (struct sockaddr *)&netParamsNeighbour, (socklen_t *)&size);
-	if(nbLus != sizeof(msg_t)) {
+	int nbLus = recvfrom(this_site.sdRecv, message, SIZE, 0, (struct sockaddr *)&netParamsNeighbour, (socklen_t *)&size);
+	if(nbLus != SIZE) {
 		if(errno != EAGAIN) {
 			fprintf(stderr, "erreur numero %d ; ", errno);
 			perror("recvfrom ");
@@ -289,13 +289,14 @@ int recvMessage(msg_t* message, struct sockaddr_in* add) {
 		add->sin_addr = netParamsNeighbour.sin_addr;
 	}
 
-	printf("Message de type %d.\n", message->_typ_mes);
+	printf("Message de type %u.\n", message->_typ_mes);
 
 	return 0;
 }
 
 int getNeighbour(unsigned long s_addr) {
 	int indice = -1, i;
+	printf ("Tibiliti : Adresse : %lu\n", s_addr);
 
 	for(i = 0 ; i < this_site.nbNeighbours ; i++)
 		if(s_addr == this_site.neighbours[i].sin_addr.s_addr)
