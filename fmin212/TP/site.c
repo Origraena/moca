@@ -61,6 +61,7 @@ void standardInput() {
 				printf ("Error");
 				break;
 			}
+			type(envoi) = MESSAGE;
 			adip[15] = '\0';
 			strncpy(ip(envoi), adip, 16);
 			sendMessageWithAdd(envoi);
