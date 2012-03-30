@@ -102,18 +102,18 @@ int handleMessage(msg_t msg) {
 }
 
 int handleRequest(msg_t msg) {
+	unsigned long int ipa = atoll(ip(msg));
 	
-	if(!getNeighbour(atoi(ip(msg))))
+	if(!getNeighbour(ipa))
 		return 0;
 	
 	if(last == -1) {
-		printf("%s \n", ip(msg));
 		if(state == WAITING || state == WORKING)
 			next = getNeighbour(atoi(ip(msg)));
 		else if(tokenPresent == 1) {
 			//printf("request answer atoll(ip) %lu\n", (unsigned long int)atoll(ip));
 			type(msg) = TOKEN;
-			if(sendMessage(getNeighbour((unsigned long int)atoll(ip(msg))), msg) == -1)
+			if(sendMessage(getNeighbour(ipa), msg) == -1)
 				return -1;
 			tokenPresent = 0;
 		}

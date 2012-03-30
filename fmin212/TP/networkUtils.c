@@ -296,11 +296,12 @@ int recvMessage(msg_t* message, struct sockaddr_in* add) {
 
 int getNeighbour(unsigned long s_addr) {
 	int indice = -1, i;
-	printf ("Tibiliti : Adresse : %lu\n", s_addr);
 
 	for(i = 0 ; i < this_site.nbNeighbours ; i++)
-		if(s_addr == this_site.neighbours[i].sin_addr.s_addr)
+		if(s_addr == this_site.neighbours[i].sin_addr.s_addr) {
 			indice = i;
+			printf ("%s\n", inet_ntoa(this_site.neighbours[i].sin_addr));
+		}
 
 	return indice;
 }
