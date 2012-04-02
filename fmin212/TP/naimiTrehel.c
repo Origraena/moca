@@ -57,7 +57,6 @@ int critSectionRequest() {
 		itoa (this_site.neighbours[0].sin_addr.s_addr, &tmpmes);
 		strncpy(ip(msg), tmpmes, 16);
 		free(tmpmes);
-		printf ("Addr %s\n", ip(msg));
 		//printf("addr %ul ; apres itoa %s\n", this_site.neighbours[0].sin_addr.s_addr, ipAddr);
 		if(sendMessage(last, msg) == -1)
 			return -1;
@@ -67,7 +66,6 @@ int critSectionRequest() {
 		itoa (this_site.neighbours[0].sin_addr.s_addr, &tmpmes);
 		strncpy(ip(msg), tmpmes, 16);
 		free(tmpmes);
-		printf ("Addr %s\n", ip(msg));
 		if(broadcast(msg) == -1)
 			return -1;
 	}
@@ -109,7 +107,7 @@ int handleRequest(msg_t msg) {
 	
 	if(last == -1) {
 		if(state == WAITING || state == WORKING)
-			next = getNeighbour(atoi(ip(msg)));
+			next = getNeighbour(ipa);
 		else if(tokenPresent == 1) {
 			//printf("request answer atoll(ip) %lu\n", (unsigned long int)atoll(ip));
 			type(msg) = TOKEN;
@@ -123,7 +121,7 @@ int handleRequest(msg_t msg) {
 		if(sendMessage(last, msg) == -1)
 			return -1;
 	}
-	last = getNeighbour(atoi(ip(msg)));
+	last = getNeighbour(ipa);
 	
 	return 0;
 }

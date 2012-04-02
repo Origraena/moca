@@ -13,24 +13,27 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <netdb.h>
 
 #define TOLERANCE 5
 #define IPLONG    16
-#define SIZE (3+TOLERANCE)*sizeof(int)+IPLONG*sizeof(char)
+#define SIZE 3*sizeof(int)+IPLONG*sizeof(char)+TOLERANCE*sizeof(struct sockaddr_in)
 
 // {{{ Data Structures
 typedef enum msg_type {
-	MESSAGE = 1,
-	REQUEST = 2,
-	TOKEN = 3,
-	HELLO = 4,
-	HELLOREP = 5,
-	COMMIT = 8,
-	ARE_YOU_ALIVE = 16,
-	I_AM_ALIVE = 32,
-	SEARCH_PREV = 64,
-	SEARCH_QUEUE = 128,
-	ACK_SEARCH_QUEUE = 256
+	MESSAGE =						1,
+	REQUEST =						2,
+	TOKEN =							3,
+	HELLO =							4,
+	HELLOREP =					5,
+	COMMIT =						6,
+	ARE_YOU_ALIVE =			7,
+	I_AM_ALIVE =				8,
+	SEARCH_PREV =				9,
+	SEARCH_QUEUE =		 10,
+	ACK_SEARCH_QUEUE = 11
 } msg_type;
 
 // Attempts to represent all kind of messages used in fault tolerant extensions
@@ -39,7 +42,7 @@ typedef struct message {
 	msg_type _typ_mes;
 	int _id_sender;
 	int _pos_next_queue; // if msg_type == SEARCH_QUEUE, it is used to store number of access to cs
-	int _pred[TOLERANCE];
+	struct sockaddr_in _pred[TOLERANCE];
 	char _ip[IPLONG];
 } msg_t;
 // }}}

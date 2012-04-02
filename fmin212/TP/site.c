@@ -8,7 +8,6 @@
 #include "networkUtils.h"
 #include "naimiTrehel.h"
 #include "utils.h"
-#include "faultTolerantExt.h"
 
 #define CLEAN()	printf("CLEAN...\n"); \
 				CLEAN_NETWORK()
@@ -43,7 +42,6 @@ void standardInput() {
 	int rea;
 	char adip[20];
 
-	printf("> ");
 	scanf("%d", &rea);
 	printf("\n");
 
