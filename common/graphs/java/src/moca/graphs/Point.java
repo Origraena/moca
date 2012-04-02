@@ -2,7 +2,7 @@ package moca.graphs;
 
 import java.lang.Math;
 
-public class Point {
+public class Point implements Comparable<Point> {
 	
 	public Point() {
 		this.x = 0;
@@ -50,6 +50,14 @@ public class Point {
 
 	public static Point vector(Point p, Point q) {
 		return new Point(q.x - p.x, q.y - p.y);
+	}
+
+	public int compareTo(Point p) {
+/*		int result = p.x - q.x;
+		if (result == 0)
+			result = p.y - q.y;
+		return result;*/
+		return (x==p.x)?y-p.y:x-p.x;
 	}
 
 };

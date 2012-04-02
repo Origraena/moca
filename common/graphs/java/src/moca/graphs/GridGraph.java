@@ -1,7 +1,6 @@
 package moca.graphs;
 
-import moca.operators.LongOperatorPlus;
-import moca.comparators.LongComparator;
+import moca.operators.OperatorPlus1T;
 
 import moca.graphs.vertices.Vertex;
 import moca.graphs.vertices.VertexGrid;
@@ -72,12 +71,26 @@ public class GridGraph<V,E> extends Graph<V,E> {
 	public int side(int idU, int idV) {
 		return getVertexGrid().side(idU,idV);
 	}
+
+	public Path AStarPath(int root,
+						  E zeroValue,
+						  OperatorPlus1T<E> plus,
+						  Comparator<E> comp,
+						  ArrayList<Vertex<V> > ends,
+						  Heuristique<E> h) {
+		return new Path(super.AStarPath(root,zeroValue,plus,comp,ends,h));		
+	}
 	
 	public class Path extends Graph.Path {
+		public Path(Graph.Path p) {
+			super(p);
+		}
 		public int nextDirection() {
 			if (!hasNext())
 				return NONE;
-			return side(_current,get(_current+1).getID());
+			if (_current+1 >= length())
+				return NONE;
+			return side(get(_current+1).getID(),get(_current).getID());
 		}
 	};
 

@@ -21,6 +21,8 @@ public interface EdgeCollection<Value> extends Iterable<Edge<Value> > {
 
 	Value getValue(int idU, int idV) throws NoSuchElementException;
 
+	int getNbNeighbours(int id) throws UnsupportedOperationException,NoSuchElementException;
+
 	int getNeighbourAt(int idU, int index) throws UnsupportedOperationException, NoSuchElementException;
 
 	void add(int idU, int idV, Value v) throws NoSuchElementException, IllegalEdgeException;

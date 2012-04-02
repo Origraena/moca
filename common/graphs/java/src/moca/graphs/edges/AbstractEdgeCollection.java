@@ -14,6 +14,10 @@ public abstract class AbstractEdgeCollection<E> implements EdgeCollection<E> {
 		throw new UnsupportedOperationException();
 	}
 
+	public int getNbNeighbours(int id) throws UnsupportedOperationException, NoSuchElementException {
+		throw new UnsupportedOperationException();
+	}
+
 	public int getNeighbourAt(int idU, int index) throws UnsupportedOperationException {
 		throw new UnsupportedOperationException();
 	}

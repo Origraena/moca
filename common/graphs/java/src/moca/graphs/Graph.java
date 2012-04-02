@@ -102,6 +102,10 @@ public class Graph<V,E> implements Iterable<V> {
 		return _vertices.get(id);
 	}
 
+	public int getNbNeighbours(int id) throws UnsupportedOperationException, NoSuchElementException {
+		return _edges.getNbNeighbours(id); 
+	}
+
 	public Vertex<V> getNeighbour(int vertexID, int index) throws UnsupportedOperationException, NoSuchElementException {
 		return getVertex(_edges.getNeighbourAt(vertexID,index));
 	}
@@ -307,6 +311,51 @@ public class Graph<V,E> implements Iterable<V> {
 					 null);
 	}
 
+	public Path AStarPath(int root,
+						  E zeroValue,
+						  OperatorPlus1T<E> plus,
+						  Comparator<E> compareEdge,
+						  ArrayList<Vertex<V> > ends,
+						  Heuristique<E> heuristique)  {
+		Path result = new Path();
+		ArrayList<E> weights = new ArrayList<E>(getNbVertices());	// contains the total weights of edges between root and index vertices
+		for (int i = 0 ; i < getNbVertices() ; i++)
+			weights.add(null);
+		weights.set(root,zeroValue);
+		Vertex<V> u = null;
+		NeighbourEdge<E> e = null;
+		Graph<V,E>.AStarVertexComparator compareVertex = new AStarVertexComparator(zeroValue,plus,compareEdge,weights,heuristique);
+		PriorityQueue<Vertex<V> > queue = new PriorityQueue<Vertex<V> >(11,compareVertex);
+		ParentFunction<V> parent = new ParentFunction<V>(getNbVertices());
+		u = getVertex(root);
+		while (u != null) {
+			if (ends.contains(u))
+			{
+				result.add(u);
+				while (u != getVertex(root)) {
+					result.add(0,u);
+					u = parent.getParent(u);
+				}
+				result.add(u);
+				return result;
+			}
+			for (Iterator<NeighbourEdge<E> > it = neighbourIterator(u.getID()) ; it.hasNext() ; ) {
+				e = it.next();
+				if ((weights.get(e.getIDV()) == null) || 
+					(compareEdge.compare(plus.exec(weights.get(u.getID()),e.getValue()),
+								  weights.get(e.getIDV())) < 0)) {
+					queue.remove(getVertex(e.getIDV()));
+					weights.set(e.getIDV(),plus.exec(weights.get(u.getID()),e.getValue()));
+					parent.exec(u,getVertex(e.getIDV()));
+					queue.add(getVertex(e.getIDV()));
+				}
+			}
+			u = queue.poll();
+		}
+		return result;
+	}
+
+
 	public ParentFunction<V> AStar(int root, 
 								   E zeroValue,
 								   OperatorPlus1T<E> plus,
@@ -325,9 +374,7 @@ public class Graph<V,E> implements Iterable<V> {
 		u = getVertex(root);
 		while (u != null) {
 			if (ends.contains(u))
-			{
 				return parent;
-			}
 			for (Iterator<NeighbourEdge<E> > it = neighbourIterator(u.getID()) ; it.hasNext() ; ) {
 				e = it.next();
 				if ((weights.get(e.getIDV()) == null) || 
@@ -742,6 +789,10 @@ public class Graph<V,E> implements Iterable<V> {
 		
 		/* Constructors */
 		public Path() { }
+		public Path(Path p)  {
+			for (int i = 0 ; i < p.length() ; i++)
+				add(p.get(i));
+		}
 		public Path(ParentFunction<V> parentFunction, Vertex<V> begin, Vertex<V> end) {
 			Vertex<V> current = end;
 			while (current != begin) {
@@ -781,7 +832,7 @@ public class Graph<V,E> implements Iterable<V> {
 
 		/* Iterator */
 		public boolean hasNext() {
-			return _current < length()-1;
+			return _current < length();
 		}
 		public Vertex<V> next() throws NoSuchElementException {
 			if (!hasNext())

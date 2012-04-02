@@ -10,11 +10,15 @@ if [ ! -d target/class ]; then
 	echo 'Created target/class directory!'
 fi
 echo 'Invoking javac...'
-javac -d target/class -Xlint:unchecked \
+javac -d target/class \
 src/moca/graphs/*.java \
 src/moca/comparators/*.java \
 src/moca/operators/*.java \
 src/moca/lists/*.java \
+src/moca/tree/*.java \
 src/moca/graphs/edges/*.java \
 src/moca/graphs/vertices/*.java
 echo 'Finished!'
+
+# -Xlint:unchecked \
+

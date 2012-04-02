@@ -37,6 +37,10 @@ public class EdgeCollectionByVertices<E> extends AbstractEdgeCollection<E> {
 		return _vertices.getEdgeValue(idU,idV);
 	}
 
+	public int getNbNeighbours(int id) throws UnsupportedOperationException,NoSuchElementException {
+		return _vertices.getNbNeighbours(id);
+	}
+
 	public int getNeighbourAt(int idU, int index) throws UnsupportedOperationException, NoSuchElementException {
 		return _vertices.getNeighbourAt(idU,index);
 	}

@@ -26,8 +26,8 @@ public class VertexGrid<V,E> implements VertexEdgedCollection<V,E> {
 		Vertex<V> v;
 		for (int i = 0 ; i < height ; i++) {
 			_grid.add(new ArrayList<Vertex<V> >(width));
-			_edges.add(null);
 			for (int j = 0 ; j < width ; j++) {
+				_edges.add(null);
 				v = new Vertex<V>(null);
 				v.setID(i*width+j);
 				_grid.get(i).add(v);
@@ -43,8 +43,8 @@ public class VertexGrid<V,E> implements VertexEdgedCollection<V,E> {
 		Vertex<V> v;
 		for (int i = 0 ; i < height ; i++) {
 			_grid.add(new ArrayList<Vertex<V> >(width));
-			_edges.add(initEdgeValue);
 			for (int j = 0 ; j < width ; j++) {
+				_edges.add(initEdgeValue);
 				v = new Vertex<V>(null);
 				v.setID(i*width+j);
 				_grid.get(i).add(v);
@@ -93,7 +93,7 @@ public class VertexGrid<V,E> implements VertexEdgedCollection<V,E> {
 		Point p = localID(id);
 		if (p == null)
 			return null;
-		return _grid.get(p.x).get(p.y);
+		return _grid.get(p.y).get(p.x);
 	}
 
 	public boolean add(Vertex<V> v) {
@@ -107,7 +107,7 @@ public class VertexGrid<V,E> implements VertexEdgedCollection<V,E> {
 	public Vertex<V> set(int id, Vertex<V> v) {
 		Point p = localID(id);
 		if (p != null)
-			return _grid.get(p.x).set(p.y,v);
+			return _grid.get(p.y).set(p.x,v);
 		return null;
 	}
 
@@ -158,31 +158,50 @@ public class VertexGrid<V,E> implements VertexEdgedCollection<V,E> {
 		setEdgeValue(idV,null);
 	}
 
+	public int getNbNeighbours(int id) throws NoSuchElementException {
+		int cpt = 0;
+		for (int i = 0 ; i < 4 ; i++) {
+			try {
+				getEdgeValue(id,getNeighbourAt(id,i));
+				cpt++;
+			}
+			catch (NoSuchElementException e) { }
+		}
+		return cpt;
+	}
+
 	public int getNeighbourAt(int idU, int index) throws NoSuchElementException {
+		int v = -1;
 		switch (index) {
 			case LEFT :
-				return getNeighbourAtLeft(idU);
+				v = getNeighbourAtLeft(idU);
+				break;
 			case TOP :
-				return getNeighbourAtTop(idU);
+				v = getNeighbourAtTop(idU);
+				break;
 			case RIGHT :
-				return getNeighbourAtRight(idU);
+				v = getNeighbourAtRight(idU);
+				break;
 			case BOTTOM :
-				return getNeighbourAtBottom(idU);
+				v = getNeighbourAtBottom(idU);
+				break;
 			default :
 				throw new NoSuchElementException();
 		}
+		getEdgeValue(idU,v);			// will throw a NoSuchElementException if there is no edge
+		return v;
 	}
 
 	public int getNeighbourAtLeft(int idU) throws NoSuchElementException {
 		Point p = localID(idU);
-		if (p.x <= 0)
+		if (p.x < 0)
 			throw new NoSuchElementException();
 		return globalID(p.x-1,p.y);
 	}
 
 	public int getNeighbourAtTop(int idU) throws NoSuchElementException {
 		Point p = localID(idU);
-		if (p.y <= 0)
+		if (p.y < 0)
 			throw new NoSuchElementException();
 		return globalID(p.x,p.y-1);
 	}
@@ -237,7 +256,15 @@ public class VertexGrid<V,E> implements VertexEdgedCollection<V,E> {
 			_id = id;
 		}
 		public boolean hasNext() {
-			return _index < 4;
+			if (_index >= 4)
+				return false;
+			try {
+				getNeighbourAt(_id,_index);
+				return true;
+			}
+			catch (NoSuchElementException e) {
+				return false;
+			}
 		}
 		public NeighbourEdge<E> next() throws UnsupportedOperationException {
 			if (!hasNext())
