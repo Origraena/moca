@@ -9,21 +9,18 @@
 #include "utils.h"
 
 
-void itoa(long n, char** res)
-{
+void itoa(long n, char** res) {
 	int i = 1, nbChiffres, iDeb = 0;
 	long trans = n;
 	char* chaine;
 	
-	while(trans > 10)
-	{
+	while(trans > 10) {
 		trans /= 10;
 		i++;
 	}
 	nbChiffres = i;
 	
-	if(n < 0)
-	{
+	if(n < 0) {
 		nbChiffres++;
 		iDeb = 1;
 	}
@@ -33,8 +30,7 @@ void itoa(long n, char** res)
 		
 	trans = n;
 	
-	for(i = nbChiffres-1 ; i >= iDeb ; i--)
-	{
+	for(i = nbChiffres-1 ; i >= iDeb ; i--) {
 		chaine[i] = 48 + abs(trans % 10);
 		trans /= 10;
 	}

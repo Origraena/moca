@@ -19,8 +19,7 @@
 #define WAITING_PERIOD 5
 
 
-typedef enum site_state
-{
+typedef enum site_state {
 	IDLE = 1,
 	WAITING = 2,
 	WORKING = 3
@@ -33,13 +32,13 @@ site_state state;
 
 int init_structures();
 int critSectionRequest();
-int handleMessage(int type, char* message);
-int handleRequest(char* ip);
-int handleToken(char* message);
+int handleMessage(msg_t mes);
+int handleRequest(msg_t mes);
+int handleToken(msg_t mes);
 int takeCriticalSection();
 void liberation(void* arg);
-int handleHello(char* message);
-int handleHelloRep(char* message, struct sockaddr_in* netParamsNeighbour);
+int handleHello(msg_t mes);
+int handleHelloRep(msg_t mes, struct sockaddr_in* netParamsNeighbour);
 int waitForHellorep(int waitingPeriod);
 
 
