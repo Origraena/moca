@@ -10,5 +10,5 @@ if [ ! -d target/class ]; then
 	echo 'Created target/class directory!'
 fi
 echo 'Invoking javac...'
-javac -d target/class src/ori/logging/*.java 
+javac -d target/class src/moca/logging/*.java 
 echo 'Finished!'

@@ -1,4 +1,4 @@
-package ori.logging;
+package moca.logging;
 
 import java.util.HashMap;
 import java.util.ArrayList;
@@ -7,10 +7,23 @@ import java.util.logging.Handler;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.LogManager;
 
+/**
+ * Logger convenient class.<br />
+ * Maintains the logger instances to not be garbage collected.<br /> 
+ * Provides some functions usefull to get quickly a specific instance for an object or a
+ * class.
+ * Most of the methods has a corresponding static method with same name but the first
+ * character.<br />
+ * Further more, this class link every handler added by the addHandler method to each
+ * loggerinlogger instance.<br />
+ * By default, a console handler is added using the default formatter class.<br />
+ * Instances are managed by an internal hash map providing average O(1) access to the
+ * loggers.
+ */
 public class Logger {
 
 	/** Default logger name */
-	public static final String DEFAULT_LOGGER_NAME = "ori";
+	public static final String DEFAULT_LOGGER_NAME = "moca";
 
 
 	/* Handlers methods */

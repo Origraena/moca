@@ -1,4 +1,4 @@
-package ori.logging;
+package moca.logging;
 
 import java.util.logging.Formatter;
 import java.util.logging.LogRecord;
