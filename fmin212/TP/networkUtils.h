@@ -41,6 +41,13 @@ typedef struct site {
 	struct sockaddr_in *neighboursTmp;
 } site;
 
+typedef enum site_state {
+	IDLE = 1,
+	WAITING = 2,
+	WORKING = 3
+} site_state;
+
+
 // ??????? ou comment faire de la prog objet en C ^^
 extern site this_site;
 

@@ -19,16 +19,14 @@
 #define WAITING_PERIOD 5
 
 
-typedef enum site_state {
-	IDLE = 1,
-	WAITING = 2,
-	WORKING = 3
-} site_state;
-
 int last;
 int next;
 int tokenPresent;
 site_state state;
+
+// Only needed for faul tolerant extension
+int position;
+struct sockaddr_in predec[TOLERANCE+1];
 
 int init_structures();
 int critSectionRequest();

@@ -136,7 +136,7 @@ int init_network(int argc, char* argv[]) {
 	this_site.nbNeighbours = 0;
 	this_site.running = 1;
 
-	printf("Lancement du site…\n");
+	printf("Lancement du site\n");
 
 	//printf("Attente des autres sites…\n");
 	//return waitForHellorep(5);
