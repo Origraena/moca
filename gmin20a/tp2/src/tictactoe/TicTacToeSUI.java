@@ -16,7 +16,7 @@ public class TicTacToeSUI implements TicTacToe.UI {
 	public static final String ASK_WIDTH = "Choose grid width -must be greater than or equals 3- :";
 	public static final String ASK_NB_PLAYERS = "How many human will play ?";
 	public static final String ASK_WHO_START = "Do you want to start ?";
-	public static final String ASK_DIFFICULTY = "Choose AI difficulty -max depth of minimax tree- :";
+	public static final String ASK_DIFFICULTY = "Choose AI difficulty -max depth of minimax tree (0 => leaves)- :";
 	public static final String ASK_ALGORITHM = "Will use minimax ? -false implies negamax-";
 	public static final String ASK_TILE_SIZE = "Choose a tile size : ";
 	public static final String ASK_TOKEN = "Choose token :";
