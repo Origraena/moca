@@ -293,9 +293,10 @@ int handleRequest(msg_t msg) {
 			next = getNeighbour(ipa);
 			type(msg) = COMMIT;
 			pos(msg) = position + 1;
+			strncpy(ip(msg), ips(msg), IPLONG * sizeof(char));
 			int j;
 			for (j=0; j<TOLERANCE; pred(msg)[j] = predec[j], j++);
-			if (sendMessage(getNeighbour(ipa), msg) == -1)
+			if (sendMessageWithAdd(msg) == -1)
 				return -1;
 		}
 		else if(tokenPresent == 1) {
