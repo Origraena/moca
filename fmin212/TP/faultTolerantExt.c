@@ -59,7 +59,7 @@ void site_failure(int sig) {
 				handleMessage(msg);
 		}
 	}
-	
+
 	msg_t min;
 
 	type(msg) = SEARCH_PREV;
@@ -89,7 +89,7 @@ void site_failure(int sig) {
 		critSectionRequest();
 		return;
 	}
-	
+
 	type(msg) = CONNECTION;
 	strncpy(ip(msg), ips(min), IPLONG * sizeof(char));
 	last = getNeighbour(atoll(ips(min)));
@@ -162,94 +162,88 @@ int critSectionRequest() {
 	else if(last != -1) {
 		if(sendMessage(last, msg) == -1)
 			return -1;
-		last = -1;
-		return 0;
-	}
-	else {
-		if(broadcast(msg) == -1)
-			return -1;
-	}
-	last = -1;
 
-	time_t timeStart, timeCur;
-	timeStart = time(&timeStart);
-	timeCur = time(&timeCur);
-
-	int flags = fcntl(this_site.sdRecv, F_GETFL);
-	int flags2 = flags | O_NONBLOCK;
-	fcntl(this_site.sdRecv, F_SETFL, flags2);
-
-	while(timeCur - timeStart < 2*TMESG) {
+		time_t timeStart, timeCur;
+		timeStart = time(&timeStart);
 		timeCur = time(&timeCur);
-		memset (&msg, 0, SIZE);
 
-		if(recvMessage(&msg, NULL) == -1) 
-			continue;
+		int flags = fcntl(this_site.sdRecv, F_GETFL);
+		int flags2 = flags | O_NONBLOCK;
+		fcntl(this_site.sdRecv, F_SETFL, flags2);
 
-		if (type(msg) == COMMIT)
-			return handleCommit(msg);
-		else if (type(msg) == REQUEST) {}
-		else
-			handleMessage(msg);
-	}
+		while(timeCur - timeStart < 2*TMESG) {
+			timeCur = time(&timeCur);
+			memset (&msg, 0, SIZE);
 
-	type(msg) = SEARCH_QUEUE;
-	nb_acc(msg) = acces;
-	broadcast(msg);
+			if(recvMessage(&msg, NULL) == -1) 
+				continue;
 
-	msg_t max;
-	pos(max) = -1;
-
-	timeStart = time(&timeStart);
-	timeCur = time(&timeCur);
-
-	while(timeCur - timeStart < 2*TMESG) {
-		timeCur = time(&timeCur);
-		memset (&msg, 0, SIZE);
-
-		if(recvMessage(&msg, NULL) == -1) 
-			continue;
-
-		switch(type(msg)) {
-			case ACK_SEARCH_QUEUE:
-				if (pos(msg) > pos(max))
-					max = msg;
-				break;
-			case SEARCH_QUEUE:
-				if (nb_acc(msg) > acces) 
-					continue;
-				if (nb_acc(msg) == acces) {
-					char *ip_pers = inet_ntoa(this_site.neighbours[0].sin_addr);
-					if (strcmp(ip_pers, ips(msg)) <= 0)
-						continue;
-				}
-				unsigned long int ipa = atoll(ips(msg));
-				last = getNeighbour(ipa);
-				return critSectionRequest();
-			case REQUEST:
-				break;
-			default:
+			if (type(msg) == COMMIT){
+				printf("Réception Commit\n");
+				return handleCommit(msg);
+			}
+			else if (type(msg) == REQUEST) {}
+			else
 				handleMessage(msg);
-				break;
+		}
+
+		type(msg) = SEARCH_QUEUE;
+		nb_acc(msg) = acces;
+		broadcast(msg);
+
+		msg_t max;
+		pos(max) = -1;
+
+		timeStart = time(&timeStart);
+		timeCur = time(&timeCur);
+
+		while(timeCur - timeStart < 2*TMESG) {
+			timeCur = time(&timeCur);
+			memset (&msg, 0, SIZE);
+
+			if(recvMessage(&msg, NULL) == -1) 
+				continue;
+
+			switch(type(msg)) {
+				case ACK_SEARCH_QUEUE:
+					if (pos(msg) > pos(max))
+						max = msg;
+					break;
+				case SEARCH_QUEUE:
+					if (nb_acc(msg) > acces) 
+						continue;
+					if (nb_acc(msg) == acces) {
+						char *ip_pers = inet_ntoa(this_site.neighbours[0].sin_addr);
+						if (strcmp(ip_pers, ips(msg)) <= 0)
+							continue;
+					}
+					unsigned long int ipa = atoll(ips(msg));
+					last = getNeighbour(ipa);
+					return critSectionRequest();
+				case REQUEST:
+					break;
+				default:
+					handleMessage(msg);
+					break;
+			}
+		}
+
+		if (pos(max) < 0) {
+			tokenPresent = 1;
+			takeCriticalSection();
+		}
+		else {
+			unsigned long int ipa = atoll(ip(msg));
+			last = getNeighbour(ipa);
+			strncpy(ip(msg), ips(max),IPLONG *sizeof(char));
+			if (next(msg)) {
+				type(msg) = CONNECTION;
+				if (sendMessageWithAdd(msg) == -1)
+					return -1;
+			}
+			return critSectionRequest();
 		}
 	}
-
-	if (pos(max) < 0) {
-		tokenPresent = 1;
-		takeCriticalSection();
-	}
-	else {
-		unsigned long int ipa = atoll(ip(msg));
-		last = getNeighbour(ipa);
-		strncpy(ip(msg), ips(max),IPLONG *sizeof(char));
-		if (next(msg)) {
-			type(msg) = CONNECTION;
-			if (sendMessageWithAdd(msg) == -1)
-				return -1;
-		}
-		return critSectionRequest();
-	}
-
 	return 0;
 }
 // }}}
@@ -266,8 +260,6 @@ int handleMessage(msg_t msg) {
 			return handleHello(msg);
 		case HELLOREP:
 			return handleHelloRep(msg, NULL);
-		case COMMIT:
-			return handleCommit(msg);
 		case ARE_YOU_ALIVE:
 			return handleAreYouAlive(msg);
 		case SEARCH_PREV:
@@ -276,12 +268,6 @@ int handleMessage(msg_t msg) {
 			return handleSearchQueue(msg);
 		case CONNECTION:
 			return handleConnection(msg);
-		case I_AM_ALIVE:
-			return handleIAmAlive(msg);
-		case ACK_SEARCH_PREV:
-			return handleAckSearchPrev(msg);
-		case ACK_SEARCH_QUEUE:
-			return handleAckSearchQueue(msg);
 		default:
 			fprintf(stderr, "Type de message receptionne inconnu...\n");
 			return -1;
@@ -309,8 +295,10 @@ int handleRequest(msg_t msg) {
 		else if(tokenPresent == 1) {
 			printf("request answer atoll(ip) %lu\n", (unsigned long int)ipa);
 			type(msg) = TOKEN;
-			if(sendMessage(getNeighbour(ipa), msg) == -1)
+			if(sendMessage(getNeighbour(ipa), msg) == -1){
+				printf ("Raté...\n");
 				return -1;
+			}
 			tokenPresent = 0;
 			position = -1;
 		}
