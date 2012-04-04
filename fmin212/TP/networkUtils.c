@@ -218,7 +218,7 @@ int sendMessageWithAdd(msg_t m) {
 	bzero(&netParamsNeighbour,sizeof(netParamsNeighbour));
 	netParamsNeighbour.sin_family = AF_INET;
 	netParamsNeighbour.sin_port = htons(PORT_RECV);
-	netParamsNeighbour.sin_addr.s_addr = inet_addr(ip(m));
+	inet_aton(ip(m), &netParamsNeighbour.sin_addr);
 
 	printf("Envoi d'un message de type %d a %s\n", type(m), inet_ntoa(netParamsNeighbour.sin_addr));
 	if (sendto(this_site.sdSend, &m, SIZE, 0, (struct sockaddr *)&netParamsNeighbour,sizeof(netParamsNeighbour)) == -1) {
