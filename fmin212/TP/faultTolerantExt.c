@@ -187,6 +187,10 @@ int critSectionRequest() {
 			}
 			else {
 				if (type(msg) == REQUEST) {}
+				else if (type(msg) == TOKEN) {
+					handleToken(msg);
+					return 0;
+				}
 				else
 					handleMessage(msg);
 			}
