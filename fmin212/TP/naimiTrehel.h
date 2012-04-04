@@ -17,6 +17,7 @@
 #include "utils.h"
 
 #define WAITING_PERIOD 5
+#define TMESG					 2
 
 
 int last;
@@ -26,6 +27,8 @@ site_state state;
 
 // Only needed for faul tolerant extension
 int position;
+int check;
+pthread_mutex_t mut_check;
 struct sockaddr_in predec[TOLERANCE+1];
 
 int init_structures();

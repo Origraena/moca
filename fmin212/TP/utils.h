@@ -19,7 +19,7 @@
 
 #define TOLERANCE 5
 #define IPLONG    16
-#define SIZE 3*sizeof(int)+IPLONG*sizeof(char)+TOLERANCE*sizeof(struct sockaddr_in)
+#define SIZE 4*sizeof(int)+2*IPLONG*sizeof(char)+TOLERANCE*sizeof(struct sockaddr_in)
 
 // {{{ Data Structures
 typedef enum msg_type {
@@ -33,26 +33,34 @@ typedef enum msg_type {
 	I_AM_ALIVE =				8,
 	SEARCH_PREV =				9,
 	SEARCH_QUEUE =		 10,
-	ACK_SEARCH_QUEUE = 11
+	ACK_SEARCH_QUEUE = 11,
+	CONNECTION =			 12,
+	CHECK =						 13,
+	ACK_CHECK =				 14,
+	ACK_SEARCH_PREV =  15,
 } msg_type;
 
 // Attempts to represent all kind of messages used in fault tolerant extensions
 // to implements only one message structure
 typedef struct message {
 	msg_type _typ_mes;
-	int _id_sender;
-	int _pos_next_queue; // if msg_type == SEARCH_QUEUE, it is used to store number of access to cs
+	char _sender[IPLONG];
+	int _pos_next_queue;
+	int _nb_access;
+	int _has_next;
 	struct sockaddr_in _pred[TOLERANCE];
 	char _ip[IPLONG];
 } msg_t;
 // }}}
 
 // {{{ Macros
-#define id(m) m._id_sender
+#define ips(m) m._sender
 #define pos(m) m._pos_next_queue
 #define pred(m) m._pred
 #define type(m) m._typ_mes
 #define ip(m) m._ip
+#define next(m) m._has_next
+#define nb_acc(m) m._nb_access
 // }}}
 
 void itoa(long n, char** res);

@@ -14,7 +14,6 @@
 
 site this_site;
 
-
 /* ending handler. Necessary to clean the environnement. */
 void end_handler(int sig) {
 	printf("\nSignal caught\n");
@@ -165,6 +164,7 @@ int main(int argc, char* argv[]) {
 	}
 	
 	CLEAN()
+		pthread_mutex_destroy(&mut_check);
 	printf("Fermeture du site.\n");
 	
 	return 0;

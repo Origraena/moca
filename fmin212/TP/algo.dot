@@ -1,0 +1,106 @@
+digraph Algo {
+	node[shape=box]
+	S [label="Site"]
+	Util [shape=hexagon, label="User Action ?"]
+
+	S -> Util;
+
+	Mess[shape=hexagon, label="Message ?"]
+	Dem [label="Ask for SC"]
+	Tok [shape=hexagon, label="Owns Token?"]
+
+	Util -> Dem [label = "Y"]
+	Util -> Mess [label = "N"]
+
+	SC[label="Enter SC"]
+	req[label="Sends REQUEST to last"]
+	tim[label="Arms a timer"]
+	rep[shape=hexagon, label="Receive answer ?"]
+
+	Dem -> Tok;
+	Tok -> SC [label = "Y"]
+	Tok -> req[label = "N"]
+	SC -> S;
+	req->tim;
+	tim->rep;
+
+	var[label="Update local variables"]
+	check[label="Sends message to pred"]
+	viv[shape=hexagon, label="Pred alive ?"]
+	tok2[shape=hexagon, label="Got the token?"]
+	broad2[label="Broadcast SEARCH_QUEUE"]
+	ans3[shape=hexagon, label="Receive answer?"]
+
+	rep->var[label="Y"]
+	rep->broad2[label="N"]
+	broad2->ans3
+	var->check;
+	check->viv;
+	viv->tok2 [label="Y"]
+	tok2->check[label="N"]
+	tok2->SC [label="Y"]
+
+	Detect[label="Send Message to other pred"]
+	ans[shape=hexagon, label="Receive answer ?"]
+	connect[label="Connection"]
+	broad[label="Broadcast SEARCH_PREV"]
+	ans2[shape=hexagon, label="Receive answer ?"]
+	regen[label="Regenerate token"]
+
+	viv->Detect [label="N"]
+	Detect -> ans;
+	ans -> connect [label="Y"]
+	ans->broad [label="N"]
+	broad->ans2;
+	ans2 -> regen [label="N"]
+	ans2 -> connect [label="Y"]
+	regen -> SC;
+	connect -> var;
+
+	Mess -> var [label=COMMIT]
+
+	next[shape=hexagon, label="Has next?"]
+	stok[label="Send Token"]
+	pos[label="reinit local var"]
+
+	SC->next;
+	next->stok [label="Y"]
+	next->pos [label="N"]
+	stok->pos;
+	pos->S;
+
+	aya[label="Send I_AM_ALIVE"]
+	Mess->aya [label="ARE_YOU_ALIVE"]
+	aya->S;
+
+	sp[shape=hexagon, label="Position inf?"]
+	acksp[label="Send ACK_SEARCH_PREV"]
+
+	Mess->sp[label="SEARCH_PREV"]
+	sp->S[label="N"]
+	sp->acksp[label="Y"]
+	acksp->S;
+
+	connected[label="Update Next"]
+	comm[label="Send COMMIT"]
+
+	Mess->connected[label="CONNECT"]
+	connected->comm
+	comm->S
+
+	recq[shape=hexagon, label="position > 0 ?"]
+	sq[label="Send ACK_SEARCH_QUEUE"]
+	sent[shape=hexagon, label="SEARCH_QUEUE sent?"]
+	nb_conn[shape=hexagon, label="nb_conn < ?"]
+
+	ans3->nb_conn[label="SEARCH_QUEUE"]
+	ans3->connect[label="ACK_SEARCH_QUEUE"]
+	Mess->recq[label="SEARCH_QUEUE"]
+	recq->sq[label="Y"]
+	recq->S[label="N"]
+	sq->sent
+	sent->nb_conn[label="Y"]
+	sent->S[label="N"]
+	nb_conn->regen[label="Y"]
+	nb_conn->req[label="N"]
+}

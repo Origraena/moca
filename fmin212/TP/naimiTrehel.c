@@ -52,23 +52,13 @@ int critSectionRequest() {
 	if(tokenPresent == 1)
 		takeCriticalSection();
 	else if(last != -1) {
-		// send a request to last
-		char *tmpmes;
-		itoa (this_site.neighbours[0].sin_addr.s_addr, &tmpmes);
-		strncpy(ip(msg), tmpmes, 16);
-		free(tmpmes);
-		//printf("addr %ul ; apres itoa %s\n", this_site.neighbours[0].sin_addr.s_addr, ipAddr);
 		if(sendMessage(last, msg) == -1)
 			return -1;
 	}
-	else {
-		char *tmpmes;
-		itoa (this_site.neighbours[0].sin_addr.s_addr, &tmpmes);
-		strncpy(ip(msg), tmpmes, 16);
-		free(tmpmes);
+	else 
 		if(broadcast(msg) == -1)
 			return -1;
-	}
+
 	last = -1;
 	
 	return 0;
@@ -100,7 +90,7 @@ int handleMessage(msg_t msg) {
 }
 
 int handleRequest(msg_t msg) {
-	unsigned long int ipa = atoll(ip(msg));
+	unsigned long int ipa = atoll(ips(msg));
 	
 	if(!getNeighbour(ipa))
 		return 0;

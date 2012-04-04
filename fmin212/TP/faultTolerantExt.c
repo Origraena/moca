@@ -1,7 +1,20 @@
 #include "naimiTrehel.h"
 
+//{{{ Header
 int handleCommit(msg_t msg);
+int handleAreYouAlive(msg_t msg);
+int handleSearchPrev (msg_t msg);
+int handleSearchQueue(msg_t msg);
+int handleConnection (msg_t msg);
+int handleAckSearchPrev (msg_t msg);
+int handleAckSearchQueue (msg_t msg);
+int handleAckCheck (msg_t msg);
+int handleCheck (msg_t msg);
 
+void checkNeighbour (void *arg);
+//}}}
+
+//{{{ init_structures
 int init_structures() {
 	int i;
 	last = -1;
@@ -10,6 +23,8 @@ int init_structures() {
 	tokenPresent = 0;
 
 	position = 0;
+	pthread_mutex_init(&mut_check, NULL);
+	check = 0;
 	for (i=0; i<TOLERANCE+1; memset(&predec[i++], 0, sizeof(struct sockaddr_in)));
 	
 	/* HELLO message broadcasting */
@@ -39,7 +54,9 @@ int init_structures() {
 	
 	return 0;
 }
+// }}}
 
+// {{{ critSectionRequest
 int critSectionRequest() {
 	state = WAITING;
 	msg_t msg;
@@ -48,20 +65,10 @@ int critSectionRequest() {
 	if(tokenPresent == 1)
 		takeCriticalSection();
 	else if(last != -1) {
-		// send a request to last
-		char *tmpmes;
-		itoa (this_site.neighbours[0].sin_addr.s_addr, &tmpmes);
-		strncpy(ip(msg), tmpmes, 16);
-		free(tmpmes);
-		//printf("addr %ul ; apres itoa %s\n", this_site.neighbours[0].sin_addr.s_addr, ipAddr);
 		if(sendMessage(last, msg) == -1)
 			return -1;
 	}
 	else {
-		char *tmpmes;
-		itoa (this_site.neighbours[0].sin_addr.s_addr, &tmpmes);
-		strncpy(ip(msg), tmpmes, 16);
-		free(tmpmes);
 		if(broadcast(msg) == -1)
 			return -1;
 	}
@@ -69,32 +76,50 @@ int critSectionRequest() {
 	
 	return 0;
 }
+// }}}
 
+// {{{ Message Management
+// {{{ handleMessage
 int handleMessage(msg_t msg) {
 	switch (type(msg)) {
 		case REQUEST:
 			return handleRequest(msg);
-			
 		case TOKEN:
 			return handleToken(msg);
-			
 		case HELLO:
 			return handleHello(msg);
-			
 		case HELLOREP:
 			return handleHelloRep(msg, NULL);
-
 		case COMMIT:
 			return handleCommit(msg);
-			
+		case ARE_YOU_ALIVE:
+			return handleAreYouAlive(msg);
+		case SEARCH_PREV:
+			return handleSearchPrev(msg);
+		case SEARCH_QUEUE:
+			return handleSearchQueue(msg);
+		case CONNECTION:
+			return handleConnection(msg);
+		case I_AM_ALIVE:
+			return handleIAmAlive(msg);
+		case ACK_SEARCH_PREV:
+			return handleAckSearchPrev(msg);
+		case ACK_SEARCH_QUEUE:
+			return handleAckSearchQueue(msg);
+		case CHECK:
+			return handleCheck(msg);
+		case ACK_CHECK:
+			return handleAckCheck(msg);
 		default:
 			fprintf(stderr, "Type de message receptionne inconnu...\n");
 			return -1;
 	}
 }
+// }}}
 
+// {{{ handleRequest
 int handleRequest(msg_t msg) {
-	unsigned long int ipa = atoll(ip(msg));
+	unsigned long int ipa = atoll(ips(msg));
 	
 	if(!getNeighbour(ipa))
 		return 0;
@@ -126,11 +151,30 @@ int handleRequest(msg_t msg) {
 	
 	return 0;
 }
+//}}}
 
+//{{{ handleCommit
 int handleCommit (msg_t msg) {
+	unsigned long int ipa = atoll(ips(msg));
+	pthread_t thread_id;
+
+	if(!getNeighbour(ipa))
+		return 0;
+
+	position = pos(msg);
+	int i;
+	for (i=0; i<TOLERANCE; predec[i] = pred(msg)[i+1], i++);
+
+	inet_aton(ips(msg),&(predec[0].sin_addr));
+
+	if(pthread_create(&thread_id, NULL, (void*)(checkNeighbour), (void*)predec) != 0)
+		fprintf(stderr, "Thread creation failure.\n");
+
 	return 0;
 }
+//}}}
 
+//{{{ handleToken
 int handleToken(msg_t message) {
 	tokenPresent = 1;
 	if(state == WAITING)
@@ -138,37 +182,9 @@ int handleToken(msg_t message) {
 	
 	return 0;
 }
+//}}}
 
-int takeCriticalSection() {
-	printf("Prise de la section critique\n");
-	state = WORKING;
-	
-	/* exec CS */
-	pthread_t thread_id;
-	if(pthread_create(&thread_id, NULL, (void*)(liberation), (void*)20) != 0)
-		fprintf(stderr, "Thread creation failure.\n");
-	
-	return 0;
-}
-
-void liberation(void* arg) {
-	pthread_detach(pthread_self());
-	
-	
-	sleep((long int)arg);
-	
-	
-	state = IDLE;
-	if(next != -1) {
-		msg_t mes;
-		type(mes) = TOKEN;
-		if(sendMessage(next, mes) == -1) {}
-		next = -1;
-		tokenPresent = 0;
-	}
-	printf("Section critique relachee\n");
-}
-
+//{{{ handleHello
 int handleHello(msg_t mes) {
 	type(mes) = HELLOREP;
 	char* ipLastStr;
@@ -188,7 +204,9 @@ int handleHello(msg_t mes) {
 	free(ipLastStr);
 	return res;
 }
+//}}}
 
+//{{{ handleHelloRep
 int handleHelloRep(msg_t message, struct sockaddr_in* netParamsNeighbour) {
 	long long int ipLastJ = atoi(ip(message));
 	int lastJ = -1, i;
@@ -216,7 +234,9 @@ int handleHelloRep(msg_t message, struct sockaddr_in* netParamsNeighbour) {
 	
 	return 0;
 }
+//}}}
 
+//{{{ waitForHellorep
 int waitForHellorep(int waitingPeriod) {
 	struct sockaddr_in netParamsNeighbour;
 	time_t timeStart, timeCur;
@@ -260,5 +280,100 @@ int waitForHellorep(int waitingPeriod) {
 	
 	return 0;
 }
+//}}}
+
+//{{{ handleAreYouAlive
+int handleAreYouAlive(msg_t msg){
+	type(msg) = I_AM_ALIVE;
+	strncpy(ip(msg), ips(msg), IPLONG * sizeof(char));
+	return (sendMessageWithAdd(msg));
+}
+//}}}
+
+//{{{ handleSearchPrev
+int handleSearchPrev (msg_t msg){
+	if (position < pos(msg)) {
+		type(msg) = ACK_SEARCH_PREV;
+		strncpy(ip(msg), ips(msg), IPLONG * sizeof(char));
+		return (sendMessageWithAdd(msg));
+	}
+	return 0;
+}
+//}}}
+
+//{{{ handleSearchQueue
+int handleSearchQueue(msg_t msg){
+
+}
+//}}}
+int handleConnection (msg_t msg){return 0;}
+//}}}
+
+//{{{ Critical Section + Threads
+//{{{ takeCriticalSection
+int takeCriticalSection() {
+	printf("Prise de la section critique\n");
+	state = WORKING;
+	
+	/* exec CS */
+	pthread_t thread_id;
+	if(pthread_create(&thread_id, NULL, (void*)(liberation), (void*)20) != 0)
+		fprintf(stderr, "Thread creation failure.\n");
+	
+	return 0;
+}
+//}}}
+
+//{{{ liberation
+void liberation(void* arg) {
+	pthread_detach(pthread_self());
+	
+	
+	sleep((long int)arg);
+	
+	
+	state = IDLE;
+	if(next != -1) {
+		msg_t mes;
+		type(mes) = TOKEN;
+		if(sendMessage(next, mes) == -1) {}
+		next = -1;
+		tokenPresent = 0;
+	}
+	printf("Section critique relachee\n");
+}
+//}}}
+
+//{{{ checkNeighbour
+void checkNeighbour (void *arg) {
+	pthread_detach(pthread_self());
+
+	struct sockaddr_in *pre = (struct sockaddr_in *)arg;
+
+	msg_t msg;
+	type(msg) = CHECK;
+	char *tmpmes;
+	tmpmes = inet_ntoa(pre->sin_addr);
+	memcpy (ip(msg), tmpmes, IPLONG * sizeof(char));
+
+	while (state == WAITING) {
+		pthread_mutex_lock(&mut_check);
+		if (check) {
+			fprintf (stderr, "Site Failure Detected\n");
+			pthread_mutex_unlock(&mut_check);
+			exit(1);
+		}
+		check --;
+		pthread_mutex_unlock(&mut_check);
+
+		if (sendMessageWithAdd(msg) == -1)
+			continue;
+
+		sleep(2*TMESG);
+	}
+}
+//}}}
+
+//}}}
 
 

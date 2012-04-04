@@ -23,16 +23,16 @@ USE_FAULT_TOLERANT_EXT = 1
 ifeq ($(USE_FAULT_TOLERANT_EXT), 1)
   OBJECTS += faultTolerantExt.o
   COMPILED = faultTolerantExt.o
-
-all: site
+  BIN = fault_tolerant
+all: $(BIN)
 
 faultTolerantExt.o: faultTolerantExt.c
 	$(CC) $(CFLAGS) $<
 else
   OBJECTS += naimiTrehel.o
   COMPILED = naimiTrehel.o
-
-all: site
+  BIN = naimi_trehel
+all: $(BIN)
 
 naimiTrehel.o: naimiTrehel.c
 	$(CC) $(CFLAGS) $<
@@ -45,7 +45,7 @@ clean:
 	rm *.o
 	rm *~
 
-site : $(COMPILED) OBJETS
+$(BIN) : $(COMPILED) OBJETS
 	$(CC) $(OBJECTS) $(OFLAGS) $@
 
 
