@@ -1,5 +1,9 @@
 #include "naimiTrehel.h"
 
+#ifndef TMESG
+#define TMESG 2
+#endif
+
 //{{{ Header
 int handleCommit(msg_t msg);
 int handleAreYouAlive(msg_t msg);
@@ -164,12 +168,12 @@ int critSectionRequest() {
 			return -1;
 
 		time_t timeStart, timeCur;
-		timeStart = time(&timeStart);
-		timeCur = time(&timeCur);
-
 		int flags = fcntl(this_site.sdRecv, F_GETFL);
 		int flags2 = flags | O_NONBLOCK;
 		fcntl(this_site.sdRecv, F_SETFL, flags2);
+
+		timeStart = time(&timeStart);
+		timeCur = time(&timeCur);
 
 		while(timeCur - timeStart < 2*TMESG) {
 			timeCur = time(&timeCur);
@@ -182,9 +186,11 @@ int critSectionRequest() {
 				printf("Réception Commit\n");
 				return handleCommit(msg);
 			}
-			else if (type(msg) == REQUEST) {}
-			else
-				handleMessage(msg);
+			else {
+				if (type(msg) == REQUEST) {}
+				else
+					handleMessage(msg);
+			}
 		}
 
 		type(msg) = SEARCH_QUEUE;
