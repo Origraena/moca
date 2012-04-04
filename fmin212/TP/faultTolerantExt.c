@@ -303,7 +303,7 @@ int handleRequest(msg_t msg) {
 		else if(tokenPresent == 1) {
 			printf("request answer atoll(ip) %lu\n", (unsigned long int)ipa);
 			type(msg) = TOKEN;
-			if(sendMessage(getNeighbour(ipa), msg) == -1){
+			if(sendMessageWithAdd(msg) == -1){
 				printf ("Raté...\n");
 				return -1;
 			}
