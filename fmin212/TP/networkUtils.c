@@ -277,11 +277,9 @@ int recvMessage(msg_t* message, struct sockaddr_in* add) {
 		return -1;
 	}
 
-	char *tmpmes;
-	tmpmes = inet_ntoa(netParamsNeighbour.sin_addr);
-	strncpy(message->_sender, tmpmes, 16);
+	strncpy(message->_sender, inet_ntoa(netParamsNeighbour.sin_addr), 16);
 
-	printf("Message recu depuis l'adresse %s et le port %d. ", inet_ntoa(netParamsNeighbour.sin_addr), ntohs(netParamsNeighbour.sin_port));
+	printf("Message recu depuis l'adresse %s et le port %d. ", message->_sender, ntohs(netParamsNeighbour.sin_port));
 
 	if(hostsUpdate(netParamsNeighbour) == -1) 
 		return -1;
