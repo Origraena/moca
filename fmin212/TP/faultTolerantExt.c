@@ -282,6 +282,9 @@ int handleMessage(msg_t msg) {
 
 // {{{ handleRequest
 int handleRequest(msg_t msg) {
+	printf ("Adresses %s %s", ips(msg), ip(msg));
+	strncpy(ip(msg), ips(msg), IPLONG * sizeof(char));
+	printf ("Adresses %s %s", ips(msg), ip(msg));
 	unsigned long int ipa = atoll(ips(msg));
 
 	if(!getNeighbour(ipa))
@@ -292,9 +295,6 @@ int handleRequest(msg_t msg) {
 			next = getNeighbour(ipa);
 			type(msg) = COMMIT;
 			pos(msg) = position + 1;
-			printf ("Adresses %s %s", ips(msg), ip(msg));
-			strncpy(ip(msg), ips(msg), IPLONG * sizeof(char));
-			printf ("Adresses %s %s", ips(msg), ip(msg));
 			int j;
 			for (j=0; j<TOLERANCE; pred(msg)[j] = predec[j], j++);
 			if (sendMessageWithAdd(msg) == -1)
