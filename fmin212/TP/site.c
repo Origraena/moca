@@ -39,6 +39,7 @@ void print_help() {
 void standardInput() {
 	msg_t envoi;
 	int rea;
+	int a = 0;
 	char adip[20];
 
 	scanf("%d", &rea);
@@ -69,7 +70,9 @@ void standardInput() {
 			printNeighbours();
 			break;
 		case 4:
-			critSectionRequest();
+			do {
+				a = critSectionRequest();
+			} while (a == -2);
 			break;
 		case 5:
 			printf("Last : %d ", last);

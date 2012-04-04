@@ -28,6 +28,7 @@ site_state state;
 // Only needed for faul tolerant extension
 int position;
 int check;
+int acces;
 pthread_mutex_t mut_check;
 struct sockaddr_in predec[TOLERANCE+1];
 
