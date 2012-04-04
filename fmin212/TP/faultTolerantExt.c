@@ -153,8 +153,10 @@ int critSectionRequest() {
 	type(msg) = REQUEST;
 	state = WAITING;
 
-	if(tokenPresent == 1)
+	if(tokenPresent == 1) {
 		takeCriticalSection();
+		return;
+	}
 	else if(last != -1) {
 		if(sendMessage(last, msg) == -1)
 			return -1;
