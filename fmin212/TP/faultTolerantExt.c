@@ -13,6 +13,7 @@ int handleIAmAlive (msg_t msg);
 void checkNeighbour (void *arg);
 //}}}
 
+//{{{ site_failure
 void site_failure(int sig) {
 	int i=0;
 	msg_t msg;
@@ -95,6 +96,7 @@ void site_failure(int sig) {
 	takeCriticalSection();
 	return;
 }
+//}}}
 
 //{{{ init_structures
 int init_structures() {
@@ -155,11 +157,13 @@ int critSectionRequest() {
 
 	if(tokenPresent == 1) {
 		takeCriticalSection();
-		return;
+		return 0;
 	}
 	else if(last != -1) {
 		if(sendMessage(last, msg) == -1)
 			return -1;
+		last = -1;
+		return 0;
 	}
 	else {
 		if(broadcast(msg) == -1)
@@ -303,7 +307,7 @@ int handleRequest(msg_t msg) {
 				return -1;
 		}
 		else if(tokenPresent == 1) {
-			//printf("request answer atoll(ip) %lu\n", (unsigned long int)atoll(ip));
+			printf("request answer atoll(ip) %lu\n", (unsigned long int)ipa);
 			type(msg) = TOKEN;
 			if(sendMessage(getNeighbour(ipa), msg) == -1)
 				return -1;
@@ -555,6 +559,8 @@ void liberation(void* arg) {
 //{{{ checkNeighbour
 void checkNeighbour (void *arg) {
 	pthread_detach(pthread_self());
+
+	printf("Je suis ici!\n");
 
 	sigset_t block;
 	sigemptyset (&block);
