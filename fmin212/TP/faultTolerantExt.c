@@ -42,7 +42,7 @@ void site_failure(int sig) {
 		timeStart = time(&timeStart);
 		timeCur = time(&timeCur);
 
-		while(timeCur - timeStart < 2*TMESG) {
+		while(timeCur - timeStart < (2*TMESG)) {
 			timeCur = time(&timeCur);
 			memset (&msg, 0, SIZE);
 
@@ -175,9 +175,8 @@ int critSectionRequest() {
 		timeStart = time(&timeStart);
 		timeCur = time(&timeCur);
 
-		while(timeCur - timeStart < 2*TMESG) {
+		while(timeCur - timeStart < (2*TMESG)) {
 			timeCur = time(&timeCur);
-			memset (&msg, 0, SIZE);
 
 			if(recvMessage(&msg, NULL) == -1) 
 				continue;
@@ -293,7 +292,9 @@ int handleRequest(msg_t msg) {
 			next = getNeighbour(ipa);
 			type(msg) = COMMIT;
 			pos(msg) = position + 1;
+			printf ("Adresses %s %s", ips(msg), ip(msg));
 			strncpy(ip(msg), ips(msg), IPLONG * sizeof(char));
+			printf ("Adresses %s %s", ips(msg), ip(msg));
 			int j;
 			for (j=0; j<TOLERANCE; pred(msg)[j] = predec[j], j++);
 			if (sendMessageWithAdd(msg) == -1)

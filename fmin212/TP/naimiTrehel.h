@@ -17,7 +17,7 @@
 #include "utils.h"
 
 #define WAITING_PERIOD 5
-#define TMESG					 2
+#define TMESG					 3
 
 
 int last;
