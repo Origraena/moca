@@ -171,10 +171,9 @@ int critSectionRequest() {
 		return 0;
 	}
 	else if(last != -1) {
-		char *tmpter;
-		getIPstrFromNb (last, &tmpter);
+		char *tmpter = getIPstrFromNb (last);
 		printf ("Envoi message à last : %d, adresse : %s.\n", last, tmpter);
-		free(tmpter);
+		free (tmpter);
 		if(sendMessage(last, msg) == -1)
 			return -1;
 
@@ -305,7 +304,7 @@ int handleRequest(msg_t msg) {
 	printf ("Adresses %s %s", ips(msg), ip(msg));
 	strncpy(ip(msg), ips(msg), IPLONG * sizeof(char));
 	printf ("Adresses %s %s", ips(msg), ip(msg));
-	unsigned long int ipa = inet_addr(ips(msg));
+	unsigned long int ipa = (unsigned long int)inet_addr(ips(msg));
 
 	if(getNeighbour(ipa)==-1) {
 		printf ("C'est la loose !!!\n");
@@ -371,6 +370,12 @@ int handleToken(msg_t message) {
 	tokenPresent = 1;
 	if(state == WAITING)
 		takeCriticalSection();
+	else if (next != -1) {
+		type(msg) = TOKEN;
+		char *tmp = getIPstrFromNb(next);
+		strncpy (ip(msg), tmp, IPLONG);
+		sendMessageWithAdd(msg);
+	}
 
 	return 0;
 }
@@ -388,8 +393,9 @@ int handleHello(msg_t mes) {
 		ipLastStr[3] = 0;
 	}
 	else
-		getIPstrFromNb(last, &ipLastStr);
+		ipLastStr = getIPstrFromNb(last);
 
+	printf ("Voilà ce que je balance : %s\n", ipLastStr);
 	memcpy (&(ip(mes)), ipLastStr, (strlen(ipLastStr) + 1) * sizeof(char));
 
 	int res = broadcast(mes);
@@ -403,12 +409,17 @@ int handleHelloRep(msg_t message, struct sockaddr_in* netParamsNeighbour) {
 	long long int ipLastJ = atoi(ip(message));
 	int lastJ = -1, i;
 
+	printf ("Voilà ce que je mange : %s --> %ld\n", ip(message), ipLastJ);
+
 	if(last == -1) {
 		if(ipLastJ > 0) {
 			for(i = 0 ; i < this_site.nbNeighbours ; i++)
-				if((unsigned long int)(this_site.neighbours[i].sin_addr.s_addr) == (unsigned long int)(ipLastJ))
+				if((unsigned long int)(this_site.neighbours[i].sin_addr.s_addr) == (unsigned long int)(netParamsNeighbours[i].sin_addr.s_addr))
 					lastJ = i;
 			last = lastJ;
+			printf ("Tout va bien dans le meilleur des mondes :\n");
+			for (i=0; i< nbNeighbours; printf("%s - ",inet_ntoa(this_site.neighbours[i++].sin_addr)));
+			printf ("\n");
 		}
 		else {
 			//			if(ipLastJ == -10)
@@ -419,6 +430,9 @@ int handleHelloRep(msg_t message, struct sockaddr_in* netParamsNeighbour) {
 						if((unsigned long int)(this_site.neighbours[i].sin_addr.s_addr) == (unsigned long int)(netParamsNeighbour->sin_addr.s_addr))
 							lastJ = i;
 					last = lastJ;
+					printf ("Tout va bien dans le meilleur des mondes num 2 :\n");
+					for (i=0; i< nbNeighbours; printf("%s - ",inet_ntoa(this_site.neighbours[i++].sin_addr)));
+					printf ("\n");
 				}
 			}
 		}
