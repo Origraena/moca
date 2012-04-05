@@ -21,6 +21,7 @@ void checkNeighbour (void *arg);
 void site_failure(int sig) {
 	printf("Réception du signal, site mort.\n");
 	int i=0;
+	int sortie = 0;
 	msg_t msg;
 	time_t timeStart, timeCur;
 
@@ -57,7 +58,8 @@ void site_failure(int sig) {
 				sendMessageWithAdd(msg);
 				last = getNeighbour(ipa);
 				critSectionRequest();
-				return;
+				sortie++;
+				break;
 			}
 			else if (type(msg) == REQUEST) {}
 			else
@@ -65,41 +67,44 @@ void site_failure(int sig) {
 		}
 	}
 
-	msg_t min;
+	if (!sortie) {
+		msg_t min;
 
-	type(msg) = SEARCH_PREV;
-	pos(msg) = position;
-	broadcast(msg);
+		type(msg) = SEARCH_PREV;
+		pos(msg) = position;
+		broadcast(msg);
 
-	timeStart = time(&timeStart);
-	timeCur = time(&timeCur);
-
-	while(timeCur - timeStart < 2*TMESG) {
+		timeStart = time(&timeStart);
 		timeCur = time(&timeCur);
-		memset (&msg, 0, SIZE);
 
-		if(recvMessage(&msg, NULL) == -1) 
-			continue;
+		while(timeCur - timeStart < (2*TMESG)) {
+			timeCur = time(&timeCur);
+			memset (&msg, 0, SIZE);
 
-		pos(min) = -1;
-		if (type(msg) == ACK_SEARCH_PREV) 
-			min = pos(min) == -1 ? msg : (pos(min) > pos(msg) ? msg : min);
-		else if (type(msg) == REQUEST) {}
-		else
-			handleMessage(msg);
+			if(recvMessage(&msg, NULL) == -1) 
+				continue;
+
+			pos(min) = -1;
+			if (type(msg) == ACK_SEARCH_PREV) 
+				min = pos(min) == -1 ? msg : (pos(min) > pos(msg) ? msg : min);
+			else if (type(msg) == REQUEST) {}
+			else
+				handleMessage(msg);
+		}
+
+		if (pos(min) == -1) {
+			tokenPresent = 1;
+			critSectionRequest();
+			sortie ++;
+		}
+
+		if (!sortie) {
+			type(msg) = CONNECTION;
+			strncpy(ip(msg), ips(min), IPLONG * sizeof(char));
+			last = getNeighbour(atoll(ips(min)));
+			takeCriticalSection();
+		}
 	}
-
-	if (pos(min) == -1) {
-		tokenPresent = 1;
-		critSectionRequest();
-		return;
-	}
-
-	type(msg) = CONNECTION;
-	strncpy(ip(msg), ips(min), IPLONG * sizeof(char));
-	last = getNeighbour(atoll(ips(min)));
-	takeCriticalSection();
-	return;
 }
 //}}}
 
@@ -139,7 +144,8 @@ int init_structures() {
 				last = i;
 			}
 		tokenPresent = (!last ? 1 : 0);
-		last = -1;
+		if (tokenPresent)
+			last = -1;
 	}
 
 	struct sigaction action;
@@ -165,6 +171,10 @@ int critSectionRequest() {
 		return 0;
 	}
 	else if(last != -1) {
+		char *tmpter;
+		getIPstrFromNb (last, &tmpter);
+		printf ("Envoi message à last : %d, adresse : %s.\n", last, tmpter);
+		free(tmpter);
 		if(sendMessage(last, msg) == -1)
 			return -1;
 
@@ -254,6 +264,9 @@ int critSectionRequest() {
 			return critSectionRequest();
 		}
 	}
+	else{
+		fprintf (stderr, "Rien ne se passe comme prévu...\n");
+	}
 	return 0;
 }
 // }}}
@@ -278,6 +291,8 @@ int handleMessage(msg_t msg) {
 			return handleSearchQueue(msg);
 		case CONNECTION:
 			return handleConnection(msg);
+		case I_AM_ALIVE:
+			return handleIAmAlive(msg);
 		default:
 			fprintf(stderr, "Type de message receptionne inconnu...\n");
 			return -1;
