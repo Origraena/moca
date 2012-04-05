@@ -15,15 +15,24 @@
 \usepackage{listings}
 \usepackage{lscape}
 \usepackage{amsmath}
+\usepackage{tikz}
+\usepackage{verbatim}
+\usetikzlibrary{arrows,shapes}
 
 \pagestyle{headings}
 \thispagestyle{empty}
 \geometry{a4paper,twoside,left=2.5cm,right=2.5cm,marginparwidth=1.2cm,marginparsep=3mm,top=2.5cm,bottom=2.5cm}
 
+
 \begin{document}
+
 \large
 \setlength{\parskip}{5mm plus2mm minus2mm}
 \lstset{language=C, showstringspaces=false, numbers=left, numberstyle=\tiny, tabsize=4}
+
+
+\pgfdeclarelayer{background}
+\pgfsetlayers{background,main}
 
  
 {\setlength{\parindent}{0cm}
