@@ -33,7 +33,7 @@ void site_failure(int sig) {
 		type(msg) = ARE_YOU_ALIVE;
 		char *tmp = inet_ntoa(predec[i].sin_addr);
 		strncpy (ip(msg), tmp, IPLONG *sizeof(char));
-		unsigned long int ipa = atoll(ip(msg));
+		unsigned long int ipa = (unsigned long int) inet_addr(ip(msg));
 		sendMessageWithAdd(msg);
 
 		pthread_mutex_lock(&mut_check);
@@ -101,7 +101,7 @@ void site_failure(int sig) {
 		if (!sortie) {
 			type(msg) = CONNECTION;
 			strncpy(ip(msg), ips(min), IPLONG * sizeof(char));
-			last = getNeighbour(atoll(ips(min)));
+			last = getNeighbour((unsigned long int)inet_addr(ips(min)));
 			takeCriticalSection();
 		}
 	}
@@ -237,7 +237,7 @@ int critSectionRequest() {
 						if (strcmp(ip_pers, ips(msg)) <= 0)
 							continue;
 					}
-					unsigned long int ipa = atoll(ips(msg));
+					unsigned long int ipa = (unsigned long int) inet_addr(ips(msg));
 					last = getNeighbour(ipa);
 					return critSectionRequest();
 				case REQUEST:
@@ -253,7 +253,7 @@ int critSectionRequest() {
 			takeCriticalSection();
 		}
 		else {
-			unsigned long int ipa = atoll(ip(msg));
+			unsigned long int ipa = (unsigned long int) inet_addr(ip(msg));
 			last = getNeighbour(ipa);
 			strncpy(ip(msg), ips(max),IPLONG *sizeof(char));
 			if (next(msg)) {
@@ -305,9 +305,9 @@ int handleRequest(msg_t msg) {
 	printf ("Adresses %s %s", ips(msg), ip(msg));
 	strncpy(ip(msg), ips(msg), IPLONG * sizeof(char));
 	printf ("Adresses %s %s", ips(msg), ip(msg));
-	unsigned long int ipa = atoll(ips(msg));
+	unsigned long int ipa = inet_addr(ips(msg));
 
-	if(!getNeighbour(ipa)) {
+	if(getNeighbour(ipa)==-1) {
 		printf ("C'est la loose !!!\n");
 		return 0;
 	}
@@ -324,7 +324,7 @@ int handleRequest(msg_t msg) {
 				return -1;
 		}
 		else if(tokenPresent == 1) {
-			printf("request answer atoll(ip) %lu\n", (unsigned long int)ipa);
+			printf("request answer inet_addr(ip) %lu\n", (unsigned long int)ipa);
 			type(msg) = TOKEN;
 			if(sendMessageWithAdd(msg) == -1){
 				printf ("Raté...\n");
@@ -347,7 +347,7 @@ int handleRequest(msg_t msg) {
 
 //{{{ handleCommit
 int handleCommit (msg_t msg) {
-	unsigned long int ipa = atoll(ips(msg));
+	unsigned long int ipa = (unsigned long int)inet_addr(ips(msg));
 	pthread_t thread_id;
 
 	if(!getNeighbour(ipa))
