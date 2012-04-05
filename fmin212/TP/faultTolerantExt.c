@@ -307,12 +307,15 @@ int handleRequest(msg_t msg) {
 	printf ("Adresses %s %s", ips(msg), ip(msg));
 	unsigned long int ipa = atoll(ips(msg));
 
-	if(!getNeighbour(ipa))
+	if(!getNeighbour(ipa)) {
+		printf ("C'est la loose !!!\n");
 		return 0;
+	}
 
 	if(last == -1) {
 		if(state == WAITING || state == WORKING) {
 			next = getNeighbour(ipa);
+			printf("Demande reçue du voisin : %d\n", next);
 			type(msg) = COMMIT;
 			pos(msg) = position + 1;
 			int j;
