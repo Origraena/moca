@@ -19,6 +19,7 @@ void checkNeighbour (void *arg);
 
 //{{{ site_failure
 void site_failure(int sig) {
+	printf("Réception du signal, site mort.\n");
 	int i=0;
 	msg_t msg;
 	time_t timeStart, timeCur;
@@ -546,9 +547,12 @@ void liberation(void* arg) {
 
 	state = IDLE;
 	if(next != -1) {
+		printf ("Envoi du Token.\n");
 		msg_t mes;
 		type(mes) = TOKEN;
-		if(sendMessage(next, mes) == -1) {}
+		if(sendMessage(next, mes) == -1) {
+			printf("Envoi raté...");
+		}
 		next = -1;
 		tokenPresent = 0;
 	}
