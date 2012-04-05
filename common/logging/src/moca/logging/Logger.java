@@ -101,13 +101,13 @@ public class Logger {
 	public void info(Object o, String msg) {
 		getLogger(o).info(msg);
 	}
-	public void sinfo(String loggerName, String msg) {
+	public static void sinfo(String loggerName, String msg) {
 		instance().info(loggerName,msg);
 	}
-	public void sinfo(String msg) {
+	public static void sinfo(String msg) {
 		instance().info(msg);
 	}
-	public void sinfo(Object o, String msg) {
+	public static void sinfo(Object o, String msg) {
 		instance().info(o,msg);
 	}
 

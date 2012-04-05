@@ -24,12 +24,11 @@ public class DefaultFormatter extends Formatter {
 
 	/* Logger name */
 	public String formatLoggerName(String loggerName) {
-		// TODO sun sdk => will work
-/*		String[] sub = loggerName.split(".");
+		String[] sub = loggerName.split(".");
 		if (sub.length > 1) {
 			if (sub[0].compareTo(Logger.DEFAULT_LOGGER_NAME) == 0)
 				return sub[sub.length-1];
-		}*/
+		}
 		return loggerName;
 	}
 
