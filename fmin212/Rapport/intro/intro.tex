@@ -1,0 +1,20 @@
+% !TEX encoding = UTF-8 Unicode
+% !TEX root = ../rapport.tex
+
+\chapter{Introduction}\label{intro}
+Afin de résoudre des problèmes complexes sur des données de grandes tailles, il existe plusieurs possibilités : utiliser un algorithme avec une bonne complexité, augmenter la puissance de l'ordinateur utilisé ou utiliser plusieurs ordinateurs interconnectés. Lorsque les deux premières possibilités ont été poussées à leur maximum, il est nécessaire d'utiliser des algorithmes dits distribués afin de répartir les calculs sur plusieurs machines.
+
+Les algorithmes distribués sont divisés en plusieurs catégories. Il existe tout d'abord des algorithmes d'élection qui permettent de donner la priorité temporaire à un site par rapport aux autres. Il y a également des algorithmes d'exclusion mutuelle qui permettent à tous les sites de travailler sur la même ressource (section critique) et qui garantissent le fait que deux sites ne peuvent pas accéder en même temps à cette ressource. Enfin les algorithmes de terminaison permettent de détecter la fin du calcul distribué pour tous les sites et ainsi de terminer l'application.
+
+Nous allons nous intéresser aux algorithmes distribués d'exclusion mutuelle. Ceux-ci sont jugés sur les critères suivants : 
+
+\begin{itemize}
+	\item la vivacité : le fait qu'un site qui demande à entrer en section critique puisse y entrer au bout d'un temps fini,
+	\item la sureté : la capacité de l'algorithme à faire en sorte qu'un seul site à la fois soit en section critique,
+	\item le respect de l'ordre des demandes,
+	\item la tolérance aux pannes,
+	\item la complexité en nombre de messages échangés.
+\end{itemize}
+
+Nous allons tout d'abord étudier l'algorithme de Naïmi-Trehel \cite{naimi1996} qui fait partie de la catégorie des algorithmes distribués d'exclusion mutuelle. Nous allons ensuite nous intéresser à une extension tolérante aux pannes de cet algorithme \cite{sopena2005}. Nous expliquerons alors les choix effectués lors de l'implémentation de ces deux algorithmes. Enfin, nous exposerons les résultats de nos phases de test.
+

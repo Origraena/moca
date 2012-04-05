@@ -10,7 +10,7 @@ if [ ! -d target/class ]; then
 	echo 'Created target/class directory!'
 fi
 echo 'Invoking javac...'
-javac -d target/class \
+javac  -J-Xms512m -J-Xmx1024m -d target/class \
 src/moca/graphs/*.java \
 src/moca/comparators/*.java \
 src/moca/operators/*.java \
