@@ -1,0 +1,16 @@
+\begin{thebibliography}{1}
+
+\bibitem{naimi1996}
+M.~Naimi, M.~Trehel, and A.~Arnold.
+\newblock A log (n) distributed mutual exclusion algorithm based on path
+  reversal.
+\newblock {\em Journal of Parallel and Distributed Computing}, 34(1):1--13,
+  1996.
+
+\bibitem{sopena2005}
+J.~Sopena, L.~Arantes, M.~Bertier, and P.~Sens.
+\newblock A fault-tolerant token-based mutual exclusion algorithm using a
+  dynamic tree.
+\newblock {\em Euro-Par 2005 Parallel Processing}, pages 644--644, 2005.
+
+\end{thebibliography}

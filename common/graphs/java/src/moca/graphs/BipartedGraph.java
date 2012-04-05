@@ -123,13 +123,11 @@ public class BipartedGraph<V,E> extends Graph<V,E> {
 	}
 
 	public Iterator<V> firstIterator() {
-		return new Graph<V,E>.VertexValueIterator(firstVertexIterator());
-		//return null;
+		return new Graph.VertexValueIterator(firstVertexIterator());
 	}
 
 	public Iterator<V> secondIterator() {
-		return new Graph<V,E>.VertexValueIterator(secondVertexIterator());
-		//return null;
+		return new Graph.VertexValueIterator(secondVertexIterator());
 	}
 
 	protected BipartedVertexCollection<V> bipartedVertices() {
