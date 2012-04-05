@@ -371,10 +371,10 @@ int handleToken(msg_t message) {
 	if(state == WAITING)
 		takeCriticalSection();
 	else if (next != -1) {
-		type(msg) = TOKEN;
+		type(message) = TOKEN;
 		char *tmp = getIPstrFromNb(next);
-		strncpy (ip(msg), tmp, IPLONG);
-		sendMessageWithAdd(msg);
+		strncpy (ip(message), tmp, IPLONG);
+		sendMessageWithAdd(message);
 	}
 
 	return 0;
@@ -409,16 +409,16 @@ int handleHelloRep(msg_t message, struct sockaddr_in* netParamsNeighbour) {
 	long long int ipLastJ = atoi(ip(message));
 	int lastJ = -1, i;
 
-	printf ("Voilà ce que je mange : %s --> %ld\n", ip(message), ipLastJ);
+	printf ("Voilà ce que je mange : %s --> %lld\n", ip(message), ipLastJ);
 
 	if(last == -1) {
 		if(ipLastJ > 0) {
 			for(i = 0 ; i < this_site.nbNeighbours ; i++)
-				if((unsigned long int)(this_site.neighbours[i].sin_addr.s_addr) == (unsigned long int)(netParamsNeighbours[i].sin_addr.s_addr))
+				if((unsigned long int)(this_site.neighbours[i].sin_addr.s_addr) == (unsigned long int)(netParamsNeighbour[i].sin_addr.s_addr))
 					lastJ = i;
 			last = lastJ;
 			printf ("Tout va bien dans le meilleur des mondes :\n");
-			for (i=0; i< nbNeighbours; printf("%s - ",inet_ntoa(this_site.neighbours[i++].sin_addr)));
+			for (i=0; i< this_site.nbNeighbours; printf("%s - ",inet_ntoa(this_site.neighbours[i++].sin_addr)));
 			printf ("\n");
 		}
 		else {
@@ -431,7 +431,7 @@ int handleHelloRep(msg_t message, struct sockaddr_in* netParamsNeighbour) {
 							lastJ = i;
 					last = lastJ;
 					printf ("Tout va bien dans le meilleur des mondes num 2 :\n");
-					for (i=0; i< nbNeighbours; printf("%s - ",inet_ntoa(this_site.neighbours[i++].sin_addr)));
+					for (i=0; i< this_site.nbNeighbours; printf("%s - ",inet_ntoa(this_site.neighbours[i++].sin_addr)));
 					printf ("\n");
 				}
 			}
