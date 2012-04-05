@@ -34,12 +34,14 @@ void print_help() {
 	printf("6. NEXT\n");
 	printf("7. TOKEN\n");
 	printf("8. STATE\n");
+	printf("9. PREDEC\n");
 }
 
 void standardInput() {
 	msg_t envoi;
 	int rea;
 	int a = 0;
+	int i = 0;
 	char adip[20];
 
 	scanf("%d", &rea);
@@ -94,6 +96,10 @@ void standardInput() {
 			break;
 		case 8:
 			printf("State %d\n", state);
+			break;
+		case 9:
+			for (i=0; i<=TOLERANCE; printf("%s - ", inet_ntoa(predec[i].sin_addr)), i++);
+			printf("\n");
 			break;
 		default:
 			printf ("Invalid command\n");
