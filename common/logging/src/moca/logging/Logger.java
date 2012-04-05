@@ -8,17 +8,38 @@ import java.util.logging.ConsoleHandler;
 import java.util.logging.LogManager;
 
 /**
- * Logger convenient class.<br />
+ * Logger convenient class.
+ * <p>
  * Maintains the logger instances to not be garbage collected.<br /> 
  * Provides some functions usefull to get quickly a specific instance for an object or a
  * class.
- * Most of the methods has a corresponding static method with same name but the first
+ * Most of the methods have a corresponding static method with same name but the first
  * character.<br />
- * Further more, this class link every handler added by the addHandler method to each
- * loggerinlogger instance.<br />
- * By default, a console handler is added using the default formatter class.<br />
+ * Further more, this class links every handler added by the addHandler method to each
+ * logger instance.<br />
  * Instances are managed by an internal hash map providing average O(1) access to the
  * loggers.
+ * </p>
+ * <p>
+ * To see the logs, you must add at least one handler, for debugging it is common to add
+ * a console handler with no filter :
+ * <pre>
+ * moca.logging.Logger.addDefaultFormattedHandler(new java.util.logging.ConsoleHandler());
+ * </pre>
+ * The following example shows how to create a more specific console handler, which
+ * displays only logs from moca.logging package.
+ * <pre>
+ * java.util.logging.Formatter formatter = MyFormatter.instance();	// formatters are usually singletons
+ * java.util.logging.Filter filter = new moca.logging.NamespaceFilter("moca.logging");
+ * java.util.logging.Handler handler = new java.util.logging.ConsoleHandler();
+ * handler.setFormatter(f);
+ * handler.setFilter(filter);
+ * moca.logging.Logger.addHandler(handler);
+ * </pre>
+ * </p>
+ * @see java.util.logging.Logger
+ * @see java.util.logging.Formatter
+ * @see java.util.logging.Filter
  */
 public class Logger {
 
@@ -27,6 +48,11 @@ public class Logger {
 
 
 	/* Handlers methods */
+	
+	/**
+	 * Adds a handler to all loggers.<br />
+	 * A handler cannot be added more than once.
+	 */
 	public boolean addHandler(Handler h) {
 		if (_handlers.contains(h))
 			return false;
@@ -34,6 +60,34 @@ public class Logger {
 		for (java.util.logging.Logger l : _loggers.values())
 			l.addHandler(h);
 		return true;
+	}
+	/** Adds a handler with the default formatter. */
+	public boolean addDefaultFormattedHandler(Handler h) {
+		h.setFormatter(DefaultFormatter.instance());
+		return addHandler(h);
+	}
+	/** Adds a handler with the default filter. */
+	public boolean addDefaultFilteredHandler(Handler h) {
+		h.setFilter(NamespaceFilter.defaultFilter());
+		return addHandler(h);
+	}
+	/** Adds a handler with the default formatter and the default filter. */
+	public boolean addDefaultHandler(Handler h) {
+		h.setFormatter(DefaultFormatter.instance());
+		h.setFilter(NamespaceFilter.defaultFilter());
+		return addHandler(h);
+	}
+	public static boolean saddHandler(Handler h) {
+		return instance().addHandler(h);
+	}
+	public static boolean saddDefaultFormattedHandler(Handler h) {
+		return instance().addDefaultFormattedHandler(h);
+	}
+	public static boolean saddDefaultFilteredHandler(Handler h) {
+		return instance().addDefaultFilteredHandler(h);
+	}
+	public static boolean saddDefaultHandler(Handler h) {
+		return instance().addDefaultHandler(h);
 	}
 
 
@@ -167,9 +221,6 @@ public class Logger {
 		LogManager.getLogManager().reset();	// remove the default console handler
 		_loggers = new HashMap<String,java.util.logging.Logger>();
 		_handlers = new ArrayList<Handler>();
-		ConsoleHandler h = new ConsoleHandler();
-		h.setFormatter(DefaultFormatter.instance());
-		addHandler(h);
 	}
 
 };
