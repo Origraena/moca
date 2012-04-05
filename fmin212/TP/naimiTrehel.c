@@ -165,7 +165,7 @@ int handleHello(msg_t mes) {
 		ipLastStr[3] = 0;
 	}
 	else
-		getIPstrFromNb(last, &ipLastStr);
+		ipLastStr = getIPstrFromNb(last);
 
 	memcpy (&(ip(mes)), ipLastStr, (strlen(ipLastStr) + 1) * sizeof(char));
 

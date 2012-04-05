@@ -67,12 +67,16 @@ void site_failure(int sig) {
 		}
 	}
 
+	fcntl(this_site.sdRecv, F_SETFL, flags);
+
 	if (!sortie) {
 		msg_t min;
 
 		type(msg) = SEARCH_PREV;
 		pos(msg) = position;
 		broadcast(msg);
+
+		fcntl(this_site.sdRecv, F_SETFL, flags2);
 
 		timeStart = time(&timeStart);
 		timeCur = time(&timeCur);
@@ -91,6 +95,8 @@ void site_failure(int sig) {
 			else
 				handleMessage(msg);
 		}
+
+		fcntl(this_site.sdRecv, F_SETFL, flags);
 
 		if (pos(min) == -1) {
 			tokenPresent = 1;
@@ -206,12 +212,16 @@ int critSectionRequest() {
 			}
 		}
 
+		fcntl(this_site.sdRecv, F_SETFL, flags);
+
 		type(msg) = SEARCH_QUEUE;
 		nb_acc(msg) = acces;
 		broadcast(msg);
 
 		msg_t max;
 		pos(max) = -1;
+
+		fcntl(this_site.sdRecv, F_SETFL, flags2);
 
 		timeStart = time(&timeStart);
 		timeCur = time(&timeCur);
@@ -246,6 +256,8 @@ int critSectionRequest() {
 					break;
 			}
 		}
+
+		fcntl(this_site.sdRecv, F_SETFL, flags);
 
 		if (pos(max) < 0) {
 			tokenPresent = 1;
@@ -301,9 +313,9 @@ int handleMessage(msg_t msg) {
 
 // {{{ handleRequest
 int handleRequest(msg_t msg) {
-	printf ("Adresses %s %s", ips(msg), ip(msg));
+	printf ("Adresses %s %s\n", ips(msg), ip(msg));
 	strncpy(ip(msg), ips(msg), IPLONG * sizeof(char));
-	printf ("Adresses %s %s", ips(msg), ip(msg));
+	printf ("Adresses %s %s\n", ips(msg), ip(msg));
 	unsigned long int ipa = (unsigned long int)inet_addr(ips(msg));
 
 	if(getNeighbour(ipa)==-1) {
@@ -384,58 +396,34 @@ int handleToken(msg_t message) {
 //{{{ handleHello
 int handleHello(msg_t mes) {
 	type(mes) = HELLOREP;
-	char* ipLastStr;
-	if(last == -1) {
-		ipLastStr = malloc(4*sizeof(char));
-		ipLastStr[0] = '-';
-		ipLastStr[1] = '1';
-		ipLastStr[2] = 48+tokenPresent;
-		ipLastStr[3] = 0;
-	}
-	else
-		ipLastStr = getIPstrFromNb(last);
+	tok(mes) = tokenPresent;
 
-	printf ("Voilà ce que je balance : %s\n", ipLastStr);
-	memcpy (&(ip(mes)), ipLastStr, (strlen(ipLastStr) + 1) * sizeof(char));
+	strncpy(ip(mes), ips(mes), IPLONG);
 
-	int res = broadcast(mes);
-	free(ipLastStr);
-	return res;
+	return sendMessageWithAdd(mes);
 }
 //}}}
 
 //{{{ handleHelloRep
 int handleHelloRep(msg_t message, struct sockaddr_in* netParamsNeighbour) {
-	long long int ipLastJ = atoi(ip(message));
+	unsigned long int ipLastJ = (unsigned long int) inet_addr(ips(message));
 	int lastJ = -1, i;
 
-	printf ("Voilà ce que je mange : %s --> %lld\n", ip(message), ipLastJ);
+	printf ("Voilà ce que je mange : %s --> %lu\n", ips(message), ipLastJ);
 
-	if(last == -1) {
-		if(ipLastJ > 0) {
-			for(i = 0 ; i < this_site.nbNeighbours ; i++)
-				if((unsigned long int)(this_site.neighbours[i].sin_addr.s_addr) == (unsigned long int)(netParamsNeighbour[i].sin_addr.s_addr))
-					lastJ = i;
-			last = lastJ;
-			printf ("Tout va bien dans le meilleur des mondes :\n");
-			for (i=0; i< this_site.nbNeighbours; printf("%s - ",inet_ntoa(this_site.neighbours[i++].sin_addr)));
-			printf ("\n");
-		}
-		else {
-			//			if(ipLastJ == -10)
-			if(ipLastJ == -11) {
-				if(netParamsNeighbour != NULL) {
-					printf("Hellorep recu et token present chez l'autre\n");
-					for(i = 0 ; i < this_site.nbNeighbours ; i++)
-						if((unsigned long int)(this_site.neighbours[i].sin_addr.s_addr) == (unsigned long int)(netParamsNeighbour->sin_addr.s_addr))
-							lastJ = i;
-					last = lastJ;
-					printf ("Tout va bien dans le meilleur des mondes num 2 :\n");
-					for (i=0; i< this_site.nbNeighbours; printf("%s - ",inet_ntoa(this_site.neighbours[i++].sin_addr)));
-					printf ("\n");
+	if (tok(message)) {
+		for (i=0; i<this_site.nbNeighbours; i++)
+			if ((unsigned long int)this_site.neighbours[i].sin_addr.s_addr == ipLastJ){
+				last = i;
+				printf("Hellorep reçu, TOKEN sur site %d.\n", last);
+				if (i) {
+					tokenPresent = 0;
+					printf ("Je jette mon token\n");
 				}
 			}
-		}
+	}
+	else {
+		printf ("HelloRep reçu sans Token");
 	}
 
 	return 0;
