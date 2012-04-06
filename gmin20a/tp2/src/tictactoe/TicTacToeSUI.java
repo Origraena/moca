@@ -8,14 +8,14 @@ public class TicTacToeSUI implements TicTacToe.UI {
 	/* Messages */
 
 	public static final String MENU = "Menu :\n1\tNew Game\n2\tGame Options\n3\tUI Options\n4\tExit";
-	public static final String NULL_MATCH = "Math null !";
+	public static final String NULL_MATCH = "Draw !";
 	public static final String GAME_OPTIONS = "Game Options :";
 	public static final String UI_OPTIONS = "UI Options :";
 	public static final String NEW_GAME = "Game begins !";
 
 	public static final String ASK_WIDTH = "Choose grid width -must be greater than or equals 3- :";
 	public static final String ASK_NB_PLAYERS = "How many human will play ?";
-	public static final String ASK_WHO_START = "Do you want to start ?";
+	public static final String ASK_WHO_START = "Do you want to play first -true/false-";
 	public static final String ASK_DIFFICULTY = "Choose AI difficulty -max depth of minimax tree (0 => leaves)- :";
 	public static final String ASK_ALGORITHM = "Will use minimax ? -false implies negamax-";
 	public static final String ASK_TILE_SIZE = "Choose a tile size : ";
@@ -25,7 +25,7 @@ public class TicTacToeSUI implements TicTacToe.UI {
 	public static final String ASK_INTERSECTION = "Choose intersection :";
 
 	public static final String AI_CREATION = "Select new AI player options :";
-	public static final String HUMAN_CREATION = "Select new human player options :";
+	public static final String HUMAN_CREATION = "New human player created!";
 
 	public static final String ERROR = "/!\\ ERROR /!\\";
 	public static final String WIDTH_ERROR = "The width must be greater than or equals 3 !";
