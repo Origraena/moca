@@ -45,7 +45,22 @@ déduit que la procédure d'arrondis garantit une solution réalisable.
 
 \subsection{Existence d'un algorithme $f$-approché}
 
+Considérons l'agorithme \ref{algo_pourri}
+\begin{algorithm}
+	\caption{Approximation couverture par ensemble}
+	\label{algo_pourri}
+	\begin{algorithmic}[1]
+		\STATE Exprimer le problème en programmation linéaire en nombres entiers
+		\STATE Résoudre la version relaxée
+		\STATE Réaliser la procédure d'arrondis
+	\end{algorithmic}
+\end{algorithm}
 
+En utilisant la procédure d'arrondis étudiée plus haut, on sait que pour chaque clause, il existe
+$x_k$ tel que $x_k \geq \frac{1}{f}$, au pire des cas \footnote{cas similaire à celui de l'exercice
+1}, chaque $x_k$ est multiplié par $f$, ce qui implique que la solution obtenue est au plus $f$ fois
+plus grande que la solution optimale. Il s'agit donc d'un algorithme f-approché.
 
+\subsection{Cas ou $f=2$}
 
-	
+Si $f=2$ alors le problème devient une couverture minimum par sommets.
