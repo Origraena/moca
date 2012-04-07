@@ -1,16 +1,23 @@
 % !TEX encoding = UTF-8 Unicode
 % !TEX root = ../Rapport/rapport.tex
 
-\section{Exercice 3 - Sur le problème du couplage maximum de poids minimum}
+\section{Sur le problème du couplage maximum de poids minimum}
 
 \subsection{Modélisation du problème}
 Soit un graphe $G = (V,E)$ avec $V$ l'ensemble de ses sommets et $E$ l'ensemble de ses arêtes. Soit $\{ \forall{(i,j) \in E}, X_{(i,j)}\}$ un ensemble de variables booléennes qui indiquent le choix de l'arête $(i,j)$ correspondante dans le couplage. Soit $P_{(i,j)}$ le poids de l'arête $(i,j)$.
 
-Le problème du couplage maximum de poids minimum peut être modélisé de la façon suivante :
+La première modélisation intuitive est la suivante :
+
+$ Maximiser $ $$ \sum\limits_{(i,j) \in E} (X_{(i,j)} \times H) - \sum\limits_{(i,j) \in E} (X_{(i,j)} \times P_{(i,j)}) $$
+$ Sous\ contraintes $
+$$ \forall{i \in V}, \sum\limits_{(i,j) \in E} X_{(i,j)} + \sum\limits_{(j,i) \in E} X_{(j,i)} \leq 1 $$
+$$ \forall{(i,j) \in E}, X_{(i,j))} \in \{0,1\} $$
+$$ \forall{(i,j) \in E}, P_{(i,j))} \geq 0 $$
+avec H une constante très grande. Cependant, après quelques instants de réflexion, nous pouvons imaginer une modélisation plus élégante :
 
 $ Minimiser $ $$ \sum\limits_{(i,j) \in E} (X_{(i,j)} \times P_{(i,j)}) $$
 $ Sous\ contraintes $
-$$ \forall{i \in V}, \sum\limits_{(i,j) \in E} X_{(i,j)} = 1 $$
+$$ \forall{i \in V}, \sum\limits_{(i,j) \in E} X_{(i,j)} + \sum\limits_{(j,i) \in E} X_{(j,i)} = 1 $$
 $$ \forall{(i,j) \in E}, X_{(i,j))} \in \{0,1\} $$
 $$ \forall{(i,j) \in E}, P_{(i,j))} \geq 0 $$
 
@@ -41,5 +48,6 @@ $$ \forall{(i,j) \in E},  0 \leq X_{(i,j))} \leq 1 $$
 En rentrant le PL relaxé dans $glpsol$, nous obtenons le couplage de poids total $3\epsilon$ : $$\{X_{ab} = 0.5 ; X_{ac} = 0.5 ; X_{bc} = 0.5 ; X_{df} = 0.5 ; X_{ef} = 0.5 ; X_{de} = 0.5\}$$ 
 
 \subsection{Conclusion sur la pertinence de la formulation}
+La solution trouvée au PLNE étant optimale, la formulation du problème semble être pertinente.
 
 
