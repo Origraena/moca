@@ -1,0 +1,22 @@
+Algorithmes d'Exploration et de Mouvement
+TP2
+7 Avril 2012
+
+DESDOUITS Chloe
+ROCHER Swan
+
+launch.sh        lance le jeu (menu principal)
+qX.sh            parametres par defaut correspondant a la question X
+
+Une fois le programme lance, il suffit de faire 'New Game' et le jeu commence.
+Dans le cas ou le launcher classique est utilise, les parametres de jeu doivent etre
+choisis.
+
+Quelle que soit la question l'heuristique utilisee est la meme :
+on calcule la valeur de chaque ligne, colonne et diagonale de la maniere suivante : si un
+seul joueur l'occupe, le nombre de ses pions donne une valeur, sinon 0.
+Si le joueur qui occupe la ligne est l'IA en train de jouer alors la valeur est positive, 
+sinon negative. 
+Evidemment si le noeud etudie est une feuille, sa valeur est egal a 0 si match nul, tres
+elevee si victorieux, tres faible si perdant.
+
