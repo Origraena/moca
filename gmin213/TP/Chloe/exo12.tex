@@ -1,6 +1,9 @@
 % !TEX encoding = UTF-8 Unicode
 % !TEX root = ../Rapport/rapport.tex
 
+
+\tikzstyle{end} = [circle, minimum width=3pt,fill, inner sep=0pt]
+
 \section{Comparaison de \emph{branch and bound} et \emph{branch and cut}}
 
 Nous considérons le  programme linéaire suivant :
@@ -60,7 +63,7 @@ $$
 
 Nous obtenons grâce à la résolution graphique : 
 $$ \begin{cases}
-x_1 = \frac{16}{11} \\
+x_1 = \frac{10}{3} \\
 x_2 = 0 \\
 z = \frac{20}{3}
 \end{cases} $$
@@ -103,10 +106,142 @@ $$ \begin{array}{|C{1cm}|C{2cm}|C{1cm} C{1cm} C{1cm} C{1cm}|} \hline
 	2 & x_1 = \frac{10}{3} &1 &  \frac{2}{3} & 0 & \frac{1}{3} \\ \hline
 	 & z = \frac{20}{3} & 0 & \frac{1}{3} & 0 & \frac{2}{3} \\ \hline
  \end{array} $$
+ 
+ Tous les coûts réduits sont positifs ou nuls donc le simplexe est fini. La solution correspond bien à celle trouvée graphiquement :
+ $$ \begin{cases}
+x_1 = \frac{10}{3} \\
+x_2 = 0 \\
+z = \frac{20}{3}
+\end{cases} $$
 
 
-\subsection{Recherche d'une solution à valeurs entières}
+\subsection{Recherche d'une solution à valeur entière}
 
 \subsubsection{Branch and bound}
+Pour la méthode du Branch and bound, nous partons de la solution optimale réelle trouvée précédemment.
+
+\begin{center}
+\begin{tikzpicture}[level/.style={sibling distance=7cm,level distance=3.5cm,
+			growth parent anchor=south}]
+\node [circle,draw] (z){	$ \begin{cases}
+						x_1 = \frac{10}{3} \\
+						x_2 = 0 \\
+					\end{cases}
+					z = \frac{20}{3} $}
+;
+\end{tikzpicture}
+\end{center}
+
+Puis nous ajoutons la contrainte $x_1 \leq 3$ pour forcer $x_1$ à être entier.
+
+\begin{center}
+\begin{tikzpicture}[level/.style={sibling distance=7cm,level distance=1cm, growth parent anchor=south}]
+\node [circle,draw] (z){	$ \begin{cases}
+						x_1 = \frac{10}{3} \\
+						x_2 = 0 \\
+					\end{cases}
+					z = \frac{20}{3} $}
+child {node [end] (a) {}
+	edge from parent 
+	node[right] {$x_1 \leq 3$}
+	}
+child {node [] (a) {}
+	edge from parent[draw=none]
+	}
+;
+\end{tikzpicture}
+\end{center}
+
+Puis nous calculons les tableaux du simplexe avec la nouvelle contrainte.
+
+$$ \begin{array}{|C{1cm}|C{2cm}|C{1cm} C{1cm} C{1cm} C{1cm} C{1cm}|} \hline
+	 &  & 2 & 1 & 0 & 0 & 0 \\ \hline
+	0 & y_1 = 17 & 2 & 5 & 1 & 0 & 0 \\ 
+	0 & y_2 = 10 & 3 & 2 & 0 & 1 & 0 \\ 
+	0 & y_3 = 3 & 1 & 0 & 0 & 0 & 1 \\ \hline
+	 & z = 0 & -2 & -1 & 0 & 0 & 0 \\ \hline
+ \end{array} $$
+ 
+ $y_3$ sort de la base ; $x_1$ rentre dans la base ; le pivot devient $a_{3,1} = 1$.
+ 
+ $$ \begin{array}{|C{1cm}|C{2cm}|C{1cm} C{1cm} C{1cm} C{1cm} C{1cm}|} \hline
+	 &  & 2 & 1 & 0 & 0 & 0 \\ \hline
+	0 & y_1 = 11 & 0 & 5 & 1 & 0 & -2 \\ 
+	0 & y_2 = 1 & 0 & 2 & 0 & 1 & -3 \\ 
+	2 & x_1 = 3 & 1 & 0 & 0 & 0 & 1 \\ \hline
+	 & z = 6 & 0 & -1 & 0 & 0 & 2 \\ \hline
+ \end{array} $$
+
+$y_2$ sort de la base ; $x_2$ rentre dans la base ; le pivot devient $a_{2,2} = 2$.
+
+$$ \begin{array}{|C{1cm}|C{2cm}|C{1cm} C{1cm} C{1cm} C{1cm} C{1cm}|} \hline
+	 &  & 2 & 1 & 0 & 0 & 0 \\ \hline
+	0 & y_1 = \frac{17}{2} & 0 & 0 & 1 & -\frac{5}{2} & 2 \\ 
+	1 & x_2 = \frac{1}{2} & 0 & 1 & 0 & \frac{1}{2} & -\frac{3}{2} \\ 
+	2 & x_1 = 3 & 1 & 0 & 0 & 0 & 1 \\ \hline
+	 & z = \frac{13}{2} & 0 & 0 & 0 & \frac{1}{2} & \frac{1}{2} \\ \hline
+ \end{array} $$
+
+Le simplexe est fini, nous ajoutons le résultat à l'arbre de branch and cut.
+
+\begin{center}
+\begin{tikzpicture}[level/.style={sibling distance=7cm,level distance=2.5cm,
+			growth parent anchor=south}]
+\node [circle,draw] (z){	$ \begin{cases}
+						x_1 = \frac{10}{3} \\
+						x_2 = 0 \\
+					\end{cases}
+					z = \frac{20}{3} $}
+child {node [circle,draw] (a) {	$ \begin{cases}
+							x_1 = 3 \\
+							x_2 = \frac{1}{2} \\
+						\end{cases}
+						z = \frac{13}{2} $}
+	edge from parent 
+	node[left] {$x_1 \leq 3$}
+	}
+child {node [] (a) {}
+	edge from parent[draw=none]
+	}
+;
+\end{tikzpicture}
+\end{center}
+
+$x_1$ a bien une valeur entière mais $x_2$ est devenu réel, nous ajoutons donc la contrainte $x_2 \leq 0$. Comme $x_2 \geq 0$ par définition, nous obtenons la solution suivante :
+
+\begin{center}
+\begin{tikzpicture}[level/.style={sibling distance=7cm,level distance=2.5cm,
+			growth parent anchor=south}]
+\node [circle,draw] (z){	$ \begin{cases}
+						x_1 = \frac{10}{3} \\
+						x_2 = 0 \\
+					\end{cases}
+					z = \frac{20}{3} $}
+child {node [circle,draw] (a) {	$ \begin{cases}
+							x_1 = 3 \\
+							x_2 = \frac{1}{2} \\
+						\end{cases}
+						z = \frac{13}{2} $}
+	child { node [circle,draw] (b) {$ \begin{cases}
+								x_1 = 3 \\
+								x_2 = 0 \\
+							\end{cases}
+							z = 6 $ }
+		edge from parent 
+		node[left] {$x_2 \leq 0$}
+						}
+	child {node [] (c) {}
+		edge from parent[draw=none]
+		}
+	edge from parent 
+	node[left] {$x_1 \leq 3$}
+	}
+child {node [] (d) {}
+	edge from parent[draw=none]
+	}
+;
+\end{tikzpicture}
+\end{center}
+
 
 \subsubsection{Coupes de Gomory}
