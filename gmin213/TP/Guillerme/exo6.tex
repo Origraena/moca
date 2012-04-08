@@ -1,1 +1,45 @@
 \section{Sur le problème du sac à dos simple}
+
+\subsection{Construction d'un algorithme approché}
+
+\subsubsection{Complexité de l'algorithme}
+
+La complexité de l'algorithme, une fois les nombres triés, est en $O(n)$. Cependant, il est possible
+de démontrer que la complexité des algorithmes de tris basés sur des fonctions de comparaisons ne
+peut être inférieures à $O(n\log n)$. la complexité de cet algorithme est donc similaire à la
+compléxité de l'algorithme de tri utilisé.
+
+\subsubsection{Minoration de $cost(T)$}
+
+Dans un premier temps nous montrerons que l'existence d'un indice $j$ pour lequel $cost(T) + w_{j+1}
+> b$ n'est pas systématique, mais que si ce dernier n'existe pas, le problème n'existe pas non plus.
+
+En effet, si cet indice n'existe pas, on a alors : 
+$$ \sum_{i=1}^n w_1 \leq b $$
+On en déduit donc que la solution optimale est donnée par $ T = \{ 1, \dot, n \} $. Ce qui en soit
+même n'a aucun intérêt\footnote{Le problème du sac à dos, dans cette configuration n'est plus
+NP-Complet}. Nous admettrons donc l'existence de cet indice $j$.
+
+Supposons, à l'indice $j$, que $cost(T) \leq \frac{b}{2}$. Par définition de l'indice $j$, on a
+$cost(T) + w_{j+1} > b$, ce qui implique $w_{j+1} > \frac{b}{2}$ et donc : $$
+\begin{array}{lrcl}
+	& w_{j+1} & > & cost(T) \\
+	\Rightarrow & w_{j+1} & > & \sum_{i=1}^j w_i \\
+	\Rightarrow & w_{j+1} & > & w_i
+\end{array}
+$$
+
+Or les éléments $w_i$ étant triés, on a $w_j \geq w_{j+1}$. L'hypothèse de départ est donc fausse.
+
+\subsubsection{Performance relative de l'algorithme}
+
+Notons $OPT$ la solution optimale au problème du sac à dos, et $A$ la solution approchée donnée par
+l'algorithme. Rappelons, par définition du problème, que $OPT \leq b $. La performance relative nous
+est donnée par : $$
+\frac{OPT}{A} \leq \frac{b}{\frac{b}{2}} = 2 $$
+
+La performance relative de l'algorithme est donc 2.
+
+\subsection{Contruction d'un schéma d'approximation}
+
+\subsubsection{complexité de l'algorithme}
