@@ -3,6 +3,7 @@
 
 
 \tikzstyle{end} = [circle, minimum width=3pt,fill, inner sep=0pt]
+\definecolor{gris}{gray}{0.85}
 
 \section{Comparaison de \emph{branch and bound} et \emph{branch and cut}}
 
@@ -96,9 +97,11 @@ Tableaux :
 $$ \begin{array}{|C{1cm}|C{2cm}|C{1cm} C{1cm} C{1cm} C{1cm}|} \hline
 	 &  & 2 & 1 & 0 & 0 \\ \hline
 	0 & y_1 = 17 & 2 & 5 & 1 & 0 \\ 
-	0 & y_2 = 10 & 3 & 2 & 0 & 1 \\ \hline
+	0 & y_2 = 10 & \textcolor{red}{3} & 2 & 0 & 1 \\ \hline
 	 & z = 0 & -2 & -1 & 0 & 0 \\ \hline
  \end{array} $$
+ 
+ $y_2$ sort de la base ; $x_1$ rentre dans la base ; le pivot devient $a_{1,2} = 3$.
  
  $$ \begin{array}{|C{1cm}|C{2cm}|C{1cm} C{1cm} C{1cm} C{1cm}|} \hline
 	 &  & 2 & 1 & 0 & 0 \\ \hline
@@ -158,16 +161,16 @@ $$ \begin{array}{|C{1cm}|C{2cm}|C{1cm} C{1cm} C{1cm} C{1cm} C{1cm}|} \hline
 	 &  & 2 & 1 & 0 & 0 & 0 \\ \hline
 	0 & y_1 = 17 & 2 & 5 & 1 & 0 & 0 \\ 
 	0 & y_2 = 10 & 3 & 2 & 0 & 1 & 0 \\ 
-	0 & y_3 = 3 & 1 & 0 & 0 & 0 & 1 \\ \hline
+	0 & y_3 = 3 & \textcolor{red}{1} & 0 & 0 & 0 & 1 \\ \hline
 	 & z = 0 & -2 & -1 & 0 & 0 & 0 \\ \hline
  \end{array} $$
  
- $y_3$ sort de la base ; $x_1$ rentre dans la base ; le pivot devient $a_{3,1} = 1$.
+ $y_3$ sort de la base ; $x_1$ rentre dans la base ; le pivot devient $a_{1,3} = 1$.
  
  $$ \begin{array}{|C{1cm}|C{2cm}|C{1cm} C{1cm} C{1cm} C{1cm} C{1cm}|} \hline
 	 &  & 2 & 1 & 0 & 0 & 0 \\ \hline
 	0 & y_1 = 11 & 0 & 5 & 1 & 0 & -2 \\ 
-	0 & y_2 = 1 & 0 & 2 & 0 & 1 & -3 \\ 
+	0 & y_2 = 1 & 0 & \textcolor{red}{2} & 0 & 1 & -3 \\ 
 	2 & x_1 = 3 & 1 & 0 & 0 & 0 & 1 \\ \hline
 	 & z = 6 & 0 & -1 & 0 & 0 & 2 \\ \hline
  \end{array} $$
@@ -243,5 +246,294 @@ child {node [] (d) {}
 \end{tikzpicture}
 \end{center}
 
+Nous obtenons un nœud de l'arbre et une solution entière admissible. Nous devons maintenant développer le reste de l'arbre pour vérifier s'il est possible d'obtenir une meilleure solution entière. Posons donc la contrainte suivante : $x_2 \geq 1$.
+
+\begin{center}
+\begin{tikzpicture}[level/.style={sibling distance=7cm,level distance=2.5cm,
+			growth parent anchor=south}]
+\node [circle,draw] (z){	$ \begin{cases}
+						x_1 = \frac{10}{3} \\
+						x_2 = 0 \\
+					\end{cases}
+					z = \frac{20}{3} $}
+child {node [circle,draw] (a) {	$ \begin{cases}
+							x_1 = 3 \\
+							x_2 = \frac{1}{2} \\
+						\end{cases}
+						z = \frac{13}{2} $}
+	child { node [circle,draw] (b) {$ \begin{cases}
+								x_1 = 3 \\
+								x_2 = 0 \\
+							\end{cases}
+							z = 6 $ }
+		edge from parent 
+		node[left] {$x_2 \leq 0$}
+						}
+	child {node [end] (c) {}
+		edge from parent 
+		node[right] {$x_2 \geq 1$}
+		}
+	edge from parent 
+	node[left] {$x_1 \leq 3$}
+	}
+child {node [] (d) {}
+	edge from parent[draw=none]
+	}
+;
+\end{tikzpicture}
+\end{center}
+
+Afin de trouver une solution, nous appliquons la phase 1 du simplexe dont voici les tableaux.
+
+$$ \begin{array}{|C{1cm}|C{2cm}|C{1cm} C{1cm} C{1cm} C{1cm} C{1cm} C{1cm} C{1cm}|} \hline
+	 &  & 0 & 0 & 0 & 0 & 0 & 0 & -1 \\ \hline
+	0 & y_1 = 17 & 2 & 5 & 1 & 0 & 0 & 0 & 0 \\ 
+	0 & y_2 = 10 & 3 & 2 & 0 & 1 & 0 & 0 & 0 \\ 
+	0 & y_3 = 3 & 1 & 0 & 0 & 0 & 1 & 0 & 0 \\ 
+	-1 & y_5 = 1 & 0 & \textcolor{red}{1} & 0 & 0 & 0 & -1 & 1 \\ \hline
+	 & z = -1 & 0 & -1 & 0 & 0 & 0 & 1 & 0 \\ \hline
+ \end{array} $$
+ 
+ $y_5$ sort de la base ; $x_2$ rentre dans la base ; le pivot devient $a_{2,4} = 1$.
+ 
+ $$ \begin{array}{|C{1cm}|C{2cm}|C{1cm} C{1cm} C{1cm} C{1cm} C{1cm} C{1cm} C{1cm}|} \hline
+	 &  & 0 & 0 & 0 & 0 & 0 & 0 & -1 \\ \hline
+	0 & y_1 = 12 & 2 & 0 & 1 & 0 & 0 & 5 & -5 \\ 
+	0 & y_2 = 8 & 3 & 0 & 0 & 1 & 0 & 2 & -2 \\ 
+	0 & y_3 = 3 & 1 & 0 & 0 & 0 & 1 & 0 & 0 \\ 
+	0 & x_2 = 1 & 0 & 1 & 0 & 0 & 0 & -1 & 1 \\ \hline
+	 & z = 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 \\ \hline
+ \end{array} $$
+
+$z = 0$ donc la phase $1$ du simplexe est finie. Passons à la phase $2$...
+
+$$ \begin{array}{|C{1cm}|C{2cm}|C{1cm} C{1cm} C{1cm} C{1cm} C{1cm} C{1cm}|} \hline
+	 &  & 2 & 1 & 0 & 0 & 0 & 0 \\ \hline
+	0 & y_1 = 12 & 2 & 0 & 1 & 0 & 0 & 5 \\ 
+	0 & y_2 = 8 & \textcolor{red}{3} & 0 & 0 & 1 & 0 & 2 \\ 
+	0 & y_3 = 3 & 1 & 0 & 0 & 0 & 1 & 0 \\ 
+	1 & x_2 = 1 & 0 & 1 & 0 & 0 & 0 & -1 \\ \hline
+	 & z = 1 & -2 & 0 & 0 & 0 & 0 & -1 \\ \hline
+ \end{array} $$
+ 
+  $y_2$ sort de la base ; $x_1$ rentre dans la base ; le pivot devient $a_{1,2} = 3$.
+
+$$ \begin{array}{|C{1cm}|C{2cm}|C{1cm} C{1cm} C{1cm} C{1cm} C{1cm} C{1cm}|} \hline
+	 &  & 2 & 1 & 0 & 0 & 0 & 0 \\ \hline
+	0 & y_1 = \frac{20}{3} & 0 & 0 & 1 & -\frac{2}{3} & 0 & \frac{11}{3} \\ 
+	2 & x_1 = \frac{8}{3} &1 & 0 & 0 & \frac{1}{3} & 0 & \frac{2}{3} \\ 
+	0 & y_3 = \frac{1}{3} & 0 & 0 & 0 & -\frac{1}{3} & 1 & -\frac{2}{3} \\ 
+	1 & x_2 = 1 & 0 & 1 & 0 & 0 & 0 & -1 \\ \hline
+	 & z = \frac{19}{3} & 0 & 0 & 0 & \frac{2}{3} & 0 & \frac{1}{3} \\ \hline
+ \end{array} $$
+ 
+\begin{center}
+\begin{tikzpicture}[level/.style={sibling distance=7cm,level distance=2.5cm,
+			growth parent anchor=south}]
+\node [circle,draw] (z){	$ \begin{cases}
+						x_1 = \frac{10}{3} \\
+						x_2 = 0 \\
+					\end{cases}
+					z = \frac{20}{3} $}
+child {node [circle,draw] (a) {	$ \begin{cases}
+							x_1 = 3 \\
+							x_2 = \frac{1}{2} \\
+						\end{cases}
+						z = \frac{13}{2} $}
+	child { node [circle,draw] (b) {$ \begin{cases}
+								x_1 = 3 \\
+								x_2 = 0 \\
+							\end{cases}
+							z = 6 $ }
+		edge from parent 
+		node[left] {$x_2 \leq 0$}
+						}
+	child {node [circle,draw] (c) {$ \begin{cases}
+								x_1 = \frac{8}{3} \\
+								x_2 = 1 \\
+							\end{cases}
+							z = \frac{19}{3} $ }
+		edge from parent 
+		node[right] {$x_2 \geq 1$}
+		}
+	edge from parent 
+	node[left] {$x_1 \leq 3$}
+	}
+child {node [] (d) {}
+	edge from parent[draw=none]
+	}
+;
+\end{tikzpicture}
+\end{center}
+ 
+Dans cette solution, $x_1$ n'est pas entier, on ajoute donc une contrainte : $x_1 \leq 2$.
+
+\begin{center}
+\begin{tikzpicture}[level/.style={sibling distance=7cm,level distance=2.5cm,
+			growth parent anchor=south}]
+\node [circle,draw] (z){	$ \begin{cases}
+						x_1 = \frac{10}{3} \\
+						x_2 = 0 \\
+					\end{cases}
+					z = \frac{20}{3} $}
+child {node [circle,draw] (a) {	$ \begin{cases}
+							x_1 = 3 \\
+							x_2 = \frac{1}{2} \\
+						\end{cases}
+						z = \frac{13}{2} $}
+	child { node [circle,draw] (b) {$ \begin{cases}
+								x_1 = 3 \\
+								x_2 = 0 \\
+							\end{cases}
+							z = 6 $ }
+		edge from parent 
+		node[left] {$x_2 \leq 0$}
+						}
+	child {node [circle,draw] (c) {$ \begin{cases}
+								x_1 = \frac{8}{3} \\
+								x_2 = 1 \\
+							\end{cases}
+							z = \frac{19}{3} $ }
+		child {node [end] (e) {}
+			edge from parent
+			node[left] {$x_1 \leq 2$}
+			}
+		edge from parent 
+		node[right] {$x_2 \geq 1$}
+		}
+	edge from parent 
+	node[left] {$x_1 \leq 3$}
+	}
+child {node [] (d) {}
+	edge from parent[draw=none]
+	}
+;
+\end{tikzpicture}
+\end{center}
+
+$$ \begin{array}{|C{1cm}|C{2cm}|C{1cm} C{1cm} C{1cm} C{1cm} C{1cm} C{1cm}|} \hline
+	 &  & 2 & 1 & 0 & 0 & 0 & 0 \\ \hline
+	0 & y_1 = 12 & 2 & 0 & 1 & 0 & 0 & 5 \\ 
+	0 & y_2 = 8 & 3 & 0 & 0 & 1 & 0 & 2 \\ 
+	0 & y_3 = 2 & \textcolor{red}{1} & 0 & 0 & 0 & 1 & 0 \\ 
+	1 & x_2 = 1 & 0 & 1 & 0 & 0 & 0 & -1 \\ \hline
+	 & z = 1 & -2 & 0 & 0 & 0 & 0 & -1 \\ \hline
+ \end{array} $$
+ 
+$$ \begin{array}{|C{1cm}|C{2cm}|C{1cm} C{1cm} C{1cm} C{1cm} C{1cm} C{1cm}|} \hline
+	 &  & 2 & 1 & 0 & 0 & 0 & 0 \\ \hline
+	0 & y_1 = 8 & 0 & 0 & 1 & 0 & -2 & 5 \\ 
+	0 & y_2 = 2 & 0 & 0 & 0 & 1 & -3 & \textcolor{red}{2} \\ 
+	2 & x_1 = 2 & 1 & 0 & 0 & 0 & 1 & 0 \\ 
+	1 & x_2 = 1 & 0 & 1 & 0 & 0 & 0 & -1 \\ \hline
+	 & z = 3 & 0 & 0 & 0 & 0 & 2 & -1 \\ \hline
+ \end{array} $$
+ 
+$$ \begin{array}{|C{1cm}|C{2cm}|C{1cm} C{1cm} C{1cm} C{1cm} C{1cm} C{1cm}|} \hline
+	 &  & 2 & 1 & 0 & 0 & 0 & 0 \\ \hline
+	0 & y_1 = 3 & 0 & 0 & 1 & -\frac{5}{2} & \frac{11}{2} & 0 \\ 
+	0 & y_4 = 1 & 0 & 0 & 0 & \frac{1}{2} & -\frac{3}{2} & 1 \\ 
+	2 & x_1 = 2 & 1 & 0 & 0 & 0 & 1 & 0 \\ 
+	1 & x_2 = 2 & 0 & 1 & 0 & \frac{1}{2} & -\frac{3}{2} & 0 \\ \hline
+	 & z = 6 & 0 & 0 & 0 & \frac{1}{2} & \frac{1}{2} & 0 \\ \hline
+ \end{array} $$
+ 
+ \begin{center}
+\begin{tikzpicture}[level/.style={sibling distance=7cm,level distance=2.5cm,
+			growth parent anchor=south}]
+\node [circle,draw] (z){	$ \begin{cases}
+						x_1 = \frac{10}{3} \\
+						x_2 = 0 \\
+					\end{cases}
+					z = \frac{20}{3} $}
+child {node [circle,draw] (a) {	$ \begin{cases}
+							x_1 = 3 \\
+							x_2 = \frac{1}{2} \\
+						\end{cases}
+						z = \frac{13}{2} $}
+	child { node [circle,draw] (b) {$ \begin{cases}
+								x_1 = 3 \\
+								x_2 = 0 \\
+							\end{cases}
+							z = 6 $ }
+		edge from parent 
+		node[left] {$x_2 \leq 0$}
+						}
+	child {node [circle,draw] (c) {$ \begin{cases}
+								x_1 = \frac{8}{3} \\
+								x_2 = 1 \\
+							\end{cases}
+							z = \frac{19}{3} $ }
+		child {node [circle,draw] (e)  {$ \begin{cases}
+									x_1 = 2 \\
+									x_2 = 2 \\
+								\end{cases}
+								z = 6 $ }
+			edge from parent
+			node[left] {$x_1 \leq 2$}
+			}
+		edge from parent 
+		node[right] {$x_2 \geq 1$}
+		}
+	edge from parent 
+	node[left] {$x_1 \leq 3$}
+	}
+child {node [] (d) {}
+	edge from parent[draw=none]
+	}
+;
+\end{tikzpicture}
+\end{center}
+ 
+\begin{center}
+\begin{tikzpicture}[level/.style={sibling distance=7cm,level distance=2.5cm,
+			growth parent anchor=south}]
+\node [circle,draw] (z){	$ \begin{cases}
+						x_1 = \frac{10}{3} \\
+						x_2 = 0 \\
+					\end{cases}
+					z = \frac{20}{3} $}
+child {node [circle,draw] (a) {	$ \begin{cases}
+							x_1 = 3 \\
+							x_2 = \frac{1}{2} \\
+						\end{cases}
+						z = \frac{13}{2} $}
+	child { node [circle,draw] (b) {$ \begin{cases}
+								x_1 = 3 \\
+								x_2 = 0 \\
+							\end{cases}
+							z = 6 $ }
+		edge from parent 
+		node[left] {$x_2 \leq 0$}
+						}
+	child {node [circle,draw] (c) {$ \begin{cases}
+								x_1 = \frac{8}{3} \\
+								x_2 = 1 \\
+							\end{cases}
+							z = \frac{19}{3} $ }
+		child {node [circle,draw] (e)  {$ \begin{cases}
+									x_1 = 2 \\
+									x_2 = 2 \\
+								\end{cases}
+								z = 6 $ }
+			edge from parent
+			node[left] {$x_1 \leq 2$}
+			}
+		edge from parent 
+		node[right] {$x_2 \geq 1$}
+		}
+	edge from parent 
+	node[left] {$x_1 \leq 3$}
+	}
+child {node [end] (d) {}
+	edge from parent
+	node[left] {$x_1 \geq 4$}
+	}
+;
+\end{tikzpicture}
+\end{center}
+
 
 \subsubsection{Coupes de Gomory}
+
+
