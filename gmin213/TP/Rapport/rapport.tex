@@ -1,7 +1,43 @@
 % !TEX encoding = UTF-8 Unicode
 \documentclass[a4paper]{report}
 
-\input{../../../common/tex_templates/include}
+%%% Encodage, langues, guillemets, ... %%%
+\usepackage[french]{babel}       
+\usepackage[utf8]{inputenc}
+\usepackage{setspace}
+\usepackage{listings}
+\usepackage{lscape}
+%%% Inclusion images et feuilles pdf %%%
+\usepackage{graphicx}
+\usepackage{pdfpages}
+\usepackage{wrapfig}
+\usepackage{geometry}
+%%% Inclusion url et liens %%%
+\usepackage{hyperref}
+\usepackage{url}
+% Changement des puces de enumerate
+\usepackage{enumerate}
+%%% Symboles, Mathématique %%%
+% Symbole euro
+\usepackage{eurosym}
+% Mathématiques
+\usepackage{amsmath}
+\usepackage{amssymb}
+%%% Schémas
+% Graphes, géométrie et autres
+\usepackage{tikz}
+\usetikzlibrary{trees}
+%%% Algorithme
+\usepackage{algorithm}
+\usepackage{algorithmic}
+
+\usepackage{array}
+\newcolumntype{C}[1]{>{\centering\arraybackslash$}p{#1}<{$}}
+\renewcommand\arraystretch{1.6}
+
+\newcommand{\PLNE}[0]{ Programmation Linéaire en Nombres Entiers }
+\newcommand{\card}{\mathrm{Card}}
+
 
 \pagestyle{headings}
 \thispagestyle{empty}
@@ -23,6 +59,7 @@ Swan ROCHER
 \vfill
 2012 \hfill UM2
 
+\setcounter{tocdepth}{1}
 \tableofcontents
 \thispagestyle{empty}
 \pagenumbering{arabic}
@@ -31,9 +68,16 @@ Swan ROCHER
 \chapter{Partie théorique}
 \input{../Guillerme/exo1}
 \input{../Guillerme/exo2}
-\input{../Exo3/exo3}
+\input{../Chloe/exo3}
 \input{../Guillerme/exo4}
+\input{../Swan/exo5}
 \input{../Guillerme/exo6}
+\input{../Chloe/exo7}
+\input{../Chloe/exo8}
+\input{../Swan/exo9}
+\input{../Swan/exo10}
+\input{../Swan/exo11}
+\input{../Chloe/exo12}
 
 
 \chapter{Partie pratique}
