@@ -1,0 +1,144 @@
+%ex16.tex
+
+\section{Exercice 16 - Coloration des Sommets d'un Graphe}\label{ex16}
+
+\subsection{Question 1}\label{ex16_q1}
+Nous devons montrer que l'algorithme \ref{ex14_algo} n'est pas r-approch\'e quel que soit
+$r \in N$.
+
+Soit la propri\'et\'e $P_r$ : "l'algorithme n'est pas r-approch\'e".
+Par r\'ecurrence sur $r \in N$ :
+
+$P_1$ : Si $P_1$ est fausse, la solution renvoy\'ee est optimale, l'algorithme \'etant polynomial et le
+probl\`eme de coloration de sommets appartenant \`a la classe $NP$, il est \'evident que
+$P_1$ est vraie (si $P \neq NP$).
+
+Sous l'hypoth\`ese que $P_r$ est vraie, nous allons montrer que $P_{r+1}$ l'est
+\'egalement :\\
+On suppose que $P_{r+1}$ est fausse (d\'emonstration par l'absurde).\\
+L'algorithme renvoie donc $k \times (r+1)$ couleurs.
+Soit $G' = G \setminus \{v : couleur(v) > k \times r\}$ (c'est \`a dire qu'on retire de G
+tous les sommets color\'es par les $k$ derni\`eres couleurs).\\
+Il est trivial de voir que l'algorithme renvoie donc une solution r-approch\'ee pour
+$G'$ (tout en restant polynomial en fonction du temps).\\
+Or ceci est impossible par hypoth\`ese de r\'ecurrence $\rightarrow$ absurde.\\
+$P_{r+1}$ est donc vraie.
+
+\subsection{Question 2}\label{ex16_q2}
+Nous devons maintenant montrer qu'il existe toujours un ordre des sommets tel que
+l'algorithme \ref{ex14_algo} renvoie une solution optimale.
+
+Soit $G$ un graphe quelconque.\\
+Soit $couleur(x_i) \forall x_i \in G$ une coloration optimale de $G$.\\
+Soit la num\'erotation $\{y_i\} \forall y_i \in G$ telle que $couleur(y_i) <=
+couleur(y_i+1)$.\\
+Il est \'evident qu'une telle num\'erotation existe et qu'en suivant celle-ci
+l'algorithme renverra toujours la solution optimale.
+
+\subsection{Question 3}\label{ex16_q3}
+Le probl\`eme de savoir si un graphe est 2-colorable est polynomial puisque l'algorithme
+suivant permet toujours de donner la r\'eponse :\\
+On attribue au premier sommet la couleur 1, puis la couleur 2 \`a tous ses voisins, \`a
+nouveau la couleur 1 \`a leurs voisins respectifs, et on continue ainsi tant qu'il
+n'existe pas deux sommets adjacents partageant la m\^eme couleur.\\
+Si aucune erreur n'est rep\'er\'ee a la fin de l'algorithme, le graphe est 2-colorable.
+
+\subsection{Question 4}\label{ex16_q4}
+Nous devons montrer que si $G$ est 3-colorable, alors $\forall x \in G\ voisinage(x)$ est
+un graphe biparti.
+
+Soit $G$ un graphe 3-colorable.\\
+Soit $x \in G$ un sommet quelconque. On note 1 la couleur de x.\\
+Soit $G_x$ le graphe du voisinage de $x$.\\
+Puisque tous les sommets $y \in G_x$ sont adjacents \`a $x$ par construction, ils ne
+peuvent pas \^etre de sa couleur. C'est \`a dire que $couleur(y) > 1$.\\
+Or $G$ est 3-colorable, donc $couleur(y) <= 3$.\\
+On a donc que $couleur(y) \in \{2,3\}$.
+Ie, $G_x$ est 2-colorable, et tout graphe 2-colorable admet une bipartition de ses
+sommets (cf \ref{ex4}).\\
+$G_x$ est donc un graphe biparti.
+
+\subsection{Question 5}\label{ex16_q5}
+Il est question de trouver un algorithme $\sqrt{n}$-approch\'e permettant de colorer un
+graphe 3-colorable.
+Soit l'algorithme suivant :
+
+\begin{center}
+\begin{algorithm}[H]
+\caption{Coloration de graphe 3-colorable}\label{ex16_algo1}
+\algsetup{indent=2em,linenodelimiter= }
+\begin{algorithmic}[1]
+\REQUIRE $G$ : graphe de n sommets 3-colorable
+\ENSURE $couleur(x)$ : couleur attribu\'e au sommet x $\forall x \in G$ 
+	\STATE trier les $x_i \in G$ par ordre d\'ecroissant de degr\'e
+	\STATE $k \leftarrow 1$
+	\STATE $couleur \leftarrow \emptyset$
+	\REPEAT
+		\STATE $x \leftarrow sommet(G)$
+		\STATE $G' \leftarrow voisinage(x)$
+		\STATE $couleur \leftarrow couleur \cup 2coloration(G',k)$
+		\STATE $k \leftarrow k+2$
+		\STATE $G \leftarrow G \setminus G'$
+	\UNTIL {$deg(sommet(G)) < \sqrt{n}$}
+	\STATE $couleur \leftarrow couleur \cup DMaxPlus1coloration(G,k)$
+\RETURN $couleur$
+\end{algorithmic}
+\end{algorithm}
+\end{center}
+
+Il faut maintenant prouver que cet algorithme renvoie bien une $\sqrt{n}$-approximation.
+
+Tout d'abord l'op\'eration $2coloration(G,k)$ (qui colore un graphe 2-colorable avec
+les couleurs k et k+1) est expliqu\'ee en question 3 (\ref{ex16_q3}).\\
+Quant \`a $DMaxPlus1coloration(G,k)$ qui colore un graphe avec les couleurs
+$[k,k+deg_{max}(G)]$, il suffit de voir qu'il est simple de colorer G si on s'autorise 1
+couleur de plus que le degr\'e maximum de G.
+En effet puisque chaque sommet a au plus D voisins, il reste toujours au moins une
+couleur non utilis\'ee.\\
+De plus, ces deux op\'erations sont \'evidemment polynomiales.
+
+Il faut donc compter le nombre de couleurs utilis\'ees.\\
+A chaque fois qu'on entre dans la boucle on \'elimine $\sqrt{n}$ sommets (puisque le
+sommet $x$ a un degr\'e d'au moins $\sqrt{n}$).\\
+On entrera donc dans cette boucle au plus $\frac{n}{\sqrt{n}} = \sqrt{n}$ fois.
+En effet, une fois ce nombre de passages effectu\'es le degr\'e maximum de G est
+forc\'ement inf\'erieur \`a $\sqrt{n}$.\\
+Or \`a chaque it\'eration on utilise seulement deux couleurs, en effet $G'$ est
+2-colorable (\ref{ex16_q4}).\\
+Ce qui am\`ene le nombre de couleurs \`a $2 \times \sqrt{n}$ \`a la fin de la boucle.\\
+Une fois celle-ci termin\'ee il ne nous reste plus que la derni\`ere coloration qui
+utilise donc une couleur de plus que le degr\'e maximum de G.\\
+Or $deg_{max}(g) < \sqrt{n}$, ce qui au pire ajoutera encore $\sqrt{n}$ couleurs.\\
+En faisant la somme nous arrivons donc \`a $3 \times \sqrt{n}$ couleurs.
+
+Le graphe \'etant 3-colorable, le nombre de couleurs optimal est 3, donc en calculant le
+ration de cet algorithme par rapport \`a la meilleure solution nous obtenons bien :
+$\frac{3 \times \sqrt{n}}{3} = \sqrt{n}$.
+
+Cet algorithme est bien $\sqrt{n}$-approch\'e.
+
+\subsection{Question 6}\label{ex16_q6}
+Si un graphe dont le voisinage de tout sommet est un graphe biparti impliquait que ce
+graphe est 3-colorable, alors il exxisterait un algorithme polynomial permettant de
+savoir si un graphe est 3-colorable (probl\`eme $NP$) :
+
+\begin{center}
+\begin{algorithm}[H]
+\caption{Graphe 3-colorable ?}\label{ex16_algo2}
+\algsetup{indent=2em,linenodelimiter= }
+\begin{algorithmic}[1]
+\REQUIRE $G$ : graphe de n sommets
+\ENSURE vrai ssi G est 3-colorable, faux sinon  
+	\FORALL {sommet $x \in G$}
+		\STATE $G_x \leftarrow voisinage(x)$
+		\IF {$G_x$ n'est pas 2-colorable}
+			\RETURN faux
+		\ENDIF
+	\ENDFOR
+	\RETURN vrai
+\end{algorithmic}
+\end{algorithm}
+\end{center}
+
+Et donc en supposant que $P \neq NP$, ceci est impossible.
+

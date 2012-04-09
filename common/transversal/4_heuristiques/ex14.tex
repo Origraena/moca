@@ -1,0 +1,49 @@
+%ex14.tex
+
+\section{Exercice 14 - Coloration de Sommets}\label{ex14}
+
+\begin{center}
+\begin{algorithm}[H]
+\caption{Approximation de $\chi$(G) s\'equentielle}\label{ex14_algo}
+\algsetup{indent=2em,linenodelimiter= }
+\begin{algorithmic}[1]
+\REQUIRE $G$ : graphe de n sommets
+\ENSURE $\chi(G)$ : nombre de couleurs n\'ecessaires pour colorer G
+\STATE Soit $x_1,...,x_n$ une num\'erotation des sommets de G.
+\STATE Soit $C = \{1,2,...,k\}$ un ensemble de couleurs.
+\FORALL {$x_i$}
+	\STATE $\chi(G) = min\{k \in C : \forall y \in voisinage(x_i), \chi(y) \neq k\}$
+\ENDFOR
+\RETURN $\chi(G)$
+\end{algorithmic}
+\end{algorithm}
+\end{center}
+
+\subsection{Question 1}\label{ex14_q1}
+Soit la num\'erotation suivante (parcours en profondeur \`a partir du premier sommet) :
+\input{4_heuristiques/ex14_fig1.tex}
+
+En appliquant l'algorithme ci-dessus on obtient la coloration suivante :
+\input{4_heuristiques/ex14_fig2.tex}
+On remarque que sur cet exemple, la solution est optimale : $\chi(G) = 3$.
+
+\subsection{Question 2}\label{ex14_q2}
+Malheureusement la solution renvoy\'ee n'est pas toujours tr`es bonne, en effet il est
+possible de construire un graphe 2-colorable pour lequel l'algorithme renverra
+$\frac{n}{2}$.
+
+En effet, soient les graphe bipartis $G = (V,E)$ suivants :\\
+\begin{itemize}
+	\item $V = \{1,2,...,n\}$ ;
+	\item $E = \{(i,j) \forall i,j \in V : i\ impair,\ j\ pair,\ et\ j \neq i+1\}$
+\end{itemize}
+
+\input{4_heuristiques/ex14_fig3.tex}
+
+En ex\'ecutant l'algorithme sur un tel graphe, on voit rapidement que le nombre de
+couleurs utilis\'ees sera bien \'egal au nombre de sommets divis\'e par deux.
+Sur l'exemple de la figure, on voit que pour $n = 6$, la solution $\chi_{alg}(G_{fig3}) =
+3$ tandis que $\chi_{opt}(G_{fig3}) = 2$.
+
+\input{4_heuristiques/ex14_fig4.tex}
+
