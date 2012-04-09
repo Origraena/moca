@@ -2,10 +2,10 @@ package tictactoe;
 
 public class TicTacToe {
 
-	public static final int NEW_GAME = 1;
-	public static final int GAME_OPTIONS = 2;
-	public static final int UI_OPTIONS = 3;
-	public static final int EXIT = 4;
+	public static final int NEW_GAME 		= 1;
+	public static final int GAME_OPTIONS 	= 2;
+	public static final int UI_OPTIONS 		= 3;
+	public static final int EXIT 			= 4;
 
 	public TicTacToe() {
 		_ui = new TicTacToeSUI(this);
