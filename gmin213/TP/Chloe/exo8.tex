@@ -4,7 +4,7 @@
 \section{Sur le produit matriciel}
 
 \subsection{Nombre d'opérations nécessaires pour un produit}
-Soit $M_i$ une $(p_i,p_{i+1})$-matrice. Soient $\pi _1$ et $\pi _2$ les produits matriciels à parenthèsage symétrique suivants : 
+Soit $M_i$ une $(p_i,p_{i+1})$-matrice. Soient $\pi _1$ et $\pi _2$ les produits matriciels à parenthésage symétrique suivants : 
 $$\pi _1 = (M_1(M_2(M_3(M_4(...(M_{k-1}.M_k))))))$$
 $$\pi _2 = ((((((M_1.M_2)M_3)M_4)...)M_{k-1})M_k)$$
 Nous admettons que le produit d'une $(p,q)$-matrice et d'une $(q,r)$-matrice peut se faire à l'aide de $p.q.r$ opérations. Tous les produits matriciels envisagés par la suite sont définis car le nombre de colonnes de la première matrice est égal au nombre de lignes de la seconde.
@@ -37,7 +37,7 @@ $ \begin{array}{|c|c|c|c|c|c|c|} \hline
  Nous pouvons alors déduire la formule donnant le nombre d'opérations nécessaires pour calculer le produit $\pi _2$ :
 $$ \sum\limits_{i =1}^{i < k} {[(i+1) \times (i+2)]} $$
 
-Nous remarquons tout d'abord que le produit $\pi_1$ dépend de $k$ alors que le produit $\pi_2$ n'en dépend pas. Comparons maintenant le nombre d'opérations nécessaires aux produits $\pi_1$ et $\pi_2$ :
+Comparons maintenant le nombre d'opérations nécessaires aux produits $\pi_1$ et $\pi_2$ :
 
 \begin{center}
 $ \begin{array}{|c|C{4.5cm}|C{4.5cm}|C{4.5cm}|} \hline
@@ -48,11 +48,11 @@ $ \begin{array}{|c|C{4.5cm}|C{4.5cm}|C{4.5cm}|} \hline
  \end{array} $
  \end{center}
  
-Nous pouvons en déduire que $\forall k \geq 2$ le nombre d'opérations nécessaires pour calculer le produit $\pi_1$ est supérieur au nombre d'opérations nécessaires pour calculer le produit $\pi_2$.
+Nous déduisons du tableau précédent (et du fait que la première expression comporte un terme de plus) que $\forall k \geq 2$ le nombre d'opérations nécessaires pour calculer le produit $\pi_1$ est supérieur au nombre d'opérations nécessaires pour calculer le produit $\pi_2$. Le nombre d'opérations nécessaires pour calculer un produit matriciel dépendant du parenthésage choisi.
 
  
  
-\subsection{Nombre de parenthèsages possibles d'un produit de $k$ matrices}
+\subsection{Nombre de parenthésages possibles d'un produit de $k$ matrices}
 
 
 \subsection{Récurrence}
