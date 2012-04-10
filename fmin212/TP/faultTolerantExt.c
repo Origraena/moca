@@ -130,6 +130,7 @@ int init_structures() {
 
 	/* HELLO message broadcasting */
 	msg_t broad;
+	memset(&broad, 0, SIZE);
 	type(broad) = HELLO;
 	broadcast(broad);
 
