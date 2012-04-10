@@ -239,8 +239,6 @@ int recvMessage(msg_t* message, struct sockaddr_in* add) {
 	bzero(&netParamsNeighbour,sizeof(netParamsNeighbour));
 	size_t size = sizeof(netParamsNeighbour);
 
-	memset(&message, 0, SIZE);
-
 	int nbLus = recvfrom(this_site.sdRecv, message, SIZE, 0, (struct sockaddr *)&netParamsNeighbour, (socklen_t *)&size);
 	if(nbLus != SIZE) {
 		if(errno != EAGAIN) {
