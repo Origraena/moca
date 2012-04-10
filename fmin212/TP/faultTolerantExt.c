@@ -137,6 +137,13 @@ int init_structures() {
 	printf("\nAttente d'autres sites...\n");
 	waitForHellorep(WAITING_PERIOD);
 
+	memset(&broad, 0, SIZE);
+	type(broad) = HELLO;
+	broadcast(broad);
+
+	printf("\nAttente d'autres sites...\n");
+	waitForHellorep(WAITING_PERIOD);
+
 	/* HELLO message broadcasting */
 	//broadcast(t, "");
 
