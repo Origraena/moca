@@ -1,0 +1,87 @@
+%ex21.tex
+
+\section{Exercice 21 - Coloration et Homomorphisme}\label{ex21}
+
+\subsection{Question 1}\label{ex21_q1}
+Soit $G = (V_G,E_G)$ un graphe quelconque connexe (s'il n'est pas connexe, il suffit
+d'appliquer la d\'emonstration \`a chaque composante).\\
+Montrons que $G$ est k-colorable $\leftrightarrow \exists$ un homomorphisme de $G$
+dans une k-clique $K_k = (V_K,E_K)$.
+
+$\rightarrow$ $G$ est k-colorable.\\
+Soit $W = (V_W,E_W)$ la plus grande clique de $G$.\\
+On sait que $\chi(W) \leq \chi(G)$ (cf \ref{ex6}).
+On note $x_1,...,x_w$ les sommets de $W$, $x_{w+1},...,x_n$ les sommets de $G \setminus
+W$.
+Et $y_1,...,y_k$ les sommets de $K_k$.\\
+Puisque $\chi(K_n) = n$ on remarque que $w \leq k$.\\
+Soit $h$ une fonction de $V_G$ dans $V_K$ construite de la mani\`ere suivante :
+\begin{itemize}
+	\item (i)  $h(x_i) = y_i \forall i \in [1,w]$
+	\item (ii) $h(x_i) \in V_K \setminus {h(x_j) : \exists (x_i,x_j) \in E_G}$
+\end{itemize}
+Les ar\^etes de $W$ sont bien conserv\'ees par (i), $K_k$ \'etant complet par d\'efinition.
+Quant \`a celles ayant une extr\'emit\'e $x \in V_G \setminus V_W$, on sait qu'il existe
+au moins un sommet $x'$ de $V_W$ tel qu'il n'existe pas $(x,x') \in E_G$. En effet si tel
+\'etait le cas, le sommet $x$ ferait partie de $W$.\\
+Ainsi il suffit de poser $h(x) = h(x')$ et ses ar\^etes seront \'egalement
+respect\'ees.\\
+La fonction $h$ \'etant bien d\'efinie pour tout $x \in V_G$ et conservant les ar\^etes,
+celle-ci est bien un homomorphisme de $G$ dans $K_k$.
+
+$\leftarrow$ $\exists$ un homomorphisme $h$ de $G$ dans $K_k$.\\
+Intuitivement, un homomorphisme est une fonction qui "contracte" les sommets du graphe de
+d\'epart dans celui d'arriv\'ee. Ainsi en appliquant $h$ de $G$ dans $K_k$, il suffit de
+colorer chaque $y_i$ avec la couleur $i$, puis de "red\'eplier" G \`a partir de son image
+dans $K_k$, et tous les sommets sont color\'es avec seulement $k$ couleurs.\\
+Plus formellement, %notons $h^{-1}_j(y_i)$ les TODO (predecesseurs) de $y_i \in K_k$ par
+%$h$.\\
+soit la coloration classique de $K_k$ suivante :
+$couleur(y_i) = i\ \forall i \in [1,k]$.\\
+Attribuons \`a chaque $x_i \in V_G$ la couleur de $h(x_i)$.\\
+Puisque $h$ conserve les ar\^etes, il est trivial de voir que la coloration de $G$ est
+valide. De plus $k$ couleurs ont \'et\'e utilis\'ees.\\
+Donc $G$ est k-colorable.
+
+%%%%	Plus formellement, supposons que $G$ contienne une clique de taille strictement
+%%%%	sup\'erieure \`a k $K_{k+1}$.\\
+%%%%	On note $y_i \in K_k$ l'image des $x_i \in V_G \forall i \in [1,k]$ par $h$.\\
+%%%%	Regardons le sommet $x_{k+1}$. Celui-ci faisant partie de $K_{k+1} \in G$, $h(x_{k+1})$
+%%%%	doit \^etre adjacent \`a tous les $h(x_i) \forall i \in [1;k]$.\\
+%%%%	Or, le degr\'e de tout sommet de $K_k$ est \'egal \`a $k-1$ (par d\'efinition d'une
+%%%%	clique).\\
+%%%%	Ainsi quelle que soit l'image choisie $h(x_i)$ dans $K_k$ il existera toujours une ar\^ete non
+%%%%	respect\'ee : pr\'ecisemment l'ar\^ete $(x_{k+1},x_i) \in E_G$ ne pourra pas appara\^itre
+%%%%	dans $K_k$ puisque les deux sommets partageront la m\^eme image.\\
+%%%%	Cela implique que $h$ n'est pas un homomorphisme de $G$ dans $K_k$ $\rightarrow
+%%%%	absurde$.\\
+%%%%	La plus grande clique de $G$ est donc de taille $\leq k$.
+
+\subsection{Question 2}\label{ex21_q2}
+Nous savons que le probl\`eme k-colorable est NP-complet.\\
+De plus, nous pouvons d\'efinir l'algorithme suivant :
+
+\begin{center}
+\begin{algorithm}[H]
+\caption{k-colorable ?}\label{ex21_algo}
+\algsetup{indent=2em,linenodelimiter= }
+\begin{algorithmic}[1]
+\REQUIRE $G$ : graphe de n sommets,
+		 $k \in N$
+\ENSURE vrai ssi G est k-colorable, faux sinon
+	\STATE $K_k \leftarrow k-clique$
+	\IF {$\exists h$ un homomorphisme de $G$ dans $K_k$}
+		\RETURN vrai
+	\ELSE
+		\RETURN faux
+	\ENDIF
+\end{algorithmic}
+\end{algorithm}
+\end{center}
+
+Sous l'hypoth\`ese que $P \neq NP$, et que la recherche d'homomorphisme dans un graphe
+est polynomiale, nous avons donc un algorithme polynomial permettant de d\'ecider si un
+graphe est k-colorable.
+Ce qui est absurde.\\
+$HOM$ appartient donc \`a la classe de probl\`eme NP-complet.
+
