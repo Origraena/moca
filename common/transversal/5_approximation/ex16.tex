@@ -4,7 +4,7 @@
 
 \subsection{Question 1}\label{ex16_q1}
 Nous devons montrer que l'algorithme \ref{ex14_algo} n'est pas r-approch\'e quel que soit
-$r \in N$.
+$r \in N$ (celui-ci est d\'etaill\'e en \ref{ex14}).
 
 On cherche donc que $\forall r \in N$, $\exists G$ tel que $\chi_{algo}(G) >
 r\chi_{opt}(G)$.\\
@@ -16,7 +16,7 @@ Soit le graphe biparti $G$ d\'efini dans la question \ref{ex14_q2} :
 Etant biparti, $\chi_{opt}(G) = 2$, et d'apr\`es \ref{ex14_q2} $\chi_{algo}(G) = \frac{n}{2}$.\\
 Donc $\chi_{algo}(G) = \frac{n}{4} \times \chi_{opt}(G)$.
 
-Pour chaque $r \in N$ cr\'eons le graphe ci-dessus de taille $4 \times r + 2$.\\
+Pour chaque $r \in N$ cr\'eons le graphe ci-dessus de taille $4 \times r + 4$.\\
 $\chi_{algo}(G) = \frac{n}{4} \times \chi_{opt}(G) = (r + 1) \times \chi_{opt}(G) > r
 \times \chi_{opt}(G)$.\\
 Ainsi pour chaque $r \in N$ il existe un graphe qui pour lequel l'algorithme ne renvoie
@@ -28,7 +28,7 @@ l'algorithme \ref{ex14_algo} renvoie une solution optimale.
 
 Soit $G$ un graphe quelconque.\\
 Soit $couleur(x_i) \forall x_i \in G$ une coloration optimale de $G$.\\
-Soit la num\'erotation $\{y_i\} \forall y_i \in G$ telle que $couleur(y_i) <=
+Soit la num\'erotation $\{y_i\}\ \forall y_i \in G$ telle que $couleur(y_i) \leq
 couleur(y_{i+1})$.\\
 Il est \'evident qu'une telle num\'erotation existe et qu'en suivant celle-ci
 l'algorithme renverra toujours la solution optimale.
@@ -50,7 +50,7 @@ Soit $x \in G$ un sommet quelconque. On note 1 la couleur de x.\\
 Soit $G_x$ le graphe du voisinage de $x$.\\
 Puisque tous les sommets $y \in G_x$ sont adjacents \`a $x$ par construction, ils ne
 peuvent pas \^etre de sa couleur. C'est \`a dire que $couleur(y) > 1$.\\
-Or $G$ est 3-colorable, donc $couleur(y) <= 3$.\\
+Or $G$ est 3-colorable, donc $couleur(y) \leq 3$.\\
 On a donc que $couleur(y) \in \{2,3\}$.
 Ie, $G_x$ est 2-colorable, et tout graphe 2-colorable admet une bipartition de ses
 sommets (cf \ref{ex4}).\\
