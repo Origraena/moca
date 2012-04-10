@@ -1,0 +1,126 @@
+\documentclass[a4paper, 11pt]{article}
+
+\usepackage[utf8x]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[french]{babel}
+\usepackage{graphicx}
+\usepackage{moreverb}
+\usepackage{subfigure}
+\usepackage{pdfpages}
+\usepackage{eurosym}
+\usepackage{fullpage}
+\usepackage[fleqn]{amsmath}
+\usepackage{bbm}
+\usepackage{amssymb}
+\usepackage{tikz}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+\usepackage{pgf}
+
+\usetikzlibrary{arrows,automata}
+
+\newtheorem{lemma}{Lemme}[subsection]
+\newtheorem{thrm}{Théorème}[section]
+
+\begin{document}
+
+On cherche à prouver qu'il n'existe pas d'algorithme $\rho$-approché permettant de résoudre le
+problème du voyageur de commerce sans l'inégalité triangulaire. Pour ce faire, raisonnons par 
+l'absurde.
+
+\underline{Hypothèse :} il existe un algorithme $\rho$-approché, $\rho \in \mathbb{R}$.
+
+On s'intéresse au problème du cycle Hamiltonien :
+\begin{algorithm}
+	\caption{Problème du cycle Hamiltonien}
+	\begin{algorithmic}[1]
+		\STATE $\forall (i, j) \in V^2$
+		\IF {$\{i,j\} \in  E$}
+			\STATE $d_{ij} \leftarrow 1$
+		\ELSE 
+			\STATE $d_{ij} \leftarrow \rho|V| + 1$
+		\ENDIF
+		\STATE $\mu \leftarrow A(V,D)$
+		\IF {longueur($\mu$) $\leq \rho|V|$}
+			\STATE G est Hamiltonien
+		\ELSE
+			\STATE G n'est pas Hamiltonien
+		\ENDIF
+	\end{algorithmic}
+\end{algorithm}
+
+En effet, si longueur$(\mu) \leq \rho|V|$, alors il n'y a aucune arête de valeur $\rho|V| + 1$, donc
+toutes les distances entre 2 villes consécutives de $\mu$ sont égales à 1, donc $G$ est Hamiltonien.
+
+Si longueur$(\mu) > \rho$, comme l'algorithme est $\rho$-approché, on a : $$
+\begin{array}{lrcl}
+	&\displaystyle \frac{l(\mu)}{c^*} & \leq & \rho \\
+	\Rightarrow & c^* & \geq & \frac{l(\mu)}{\rho} > |V|
+\end{array} $$
+Donc le meilleur cycle n'utilise pas que des arêtes de poids 1, et donc $G$ n'est pas Hamiltonien.
+
+\section{Comment trouver un schéma d'approximation polynomial ?}
+
+Trouver un algorithme pseudo polynomial (la complexité dépend de la valeur de la donnée de façon
+polynomiale). Pour accélérer le calcul, on divise la valeur de la donnée, mais on introduit des
+erreurs liées à la division : on perd l'optimalité, la division n'est pas forcément pertinente.
+
+Une autre technique utilisée, repose sur le calcul d'échantillons, c'est à dire une partie des
+solutions et les solutions \emph{oubliées} ont un représentant dans l'échantillon.
+
+\subsection{Problème du sac à dos}
+
+On énonce le problème du sac à dos ainsi : $$
+KP \left \lbrace \begin{array}{rcl}
+	\max p_ix_i \\
+	\displaystyle \sum a_i x_i & < & B 
+\end{array} \right . $$
+
+$p_i$ (resp. $a_i$) est le poids (resp. le volume) de l'objet $i$, avec $B$ le volume du sac à dos,
+$x_i \in \{0,1\}$ et :
+\begin{itemize}
+	\item $x_i = 0 \rightarrow $ l'objet $i$ n'est pas mis dans le sac à dos
+	\item $x_i = 1 \rightarrow $ l'objet $i$ est mis dans le sac à dos
+\end{itemize}
+
+Si on a une instance du problème de la partition, on pose : $$
+\begin{array}{rcl}
+	p_i & = & a_i \quad (\mbox{ = valeur de l'entier } i \\
+		B & = & \displaystyle \frac{\sum_{i=1}^n p_i}{2}
+\end{array} $$
+
+On résouds avec un algorithme polynomial $KP$. Soit S l'ensemble des objetrs mis dans le sac à dos.
+La réponse est OUI pour le problème de la partition ssi $\displaystyle \sum_{i\in S} p_i = B$. On
+voit alors que $KP$ est plus difficile que partition, il est NP-difficile.
+
+
+Soit $F_j(i) =$ volume minimal pour atteindre le poids $i$ avec les objets de $1$ à $j$. On a alors
+: $F_1(0) = 0$, $F_1(p_1) = a_1$ et $F_1(i) = +\infty$ avec $i \neq 0$ et $i \neq p_1$. De là on
+peut donc calculer $F_j(i)$ en fonction de $F_{j-1}(j)$ : $$
+F_j(i) =  min (F_{j-1}(i), F_{j-1} (i - p_j) + a_j) $$. 
+
+On cherche le maximum pour $i$ tel que $F_n (i) \leq B$, on calcule donc $F_j(i)$ pour $j$ allant de
+$1$ à $n$ et pour $i$ allant de $0$ à $\displaystyle \sum_{k=1}^n p_k$. La complexité est égale à
+$O(n \displaystyle\sum_{i=1}^n p_i)$ c'est à dire : $O (n^2 P_{\max})$ ou $P_{\max} = \max p_i$.
+
+Pour cet algorithme, on a une complexité en $0 (n^2 P_{\max})$. Pour accélérer, le calcul, on pose :
+$\forall j P_j(K) = \displaymath \left \lfloor\frac{P_j}{K} \right \rfloor$, la complexité se ramène
+à une complexité en $\displaystyle 0 (n^2 \frac{P_{\max}}{K})$. 
+
+À partir de maintenant, on considère le problème : $$
+KP(K= \left \lbrace \begin{array}{rcl}
+	\max \displaystyle \sum \left \lfloor \frac{P_i}{K} \right \rfloor x_i \\
+	\displaystyle \sum a_i x_i & \leq B 
+\end{array} \right .
+$$
+
+Soit $S(K)$ la solution optimale obtenue en résolvant $KP(K=$, soit $S^*$ la solution optimale de
+$KP$. On a : $$
+\sum_{j\in S(k) P_j \geq K \sum_{j\inS(K)} \left \lfloor \frac{P_j}{K} \right \rfloor \geq K \sum_{j
+	\in S^*} \left \lfloor \frac {P_j}{K} \right \rfloor \geq K \sum_{j\inS^*} \left ( \frac{P_j}{K} -
+	1 \right ) \geq \sum_{j\in S^*} P_j - \sum_{j\in S^*} K $$
+
+	Ce qui nous donne : $$
+	\frac{\sum_{j\in S(K)} P_j}{\sum_{j \in S^*} P_j \geq 1 - \frac{\sum_{j\in S^*} K}{\sum_{j\in S^*}
+		P_j} \geq 1 - \frac{KN}{P_{\max}} $$
+\end{document}
