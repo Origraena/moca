@@ -194,6 +194,8 @@ int critSectionRequest() {
 			return -1;
 		}
 
+		last = -1;
+
 		time_t timeStart, timeCur;
 		int flags = fcntl(this_site.sdRecv, F_GETFL);
 		int flags2 = flags | O_NONBLOCK;
@@ -556,6 +558,7 @@ int handleConnection (msg_t msg){
 //{{{ Critical Section + Threads
 //{{{ takeCriticalSection
 int takeCriticalSection() {
+	last = -1;
 	printf("Prise de la section critique\n");
 	state = WORKING;
 	position = 0;
