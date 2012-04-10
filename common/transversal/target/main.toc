@@ -10,8 +10,8 @@
 \contentsline {subsection}{\numberline {0.3.2}Question 2}{4}{subsection.0.3.2}
 \contentsline {subsection}{\numberline {0.3.3}Question 3}{4}{subsection.0.3.3}
 \contentsline {subsection}{\numberline {0.3.4}Question 4}{4}{subsection.0.3.4}
-\contentsline {subsection}{\numberline {0.3.5}Question 5}{5}{subsection.0.3.5}
-\contentsline {subsection}{\numberline {0.3.6}Question 6}{6}{subsection.0.3.6}
+\contentsline {subsection}{\numberline {0.3.5}Question 5}{4}{subsection.0.3.5}
+\contentsline {subsection}{\numberline {0.3.6}Question 6}{5}{subsection.0.3.6}
 \contentsline {subsection}{\numberline {0.3.7}Question 7}{6}{subsection.0.3.7}
 \contentsline {section}{\numberline {0.4}Exercice 21 - Coloration et Homomorphisme}{6}{section.0.4}
 \contentsline {subsection}{\numberline {0.4.1}Question 1}{6}{subsection.0.4.1}
