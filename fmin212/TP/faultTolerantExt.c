@@ -250,7 +250,7 @@ int critSectionRequest() {
 			switch(type(msg)) {
 				case ACK_SEARCH_QUEUE:
 					if (pos(msg) > pos(max))
-						memcpy(&max, msg, SIZE);
+						memcpy(&max, (void *) &msg, SIZE);
 					break;
 				case SEARCH_QUEUE:
 					if (nb_acc(msg) > acces) 
