@@ -179,6 +179,8 @@ int critSectionRequest() {
 	msg_t msg;
 	type(msg) = REQUEST;
 	state = WAITING;
+	char *ip_tmp = inet_ntoa(this_site.neighbours[0].sin_addr);
+	strncpy (ask(msg), ip_tmp, SIZE);
 
 	if(tokenPresent == 1) {
 		takeCriticalSection();
@@ -329,19 +331,17 @@ int handleMessage(msg_t msg) {
 
 // {{{ handleRequest
 int handleRequest(msg_t msg) {
-	printf ("Adresses %s %s\n", ips(msg), ip(msg));
-	strncpy(ip(msg), ips(msg), IPLONG * sizeof(char));
-	printf ("Adresses %s %s\n", ips(msg), ip(msg));
-	unsigned long int ipa = (unsigned long int)inet_addr(ips(msg));
+	strncpy(ip(msg), ask(msg), IPLONG * sizeof(char));
+	unsigned long int ipt = (unsigned long int)inet_addr(ask(msg));
 
-	if(getNeighbour(ipa)==-1) {
+	if(getNeighbour(ipt)==-1) {
 		printf ("C'est la loose !!!\n");
 		return 0;
 	}
 
 	if(last == -1) {
 		if(state == WAITING || state == WORKING) {
-			next = getNeighbour(ipa);
+			next = getNeighbour(ipt);
 			printf("Demande reçue du voisin : %d\n", next);
 			type(msg) = COMMIT;
 			pos(msg) = position + 1;
@@ -351,7 +351,7 @@ int handleRequest(msg_t msg) {
 				return -1;
 		}
 		else if(tokenPresent == 1) {
-			printf("request answer inet_addr(ip) %lu\n", (unsigned long int)ipa);
+			printf("request answer inet_addr(ip) %lu\n", (unsigned long int)ipt);
 			type(msg) = TOKEN;
 			if(sendMessageWithAdd(msg) == -1){
 				printf ("Raté...\n");
@@ -366,7 +366,7 @@ int handleRequest(msg_t msg) {
 		if(sendMessage(last, msg) == -1)
 			return -1;
 	}
-	last = getNeighbour(ipa);
+	last = getNeighbour(ipt);
 
 	return 0;
 }
