@@ -6,36 +6,21 @@
 Nous devons montrer que l'algorithme \ref{ex14_algo} n'est pas r-approch\'e quel que soit
 $r \in N$.
 
-%%%%	Soit la propri\'et\'e $P_r$ : "l'algorithme n'est pas r-approch\'e".
-%%%%	Par r\'ecurrence sur $r \in N$ :
-
-%%%%	$P_1$ : Si $P_1$ est fausse, la solution renvoy\'ee est optimale, l'algorithme \'etant polynomial et le
-%%%%	probl\`eme de coloration de sommets appartenant \`a la classe $NP$, il est \'evident que
-%%%%	$P_1$ est vraie (si $P \neq NP$).
-
-%%%%	Sous l'hypoth\`ese que $P_r$ est vraie, nous allons montrer que $P_{r+1}$ l'est
-%%%%	\'egalement :\\
-%%%%	On suppose que $P_{r+1}$ est fausse (d\'emonstration par l'absurde).\\
-%%%%	L'algorithme renvoie donc $k \times (r+1)$ couleurs.
-%%%%	Soit $G' = G \setminus \{v : couleur(v) > k \times r\}$ (c'est \`a dire qu'on retire de G
-%%%%	tous les sommets color\'es par les $k$ derni\`eres couleurs).\\
-%%%%	Il est trivial de voir que l'algorithme renvoie donc une solution r-approch\'ee pour
-%%%%	$G'$ (tout en restant polynomial en fonction du temps).\\
-%%%%	Or ceci est impossible par hypoth\`ese de r\'ecurrence $\rightarrow$ absurde.\\
-%%%%	$P_{r+1}$ est donc vraie.
-
-On cherche donc que $forall r \in N$, $\exists G$ tel que $\chi_{algo}(G) >
+On cherche donc que $\forall r \in N$, $\exists G$ tel que $\chi_{algo}(G) >
 r\chi_{opt}(G)$.\\
 Soit le graphe biparti $G$ d\'efini dans la question \ref{ex14_q2} :
 \begin{itemize}
 	\item $V = \{1,2,...,n\}$ ;
 	\item $E = \{(i,j) \forall i,j \in V : i\ impair,\ j\ pair,\ et\ j \neq i+1\}$
 \end{itemize}
-Etant biparti, $\chi_{opt}(G) = 2$, et $\chi_{algo}(G) = \frac{n}{2}$.\\
+Etant biparti, $\chi_{opt}(G) = 2$, et d'apr\`es \ref{ex14_q2} $\chi_{algo}(G) = \frac{n}{2}$.\\
 Donc $\chi_{algo}(G) = \frac{n}{4} \times \chi_{opt}(G)$.
-On peut alors poser $r = \frac{n}{4}$. Et en d\'eduire $n = 4 \times r$\\
-Ainsi $\forall r \in N$ on peut cr\'eer un graphe contenant $4 \times r + 2$ sommet qui
-sera un cas o\`u l'algorithme renverra une (r+1)-approximation.
+
+Pour chaque $r \in N$ cr\'eons le graphe ci-dessus de taille $4 \times r + 2$.\\
+$\chi_{algo}(G) = \frac{n}{4} \times \chi_{opt}(G) = (r + 1) \times \chi_{opt}(G) > r
+\times \chi_{opt}(G)$.\\
+Ainsi pour chaque $r \in N$ il existe un graphe qui pour lequel l'algorithme ne renvoie
+pas une r-approximation.
 
 \subsection{Question 2}\label{ex16_q2}
 Nous devons maintenant montrer qu'il existe toujours un ordre des sommets tel que
@@ -44,7 +29,7 @@ l'algorithme \ref{ex14_algo} renvoie une solution optimale.
 Soit $G$ un graphe quelconque.\\
 Soit $couleur(x_i) \forall x_i \in G$ une coloration optimale de $G$.\\
 Soit la num\'erotation $\{y_i\} \forall y_i \in G$ telle que $couleur(y_i) <=
-couleur(y_i+1)$.\\
+couleur(y_{i+1})$.\\
 Il est \'evident qu'une telle num\'erotation existe et qu'en suivant celle-ci
 l'algorithme renverra toujours la solution optimale.
 
