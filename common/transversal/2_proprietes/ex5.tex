@@ -1,0 +1,26 @@
+%ex5.tex
+
+\section{Exercice 5 - Coloration des Sommets}\label{ex5}
+Soit $A$ le plus grand stable d'un graphe quelconque $G$ \`a n sommets.
+On note $\alpha(G) = |A|$. \\
+Montrons que $\lceil\frac{n}{\alpha(G)}\rceil \leq \chi(G) \leq n - \alpha(G) + 1$.
+On pose (i) la premi\`ere in\'egalit\'e et (ii) la seconde.
+
+Montrons (i) par r\'ecurrence sur la taille $\alpha(G)$ de A.\\
+Si $\alpha(G) = 1$, on a : $\lceil\frac{n}{1}\rceil = n \leq \chi(G) \leq n$.\\
+On suppose que (i) est vraie pour $\alpha(G) = c$ et on cherche \`a prouver que c'est
+toujours le cas pour $\alpha(G) = c+1$.
+Il est \'evident que $\lceil\frac{n}{c+1}\rceil \leq \lceil\frac{n}{c}\rceil$,
+or par hypoth\`ese on a : $\lceil\frac{n}{c}\rceil \leq \chi(G)$.\\
+(i) est donc v\'erifi\'ee.
+
+Montrons maintenant (ii) :\\
+On sait que $\chi(G) \leq n$ (il suffit d'attribuer une couleur diff\'erente \`a chaque
+sommet).\\
+Soit $G' = G \setminus A$, on voit que le nombre de sommets de $G'$ est \'egal \`a $n -
+\alpha(G)$, et on en d\'eduit que $\chi(G') \leq n - \alpha(G)$.
+$A$ \'etant stable, on a $\chi(A) = 1$.\\
+De plus, $\chi(G) \leq \chi(G') + \chi(A)$, et donc on peut conclure :\\
+$\chi(G) \leq n - \alpha(G) + 1$.
+
+

@@ -1,0 +1,30 @@
+%ex4.tex
+
+\section{Exercice 4 - Coloration des Sommets}\label{ex4}
+Montrons que : $G = (V,E)$ est biparti $\leftrightarrow G$ est 2-colorable.\\
+Un graphe biparti est d\'efini de la mani\`ere suivante :
+\begin{itemize}
+	\item $V = V_1 \cup V_2$ avec $V_1 \cap V_2 = \emptyset$,
+	\item $\forall x_1,y_1 \in V1 (x_1,y_1) \notin E$,
+	\item $\forall x_2,y_2 \in V2 (x_2,y_2) \notin E$.
+\end{itemize}
+
+$\rightarrow$ Soit $G = (V = V_1 \cup V_2,E)$.\\
+Soit la coloration $C$ suivante :
+\begin{itemize}
+	\item $C(x) = 1 \forall x \in V_1$,
+	\item $C(x) = 2 \forall x \in V_2$.
+\end{itemize}
+Par d\'efinition d'un graphe biparti, cette 2-coloration est bien valide (puisque il
+n'existe aucune ar\^ete \`a l'int\'erieur de chaque partition).
+
+$\leftarrow$ Soit $G = (V,E)$ un graphe 2-colorable.\\
+Soit $C$ une 2-coloration valide de ses sommets.\\
+On pose $V_1 = \{x \in V : C(x) = 1\}$ et $V_2 = \{x \in V : C(x) = 2\}$.
+Puisque cette coloration est valide $\forall x,y \in V$ si $C(x) = C(y)$ alors
+$(x,y) \notin E$.\\
+Ainsi on peut noter $V = V_1 \cup V_2$, leur intersection est bien vide (puisque un
+m\^eme sommet ne peut pas avoir deux couleurs diff\'erentes) et il n'existe aucune
+ar\^ete ayant ses deux extr\'emit\'es dans le m\^eme sous-ensemble de sommets.\\
+$G$ est donc un graphe biparti.
+

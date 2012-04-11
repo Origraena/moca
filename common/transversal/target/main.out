@@ -1,18 +1,28 @@
-\BOOKMARK [1][-]{section.0.1}{Exercice 14 - Coloration de Sommets}{}
-\BOOKMARK [2][-]{subsection.0.1.1}{Question 1}{section.0.1}
-\BOOKMARK [2][-]{subsection.0.1.2}{Question 2}{section.0.1}
-\BOOKMARK [1][-]{section.0.2}{Exercice 15 - Coloration de Sommets}{}
-\BOOKMARK [2][-]{subsection.0.2.1}{Question 1}{section.0.2}
-\BOOKMARK [2][-]{subsection.0.2.2}{Question 2}{section.0.2}
-\BOOKMARK [1][-]{section.0.3}{Exercice 16 - Coloration des Sommets d'un Graphe}{}
-\BOOKMARK [2][-]{subsection.0.3.1}{Question 1}{section.0.3}
-\BOOKMARK [2][-]{subsection.0.3.2}{Question 2}{section.0.3}
-\BOOKMARK [2][-]{subsection.0.3.3}{Question 3}{section.0.3}
-\BOOKMARK [2][-]{subsection.0.3.4}{Question 4}{section.0.3}
-\BOOKMARK [2][-]{subsection.0.3.5}{Question 5}{section.0.3}
-\BOOKMARK [2][-]{subsection.0.3.6}{Question 6}{section.0.3}
-\BOOKMARK [2][-]{subsection.0.3.7}{Question 7}{section.0.3}
-\BOOKMARK [1][-]{section.0.4}{Exercice 21 - Coloration et Homomorphisme}{}
-\BOOKMARK [2][-]{subsection.0.4.1}{Question 1}{section.0.4}
-\BOOKMARK [2][-]{subsection.0.4.2}{Question 2}{section.0.4}
-\BOOKMARK [1][-]{section.0.5}{Exercice 22 - Homomorphisme et Satisfaction de Contraintes}{}
+\BOOKMARK [0][-]{chapter.1}{Introduction}{}
+\BOOKMARK [1][-]{section.1.1}{Remarques}{chapter.1}
+\BOOKMARK [2][-]{subsection.1.1.1}{Connexit\351}{section.1.1}
+\BOOKMARK [0][-]{chapter.2}{Propri\351t\351s G\351n\351rales}{}
+\BOOKMARK [1][-]{section.2.1}{Exercice 4 - Coloration des Sommets}{chapter.2}
+\BOOKMARK [1][-]{section.2.2}{Exercice 5 - Coloration des Sommets}{chapter.2}
+\BOOKMARK [1][-]{section.2.3}{Exercice 6 - Coloration des Sommets}{chapter.2}
+\BOOKMARK [0][-]{chapter.3}{Heuristiques}{}
+\BOOKMARK [1][-]{section.3.1}{Exercice 14 - Coloration de Sommets}{chapter.3}
+\BOOKMARK [2][-]{subsection.3.1.1}{Question 1}{section.3.1}
+\BOOKMARK [2][-]{subsection.3.1.2}{Question 2}{section.3.1}
+\BOOKMARK [1][-]{section.3.2}{Exercice 15 - Coloration de Sommets}{chapter.3}
+\BOOKMARK [2][-]{subsection.3.2.1}{Question 1}{section.3.2}
+\BOOKMARK [2][-]{subsection.3.2.2}{Question 2}{section.3.2}
+\BOOKMARK [0][-]{chapter.4}{Approximations}{}
+\BOOKMARK [1][-]{section.4.1}{Exercice 16 - Coloration des Sommets d'un Graphe}{chapter.4}
+\BOOKMARK [2][-]{subsection.4.1.1}{Question 1}{section.4.1}
+\BOOKMARK [2][-]{subsection.4.1.2}{Question 2}{section.4.1}
+\BOOKMARK [2][-]{subsection.4.1.3}{Question 3}{section.4.1}
+\BOOKMARK [2][-]{subsection.4.1.4}{Question 4}{section.4.1}
+\BOOKMARK [2][-]{subsection.4.1.5}{Question 5}{section.4.1}
+\BOOKMARK [2][-]{subsection.4.1.6}{Question 6}{section.4.1}
+\BOOKMARK [2][-]{subsection.4.1.7}{Question 7}{section.4.1}
+\BOOKMARK [0][-]{chapter.5}{Repr\351sentation des Connaissances}{}
+\BOOKMARK [1][-]{section.5.1}{Exercice 21 - Coloration et Homomorphisme}{chapter.5}
+\BOOKMARK [2][-]{subsection.5.1.1}{Question 1}{section.5.1}
+\BOOKMARK [2][-]{subsection.5.1.2}{Question 2}{section.5.1}
+\BOOKMARK [1][-]{section.5.2}{Exercice 22 - Homomorphisme et Satisfaction de Contraintes}{chapter.5}

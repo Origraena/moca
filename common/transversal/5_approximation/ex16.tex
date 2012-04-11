@@ -4,9 +4,9 @@
 
 \subsection{Question 1}\label{ex16_q1}
 Nous devons montrer que l'algorithme \ref{ex14_algo} n'est pas r-approch\'e quel que soit
-$r \in N$ (celui-ci est d\'etaill\'e en \ref{ex14}).
+$r \in \mathbb{N}$ (celui-ci est d\'etaill\'e en \ref{ex14}).
 
-On cherche donc que $\forall r \in N$, $\exists G$ tel que $\chi_{algo}(G) >
+On cherche donc que $\forall r \in \mathbb{N}$, $\exists G$ tel que $\chi_{algo}(G) >
 r\chi_{opt}(G)$.\\
 Soit le graphe biparti $G$ d\'efini dans la question \ref{ex14_q2} :
 \begin{itemize}
@@ -16,10 +16,10 @@ Soit le graphe biparti $G$ d\'efini dans la question \ref{ex14_q2} :
 Etant biparti, $\chi_{opt}(G) = 2$, et d'apr\`es \ref{ex14_q2} $\chi_{algo}(G) = \frac{n}{2}$.\\
 Donc $\chi_{algo}(G) = \frac{n}{4} \times \chi_{opt}(G)$.
 
-Pour chaque $r \in N$ cr\'eons le graphe ci-dessus de taille $4 \times r + 4$.\\
+Pour chaque $r \in \mathbb{N}$ cr\'eons le graphe ci-dessus de taille $4 \times r + 4$.\\
 $\chi_{algo}(G) = \frac{n}{4} \times \chi_{opt}(G) = (r + 1) \times \chi_{opt}(G) > r
 \times \chi_{opt}(G)$.\\
-Ainsi pour chaque $r \in N$ il existe un graphe qui pour lequel l'algorithme ne renvoie
+Ainsi pour chaque $r \in \mathbb{N}$ il existe un graphe qui pour lequel l'algorithme ne renvoie
 pas une r-approximation.
 
 \subsection{Question 2}\label{ex16_q2}
@@ -39,7 +39,8 @@ suivant permet toujours de donner la r\'eponse :\\
 On attribue au premier sommet la couleur 1, puis la couleur 2 \`a tous ses voisins, \`a
 nouveau la couleur 1 \`a leurs voisins respectifs, et on continue ainsi tant qu'il
 n'existe pas deux sommets adjacents partageant la m\^eme couleur.\\
-Si aucune erreur n'est rep\'er\'ee a la fin de l'algorithme, le graphe est 2-colorable.
+Si aucune erreur n'est rep\'er\'ee a la fin de l'algorithme, le graphe est 2-colorable
+(preuve en \ref{ex11_q1}).
 
 \subsection{Question 4}\label{ex16_q4}
 Nous devons montrer que si $G$ est 3-colorable, alors $\forall x \in G\ voisinage(x)$ est
