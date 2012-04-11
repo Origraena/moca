@@ -19,7 +19,7 @@
 
 #define TOLERANCE 5
 #define IPLONG    16
-#define SIZE 5*sizeof(int)+2*IPLONG*sizeof(char)+TOLERANCE*sizeof(struct sockaddr_in)
+#define SIZE 5*sizeof(int)+3*IPLONG*sizeof(char)+TOLERANCE*sizeof(struct sockaddr_in)
 
 // {{{ Data Structures
 typedef enum msg_type {
@@ -49,6 +49,7 @@ typedef struct message {
 	int _has_token;
 	struct sockaddr_in _pred[TOLERANCE];
 	char _ip[IPLONG];
+	char _ip_asking_site[IPLONG];
 } msg_t;
 // }}}
 
@@ -61,6 +62,7 @@ typedef struct message {
 #define next(m) m._has_next
 #define nb_acc(m) m._nb_access
 #define tok(m) m._has_token
+#define ask(m) m._ip_asking_site
 // }}}
 
 void itoa(long n, char** res);

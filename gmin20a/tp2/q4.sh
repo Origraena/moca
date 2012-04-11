@@ -3,4 +3,4 @@ java \
 -Xmx512M \
 -cp lib/graphs.jar:target/class \
 Main \
-q2
+q3

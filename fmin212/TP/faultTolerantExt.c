@@ -130,6 +130,14 @@ int init_structures() {
 
 	/* HELLO message broadcasting */
 	msg_t broad;
+	memset(&broad, 0, SIZE);
+	type(broad) = HELLO;
+	broadcast(broad);
+
+	printf("\nAttente d'autres sites...\n");
+	waitForHellorep(WAITING_PERIOD);
+
+	memset(&broad, 0, SIZE);
 	type(broad) = HELLO;
 	broadcast(broad);
 
@@ -171,6 +179,8 @@ int critSectionRequest() {
 	msg_t msg;
 	type(msg) = REQUEST;
 	state = WAITING;
+	char *ip_tmp = inet_ntoa(this_site.neighbours[0].sin_addr);
+	strncpy (ask(msg), ip_tmp, SIZE);
 
 	if(tokenPresent == 1) {
 		takeCriticalSection();
@@ -179,9 +189,14 @@ int critSectionRequest() {
 	else if(last != -1) {
 		char *tmpter = getIPstrFromNb (last);
 		printf ("Envoi message à last : %d, adresse : %s.\n", last, tmpter);
+		strncpy(ip(msg), tmpter, IPLONG);
 		free (tmpter);
-		if(sendMessage(last, msg) == -1)
+		if(sendMessageWithAdd(msg) == -1){
+			fprintf (stderr, "Problème lors de la requête!!!\n");
 			return -1;
+		}
+
+		last = -1;
 
 		time_t timeStart, timeCur;
 		int flags = fcntl(this_site.sdRecv, F_GETFL);
@@ -202,8 +217,10 @@ int critSectionRequest() {
 				return handleCommit(msg);
 			}
 			else {
-				if (type(msg) == REQUEST) {}
+				if (type(msg) == REQUEST)
+					printf ("Réception d'une requête en attendant un COMMIT.\n");
 				else if (type(msg) == TOKEN) {
+					printf ("Réception du TOKEN Impeccable... \n");
 					handleToken(msg);
 					return 0;
 				}
@@ -214,6 +231,7 @@ int critSectionRequest() {
 
 		fcntl(this_site.sdRecv, F_SETFL, flags);
 
+		memset (&msg, 0, SIZE);
 		type(msg) = SEARCH_QUEUE;
 		nb_acc(msg) = acces;
 		broadcast(msg);
@@ -236,7 +254,7 @@ int critSectionRequest() {
 			switch(type(msg)) {
 				case ACK_SEARCH_QUEUE:
 					if (pos(msg) > pos(max))
-						max = msg;
+						memcpy(&max, (void *) &msg, SIZE);
 					break;
 				case SEARCH_QUEUE:
 					if (nb_acc(msg) > acces) 
@@ -267,7 +285,7 @@ int critSectionRequest() {
 			unsigned long int ipa = (unsigned long int) inet_addr(ip(msg));
 			last = getNeighbour(ipa);
 			strncpy(ip(msg), ips(max),IPLONG *sizeof(char));
-			if (next(msg)) {
+			if (next(max)) {
 				type(msg) = CONNECTION;
 				if (sendMessageWithAdd(msg) == -1)
 					return -1;
@@ -313,19 +331,17 @@ int handleMessage(msg_t msg) {
 
 // {{{ handleRequest
 int handleRequest(msg_t msg) {
-	printf ("Adresses %s %s\n", ips(msg), ip(msg));
-	strncpy(ip(msg), ips(msg), IPLONG * sizeof(char));
-	printf ("Adresses %s %s\n", ips(msg), ip(msg));
-	unsigned long int ipa = (unsigned long int)inet_addr(ips(msg));
+	strncpy(ip(msg), ask(msg), IPLONG * sizeof(char));
+	unsigned long int ipt = (unsigned long int)inet_addr(ask(msg));
 
-	if(getNeighbour(ipa)==-1) {
+	if(getNeighbour(ipt)==-1) {
 		printf ("C'est la loose !!!\n");
 		return 0;
 	}
 
 	if(last == -1) {
 		if(state == WAITING || state == WORKING) {
-			next = getNeighbour(ipa);
+			next = getNeighbour(ipt);
 			printf("Demande reçue du voisin : %d\n", next);
 			type(msg) = COMMIT;
 			pos(msg) = position + 1;
@@ -335,7 +351,7 @@ int handleRequest(msg_t msg) {
 				return -1;
 		}
 		else if(tokenPresent == 1) {
-			printf("request answer inet_addr(ip) %lu\n", (unsigned long int)ipa);
+			printf("request answer inet_addr(ip) %lu\n", (unsigned long int)ipt);
 			type(msg) = TOKEN;
 			if(sendMessageWithAdd(msg) == -1){
 				printf ("Raté...\n");
@@ -350,7 +366,7 @@ int handleRequest(msg_t msg) {
 		if(sendMessage(last, msg) == -1)
 			return -1;
 	}
-	last = getNeighbour(ipa);
+	last = getNeighbour(ipt);
 
 	return 0;
 }
@@ -542,6 +558,7 @@ int handleConnection (msg_t msg){
 //{{{ Critical Section + Threads
 //{{{ takeCriticalSection
 int takeCriticalSection() {
+	last = -1;
 	printf("Prise de la section critique\n");
 	state = WORKING;
 	position = 0;

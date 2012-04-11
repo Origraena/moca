@@ -63,35 +63,6 @@ char* getIPaddress() {
 
 
 int init_network(int argc, char* argv[]) {
-	/*int i = 1;
-
-		if(argc == 2 && strcmp(argv[1], "--help")==0)
-		{
-		printf("Arguments : ");
-		printf("[masque_sous_reseau]\n");
-		return -1;
-		}
-
-		if(argc < 2)
-		{
-		printf("Ce programme necessite des arguments. Essayez '--help' pour plus de precisions.\n\n");
-		return -1;
-		}
-
-		while(i < argc)
-		{
-		if(inet_aton(argv[i], &addMask) != 0)
-		{
-	//printf("Mask : %s\n", inet_ntoa(addMask));
-	i++;
-	}
-	else
-	{
-	printf("Veuillez entrer des arguments coherents.\n");
-	exit(EXIT_FAILURE);
-	}
-	}*/
-
 	int enabled = 1;
 
 	/* sockets initialisation */
