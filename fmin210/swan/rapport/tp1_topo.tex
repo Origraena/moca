@@ -1,0 +1,17 @@
+%tp1_topo.tex
+
+\section{Topologie du R\'eseau}
+
+Le r\'eseau simul\'e est compos\'e de deux sites avec un lien du premier vers le second
+d'une capacit\'e de 2Mb/s et de latence 20ms.
+Sa file d'attente de type {\em DropTail} peut supporter 100 paquets.
+
+Quatre trafics sont mis en place :
+\begin{itemize}
+	\item la premi\`ere connexion suit le protocole UDP, son d\'ebit est exponentiel, la
+	dur\'ee moyenne des p\'eriodes d'activit\'e est de 10ms, tandis que celles
+	d'inactivit\'e durent 5 ms ;
+	\item les trois autres suivent un protocole TCP, et sont de d\'ebits constants, leurs
+	latences respectives sont de 50ms, 100ms et 150ms.
+\end{itemize}
+
