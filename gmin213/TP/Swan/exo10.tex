@@ -76,8 +76,10 @@ Soit $x$ un problème de Partition.
 Grâce à la réduction polynomiale étudiée ci-dessus, nous avons donc :
 $sol_{A}(x') < \frac{3}{2}sol_{opt}(x')$.\\
 Et si le problème partition admet une solution alors $sol_{opt}(x') = 2$, nous en
-déduisons : $sol_{A}(x') < 3$, ie $sol_A(x') = 2 = sol_{opt}(x')$.
+déduisons : $sol_{A}(x') < 3$, ie $sol_A(x') = 2 = sol_{opt}(x')$, et si ce n'est pas le
+cas $sol_A(x') = 3$.
 A permet donc de résoudre le problème Partition en temps polynomial, celui-ci étant
 NP-complet, il n'existe pas un tel algorithme.\\
-Ainsi le problème Bin Packing n'appartient pas à la classe d'approximation $PTAS$.
+Ainsi le problème Bin Packing admet un seuil d'approximation en $\frac{3}{2}$ et donc 
+n'appartient pas à la classe d'approximation $PTAS$.
 
