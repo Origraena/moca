@@ -34,3 +34,8 @@
 ehthumbs.db
 Icon?
 Thumbs.db
+
+# TMP files #
+#############
+*.swp
+
