@@ -6,11 +6,11 @@ Soit une fonction $q : O \rightarrow \mathbb{N}$.\\
 Soit une taille de boîte $Q$.
 
 Le problème de décision Bin Packing est le suivant :\\
-Existe-t-il une k-partition $O_1,...,O_k TODO O$ telle que :
+Existe-t-il une k-partition $O_1,...,O_k \subseteq O$ telle que :
 \begin{itemize}
 	\item $O = \cup_{i = 1}^{k}O_i$,
 	\item $\forall i,j \in \mathbb{N}$, $i \neq j$, $O_i \cap O_j = \emptyset$,
-	\item $\sum_{o_{ij} \in O_i} \leq Q \forall i \in [1;k]$.
+	\item $\sum_{o_{ij} \in O_i} \leq Q\ \forall i \in [1;k]$.
 \end{itemize}
 
 Le problème d'optimisation associé est :\\
@@ -42,11 +42,11 @@ Commençons par calculer $B = \sum_{a_i \in A} \frac{2 \times p(a_i)}{w(a)} =
 Montrons tout d'abord que $K^*(x') \leq 3$.\\
 Nous supposons que $K(x') = 4 > 3$. Nous savons alors qu'il existe quatre ensembles
 $O_1,O_2,O_3,O_4$ tels que $B(O_i) \leq 1$.
-De plus, puisque les $O_i$ sont disjoints, nous avons $B = B(0_1)+B(O_2)+B(O_3)+B(0_4)$,
+De plus, puisque les $O_i$ sont disjoints, nous avons $B = B(O_1)+B(O_2)+B(O_3)+B(O_4)$,
 et nous pouvons énumérer les $O_i$ de sorte que $B(O_i) \geq B(O_{i+1})$.\\
-Or, $B(O_i) + B(O_j) > 1 \forall i \neq j$, en effet si ce n'était pas le cas, alors on
+Or, $B(O_i) + B(O_j) > 1\ \forall i \neq j$, en effet si ce n'était pas le cas, alors on
 pourrait unir les deux ensembles et $K^*(x')$ serait égal à 3.
-En particulier nous avons : $B(O_1)+B(O_2) > 1$ et $B(O_3)+B(0_4) > 1$, c'est à dire :
+En particulier nous avons : $B(O_1)+B(O_2) > 1$ et $B(O_3)+B(O_4) > 1$, c'est à dire :
 $2 = B(O_1) + B(O_2) + B(O_3) + B(O_4) > 2$, ce qui est absurde.\\
 Nous avons donc que $K(x') \leq 3$.
 

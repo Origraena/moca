@@ -6,7 +6,7 @@
 Soit un ensemble d'objets $A = \{a_i : i \in [1;n]\}$ et une fonction de poids $p : A
 \rightarrow \mathbb{N}$.\\
 Le problème de décision est le suivant : \\
-existe-t-il $Y_1,Y_2 todo A\ Y_1 \cap Y_2 = \emptyset: \sum_{y_{1} \in Y_1}p(y_1) = \sum_{y_2 
+existe-t-il $Y_1,Y_2 \subseteq A\ Y_1 \cap Y_2 = \emptyset: \sum_{y_{1} \in Y_1}p(y_1) = \sum_{y_2 
 \in Y_2}p(y_2) = P$ ?\\
 Son problème d'optimisation associé est défini comme suit :\\
 $minimiser\ \sum_{y_1 \in Y_1}p(y_1) : \sum_{y_1 \in Y_1}p(y_1) - \sum_{y_2 \in Y_2}p(y_2) 
@@ -14,7 +14,7 @@ $minimiser\ \sum_{y_1 \in Y_1}p(y_1) : \sum_{y_1 \in Y_1}p(y_1) - \sum_{y_2 \in 
 
 On note :
 \begin{itemize}
-	\item $w(E) = \sum_{e \in E}p(e)$ avec $E TODO A$,
+	\item $w(E) = \sum_{e \in E}p(e)$ avec $E \subseteq A$,
 	\item $L = \frac{w(A)}{2}$.
 \end{itemize}
 
@@ -93,9 +93,9 @@ $sol_{algo}(A) = sol_{opt}(A)$.
 
 \subsubsection{(c)}\label{ex5_q2_c}
 Supposons maintenant que $a_h$ est inséré durant la seconde phase, et intéressons nous aux 
-$p(a_j) \forall j \in [1;k(r)]$. 
+$p(a_j)\ \forall j \in [1;k(r)]$. 
 Puisque $a_h$ est inséré dans la seconde phase ($h \geq k(r)+1$), et que les $a_i$ sont
-rangés par ordre décroissant de poids, on a : $p(a_h) \leq p(a_j) \forall j \in [1;k(r)+1]$.\\
+rangés par ordre décroissant de poids, on a : $p(a_h) \leq p(a_j)\ \forall j \in [1;k(r)+1]$.\\
 Ce qui implique : $\sum_{j = 1}^{k(r)+1}p(a_h) \leq \sum_{j = 1}^{k(r)+1} \times p(a_j)$.\\
 Or, $\sum_{j=1}^{k(r)+1}p(a_j) \leq w(A)$. \\
 On a donc $(k(r)+1) \times p(a_h) \leq w(A) = 2 \times L$.
