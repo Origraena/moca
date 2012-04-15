@@ -68,9 +68,17 @@
 \contentsline {subsection}{\numberline {1.10.3}Question 3}{17}{subsection.1.10.3}
 \contentsline {subsection}{\numberline {1.10.4}Question 4}{17}{subsection.1.10.4}
 \contentsline {section}{\numberline {1.11}Seuil d'approximation pour le probl\IeC {\`e}me de la coloration de sommets (resp. d'ar\IeC {\^e}tes)}{18}{section.1.11}
-\contentsline {section}{\numberline {1.12}Comparaison de \emph {branch and bound} et \emph {branch and cut}}{18}{section.1.12}
-\contentsline {subsection}{\numberline {1.12.1}Polytope associ\IeC {\'e} \IeC {\`a} ${PL}_0$}{18}{subsection.1.12.1}
-\contentsline {subsection}{\numberline {1.12.4}Recherche d'une solution \IeC {\`a} valeur enti\IeC {\`e}re}{19}{subsection.1.12.4}
-\contentsline {subsubsection}{Branch and bound}{19}{section*.29}
-\contentsline {subsubsection}{Coupes de Gomory}{26}{section*.30}
-\contentsline {chapter}{\numberline {2}Partie pratique}{29}{chapter.2}
+\contentsline {subsection}{\numberline {1.11.1}D\IeC {\'e}finitions}{18}{subsection.1.11.1}
+\contentsline {subsubsection}{Coloration de sommets}{18}{section*.29}
+\contentsline {subsubsection}{Coloration d'ar\IeC {\^e}tes}{18}{section*.30}
+\contentsline {subsection}{\numberline {1.11.2}Question 1}{18}{subsection.1.11.2}
+\contentsline {subsection}{\numberline {1.11.3}Question 2}{18}{subsection.1.11.3}
+\contentsline {subsubsection}{(a)}{18}{section*.31}
+\contentsline {subsubsection}{(b)}{19}{section*.32}
+\contentsline {subsection}{\numberline {1.11.4}Question 3}{19}{subsection.1.11.4}
+\contentsline {section}{\numberline {1.12}Comparaison de \emph {branch and bound} et \emph {branch and cut}}{19}{section.1.12}
+\contentsline {subsection}{\numberline {1.12.1}Polytope associ\IeC {\'e} \IeC {\`a} ${PL}_0$}{19}{subsection.1.12.1}
+\contentsline {subsection}{\numberline {1.12.4}Recherche d'une solution \IeC {\`a} valeur enti\IeC {\`e}re}{20}{subsection.1.12.4}
+\contentsline {subsubsection}{Branch and bound}{20}{section*.33}
+\contentsline {subsubsection}{Coupes de Gomory}{27}{section*.34}
+\contentsline {chapter}{\numberline {2}Partie pratique}{30}{chapter.2}
