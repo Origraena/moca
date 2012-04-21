@@ -259,6 +259,10 @@ public class Graph<V,E> implements Iterable<V> {
 		return new BFSIterator(this,root,function);
 	}
 
+	public WalkIterator BFSIterator(int root, VertexBinaryFunction<V> preFunction, VertexBinaryFunction<V> function) {
+		return new BFSIterator(this,root,preFunction,function);
+	}
+
 	public WalkIterator DFSIterator() {
 		return new DFSIterator(this,0,null);
 	}
@@ -271,6 +275,9 @@ public class Graph<V,E> implements Iterable<V> {
 		return new DFSIterator(this,root,function);
 	}
 
+	public WalkIterator DFSIterator(int root, VertexBinaryFunction<V> preFunction, VertexBinaryFunction<V> function) {
+		return new DFSIterator(this,root,preFunction,function);
+	}
 
 	/* ALGORITHMS */
 
@@ -481,6 +488,24 @@ public class Graph<V,E> implements Iterable<V> {
 			}
 		}
 
+		protected WalkIterator(Graph<V,E> source, int rootID, VertexBinaryFunction<V> preFunction, VertexBinaryFunction<V> function) {
+			if (source.getNbVertices() == 0)
+				_current = null;
+			else {
+				_source = source;
+				_current = source.getVertex(rootID);
+				_preFunction = preFunction;
+				_function = function;
+				_colors = new int[source.getNbVertices()];
+				_neighbourIterators = new ArrayList<Iterator<NeighbourEdge<E> > >(source.getNbVertices());
+				for (int i = 0 ; i < source.getNbVertices() ; i++) {
+					_neighbourIterators.add(_source.neighbourIterator(i));
+					_colors[i] = 0;
+				}
+				_colors[rootID] = 1;
+			}
+		}
+
 		protected WalkIterator(Graph<V,E> source, Vertex<V> root, VertexBinaryFunction<V> function) {
 			if (source.getNbVertices() == 0)
 				_current = null;
@@ -518,6 +543,8 @@ public class Graph<V,E> implements Iterable<V> {
 			if (_neighbourIterators.get(head.getID()).hasNext()) {
 				edge = _neighbourIterators.get(head.getID()).next();
 				neighbour = _source.getVertex(edge.getIDV());
+				if (_preFunction != null)
+					_preFunction.exec(head,neighbour);
 				if (_colors[neighbour.getID()] == 0) {
 					_colors[neighbour.getID()] = 1;
 					_waitingList.put(neighbour);
@@ -559,6 +586,7 @@ public class Graph<V,E> implements Iterable<V> {
 
 		protected Graph<V,E> _source = null;
 		protected Vertex<V> _current = null;
+		protected VertexBinaryFunction<V> _preFunction = null;
 		protected VertexBinaryFunction<V> _function = null;
 		protected LinkedList<Vertex<V> > _waitingList = null;
 		protected int _colors[];
@@ -576,6 +604,14 @@ public class Graph<V,E> implements Iterable<V> {
 			_waitingList = new Fifo<Vertex<V> >();
 			_waitingList.put(_current);
 		}
+		public BFSIterator(Graph<V,E> source, 
+						  int root,
+						  VertexBinaryFunction<V> preFunction,
+						  VertexBinaryFunction<V> function) {
+			super(source,root,preFunction,function);
+			_waitingList = new Fifo<Vertex<V> >();
+			_waitingList.put(_current);
+		}
 	};
 
 	/**
@@ -585,6 +621,14 @@ public class Graph<V,E> implements Iterable<V> {
 	protected class DFSIterator extends WalkIterator {
 		public DFSIterator(Graph<V,E> source, int root, VertexBinaryFunction<V> function) {
 			super(source,root,function);
+			_waitingList = new Lifo<Vertex<V> >();
+			_waitingList.put(_current);
+		}
+		public DFSIterator(Graph<V,E> source, 
+						  int root,
+						  VertexBinaryFunction<V> preFunction,
+						  VertexBinaryFunction<V> function) {
+			super(source,root,preFunction,function);
 			_waitingList = new Lifo<Vertex<V> >();
 			_waitingList.put(_current);
 		}

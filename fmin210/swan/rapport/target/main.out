@@ -2,3 +2,7 @@
 \BOOKMARK [1][-]{section.2}{Topologie du R\351seau}{}
 \BOOKMARK [1][-]{section.3}{Code Source}{}
 \BOOKMARK [1][-]{section.4}{R\351sultats}{}
+\BOOKMARK [2][-]{subsection.4.1}{Débits moyens}{section.4}
+\BOOKMARK [2][-]{subsection.4.2}{Taux de perte}{section.4}
+\BOOKMARK [2][-]{subsection.4.3}{Taille de la file d'attente}{section.4}
+\BOOKMARK [2][-]{subsection.4.4}{Taille de la fenêtre TCP}{section.4}

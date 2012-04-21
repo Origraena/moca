@@ -15,3 +15,24 @@ Quatre trafics sont mis en place :
 	latences respectives sont de 50ms, 100ms et 150ms.
 \end{itemize}
 
+Le débit moyen théorique de chacune de ces connexions est de 1Mb/s, il était donc
+nécessaire de calculer le débit crête du lien UDP de manière à pouvoir obtenir un débit
+moyen théorique juste malgré les périodes d'inactivité.\\
+$\bar{\lambda} = \frac{\lambda_{crete} \times ON}{ON + OFF}$\\
+On a donc : $\lambda_{crete} = \frac{(ON + OFF) \times \bar{\lambda}}{ON}$.\\
+On en déduit $\lambda_{crete} = 1.5 Mb/s$.
+
+De plus il fallait également calculer la taille des paquets des connexions TCP de manière
+à assurer le débit moyen théorique de 1Mb/s.\\
+$\bar{\lambda} = \frac{taille_paquet}{intervalle}$\\
+On a donc : $taille_paquet = \bar{\lambda} \times intervalle$.\\
+Les tailles de paquets sont donc respectivement :
+\begin{itemize}
+	\item 6250 octets,
+	\item 12500 octets,
+	\item 18750 octets.
+\end{itemize}
+
+Les quatre connexions sont lancées simultanément au démarrage, et sont stoppées à 10
+secondes du démarrage.
+
