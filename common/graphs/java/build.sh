@@ -17,7 +17,8 @@ src/moca/operators/*.java \
 src/moca/lists/*.java \
 src/moca/tree/*.java \
 src/moca/graphs/edges/*.java \
-src/moca/graphs/vertices/*.java
+src/moca/graphs/vertices/*.java \
+src/moca/graphs/visu/*.java
 echo 'Finished!'
 
 # -Xlint:unchecked \

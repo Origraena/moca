@@ -263,6 +263,10 @@ public class Graph<V,E> implements Iterable<V> {
 		return new BFSIterator(this,root,preFunction,function);
 	}
 
+	public WalkIterator BFSIterator(ArrayList<Integer> roots, VertexBinaryFunction<V> preFunction, VertexBinaryFunction<V> function) {
+		return new BFSIterator(this,roots,preFunction,function);
+	}
+
 	public WalkIterator DFSIterator() {
 		return new DFSIterator(this,0,null);
 	}
@@ -274,6 +278,11 @@ public class Graph<V,E> implements Iterable<V> {
 	public WalkIterator DFSIterator(int root, VertexBinaryFunction<V> function) {
 		return new DFSIterator(this,root,function);
 	}
+
+	public WalkIterator DFSIterator(ArrayList<Integer> roots, VertexBinaryFunction<V> preFunction, VertexBinaryFunction<V> function) {
+		return new DFSIterator(this,roots,preFunction,function);
+	}
+
 
 	public WalkIterator DFSIterator(int root, VertexBinaryFunction<V> preFunction, VertexBinaryFunction<V> function) {
 		return new DFSIterator(this,root,preFunction,function);
@@ -612,6 +621,19 @@ public class Graph<V,E> implements Iterable<V> {
 			_waitingList = new Fifo<Vertex<V> >();
 			_waitingList.put(_current);
 		}
+		public BFSIterator(Graph<V,E> source, 
+						  ArrayList<Integer> roots,
+						  VertexBinaryFunction<V> preFunction,
+						  VertexBinaryFunction<V> function) {
+			super(source,roots.get(0),preFunction,function);
+			_waitingList = new Fifo<Vertex<V> >();
+			final int size = roots.size();
+			for (int i = 0 ; i < size ; i++) {
+				_colors[roots.get(i)] = 1;
+				_waitingList.put(getVertex(roots.get(i)));
+			}
+		}
+
 	};
 
 	/**
@@ -632,6 +654,20 @@ public class Graph<V,E> implements Iterable<V> {
 			_waitingList = new Lifo<Vertex<V> >();
 			_waitingList.put(_current);
 		}
+		public DFSIterator(Graph<V,E> source, 
+						  ArrayList<Integer> roots,
+						  VertexBinaryFunction<V> preFunction,
+						  VertexBinaryFunction<V> function) {
+			super(source,roots.get(0),preFunction,function);
+			_waitingList = new Fifo<Vertex<V> >();
+			final int size = roots.size();
+			for (int i = 0 ; i < size ; i++) {
+				_colors[roots.get(i)] = 1;
+				_waitingList.put(getVertex(roots.get(i)));
+			}
+		}
+
+
 	};
 
 	private StronglyConnectedComponents _stronglyConnectedComponents = null;
