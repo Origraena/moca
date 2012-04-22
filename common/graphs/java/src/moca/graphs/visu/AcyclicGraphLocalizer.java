@@ -10,11 +10,13 @@ import moca.graphs.edges.NeighbourEdge;
 public class AcyclicGraphLocalizer extends AbstractLocalizer implements Localizer {
 
 	public AcyclicGraphLocalizer(Graph graph, int width, int height) {
+		super();
 		_width = width;
 		_height = height;
 		process(graph);
 	}
 	public AcyclicGraphLocalizer(int width, int height) {
+		super();
 		_width = width;
 		_height = height;
 	}
@@ -71,12 +73,12 @@ public class AcyclicGraphLocalizer extends AbstractLocalizer implements Localize
 		
 		// process positions
 		_positions = new Point[nbVertices];
-		hfoot = _height / (positions.size() + 2);
+		hfoot = _height / (positions.size() + 1);
 		for (i = 0 ; i < positions.size() ; i++) {
-			wfoot = _width / (positions.get(i).size() + 2);
+			wfoot = _width / (positions.get(i).size() + 1);
 			for (j = 0 ; j < positions.get(i).size() ; j++) {
 				_positions[positions.get(i).get(j)] = 
-					new Point((j + 1) * wfoot,(i + 1) * hfoot);
+					new Point((j + 1) * wfoot,_height - ((i + 1) * hfoot));
 			}
 		}
 	}

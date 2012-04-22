@@ -1,6 +1,7 @@
 package moca.graphs.visu;
 
 import moca.graphs.Graph;
+import moca.graphs.Point;
 import moca.graphs.vertices.VertexIdentityFunction;
 import moca.graphs.edges.Edge;
 import java.util.Iterator;
@@ -11,8 +12,40 @@ import java.io.OutputStreamWriter;
 
 public class PostScriptConverter {
 
+	public static final int DEFAULT_TITLE_X = 30;
+	public static final int DEFAULT_TITLE_Y = 30;
+
 	public PostScriptConverter(Graph graph, 
-							   int width, int height, 
+							   int width, int height,
+							   Localizer localizer,
+							   VertexIdentityFunction function,
+							   String title, Point titlePosition) {
+		_graph = graph;
+		_width = width;
+		_height = height;
+		_localizer = localizer;
+		_function = function;
+		_title = title;
+		_titlePosition = titlePosition;
+
+	}
+
+	public PostScriptConverter(Graph graph, 
+							   int width, int height,
+							   Localizer localizer,
+							   VertexIdentityFunction function,
+							   String title) {
+		_graph = graph;
+		_width = width;
+		_height = height;
+		_localizer = localizer;
+		_function = function;
+		_title = title;
+		_titlePosition = new Point(DEFAULT_TITLE_X,DEFAULT_TITLE_Y);
+	}
+
+	public PostScriptConverter(Graph graph, 
+							   int width, int height,
 							   Localizer localizer,
 							   VertexIdentityFunction function) {
 		_graph = graph;
@@ -21,6 +54,8 @@ public class PostScriptConverter {
 		_localizer = localizer;
 		_function = function;
 	}
+
+
 
 	public void writeToFile(String filepath) {
 		final int nbVertices = _graph.getNbVertices();
@@ -101,6 +136,20 @@ public class PostScriptConverter {
 					out.write(" arrowhead\n\n");
 				}
 			}
+			// other data
+			if (_title != null) {
+				out.write("/Times-Roman findfont\n");
+				out.write("18 scalefont\n");
+				out.write("setfont\n");
+				out.write(new Integer(_titlePosition.x).toString());
+				out.write(" ");
+				out.write(new Integer(_titlePosition.y).toString());
+				out.write(" moveto\n");
+				out.write("(");
+				out.write(_title);
+				out.write(") show\n\n");
+			}
+
 			out.close(); 
 		}
 		catch (Exception e) {
@@ -113,7 +162,9 @@ public class PostScriptConverter {
 	private Graph _graph;
 	private int _width,_height;
 	private Localizer _localizer;
-	private VertexIdentityFunction _function; 
+	private VertexIdentityFunction _function = null;
+	private String _title = null;
+	private Point _titlePosition = null;
 
 };
 
