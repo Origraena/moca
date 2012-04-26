@@ -1,7 +1,0 @@
-\select@language {french}
-\contentsline {section}{\numberline {1}Introduction}{3}{section.1}
-\contentsline {section}{\numberline {2}Param\IeC {\`e}tres de la simulation}{3}{section.2}
-\contentsline {section}{\numberline {3}Code source du script TCL}{4}{section.3}
-\contentsline {section}{\numberline {4}Analyse et r\IeC {\'e}sultats}{5}{section.4}
-\contentsline {subsection}{\numberline {4.1}Taille de la fen\IeC {\^e}tre TCP}{5}{subsection.4.1}
-\contentsline {subsection}{\numberline {4.2}Longueur de la file d'attente}{5}{subsection.4.2}
