@@ -1,0 +1,58 @@
+#!/bin/bash
+
+noeud=0
+
+for i in `seq 0 3`; do
+	let date$i 0
+	let tmpsomme$i 0
+	let somme$i 0
+	let resultat$i 0
+	let sommebis$i 0
+	let resultatbis$i 0
+	let perte$i 0
+done
+
+grep ^[r] tp1.tr > recep_site2
+
+# Calcul du débit moyen reçu sur le second noeud
+while read line; do
+	noeud=$(echo "$line" | awk -F '.' {print'$3'} | awk {print$1})
+	let date$noeud $(echo "$line" | awk {print'$2'})
+	let tmpsomme$noeud $(echo "$line" | awk {print'$6'})
+	let somme$noeud $(( $somme$noeud + $tmpsomme$noeud ))
+done < "recep_site2"
+
+for i in `seq 0 3`; do
+	let resultat$i $(( $somme$i / 10 ))
+done
+
+grep ^[+] tp1.tr > envoi_site1
+grep ^[d] tp1.tr > perte_site1
+
+	# Calcul du débit moyen envoyé par le premier noeud
+	if [[ $i == 0 ]]; then
+		grep "\-\-\-\-\-\-\-\ 0\ 0.$i" tp1.tr | grep "r" > "tmp$i"
+		while read line; do
+			date=$(echo "$line" | awk {print'$2'})
+			tmpsomme=$(echo "$line" | awk {print'$6'})
+			sommebis=$(( $sommebis + $tmpsomme ))
+		done < "tmp$i"
+	else
+		grep "\-\-\-\-\-\-\-\ 0\ 0.$i" tp1.tr | grep "d" > "tmp$i"
+		while read line; do
+			date=$(echo "$line" | awk {print'$2'})
+			tmpsomme=$(echo "$line" | awk {print'$6'})
+			sommebis=$(( $sommebis + $tmpsomme ))
+		done < "tmp$i"
+	fi
+	resultatbis=$(( $sommebis / 10 ))
+	if [[ $i == 0 ]]; then
+		echo "UDP : "
+	else
+		echo "TCP $i : "
+	fi
+	echo "Débit Moyen Envoyé : $resultat o/s ( $(( $resultat / 1024 )) ko/s)"
+	echo "Débit Moyen Reçu   : $resultatbis o/s ( $(( $resultatbis / 1024 )) ko/s)"
+	perte=$(( $resultat - $resultatbis ))
+	echo "Perte              : $perte o/s ( $(( $perte / 1024 )) ko/s)"
+done

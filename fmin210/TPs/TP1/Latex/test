@@ -1,0 +1,85 @@
+% !TEX encoding = UTF-8 Unicode
+
+\documentclass[a4paper]{article}
+
+\usepackage[francais]{babel}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage[colorlinks=true]{hyperref}
+\usepackage{algorithm,algorithmic}
+\usepackage{listings}
+\usepackage{amssymb}
+\usepackage{setspace}
+\usepackage{listings}
+\usepackage{lscape}
+\usepackage{mathrsfs}
+\usepackage{amsthm}
+\usepackage{textcomp}
+\usepackage{enumerate}
+
+
+\hypersetup{urlcolor=blue,linkcolor=black,citecolor=black,colorlinks=true}
+\geometry{a4paper,twoside,left=2.5cm,right=2.5cm,marginparwidth=1.2cm,marginparsep=3mm,top=2.5cm,bottom=2.5cm}
+\setlength{\parskip}{5mm plus2mm minus2mm}
+\lstset{language=C, showstringspaces=false, numbers=left, numberstyle=\tiny, tabsize=4}
+
+
+
+\begin{document}
+\Large
+\pagenumbering{arabic}
+
+\begin{titlepage}
+\begin{flushright}
+M1 Informatique MOCA
+\end{flushright}
+\vfill
+\begin{center}
+{ \huge \bfseries Service et qualité des réseaux - TP1}\\[0.5cm]
+23 mars 2012\\[3cm]
+
+\begin{minipage}[c][4cm][t]{0.4\textwidth}
+\raggedright \large
+\emph{Auteurs:}\\
+Chloé DESDOUITS\\
+Guillerme DUVILLIE
+\end{minipage}
+\begin{minipage}[c][4cm][t]{0.4\textwidth}
+\raggedleft \large
+\emph{Professeur:} \\
+Anne-\'elisabeth BAERT
+\end{minipage}
+
+\vfill
+
+\end{center}
+\end{titlepage}
+
+\normalsize
+
+\tableofcontents
+\thispagestyle{empty}
+\newpage
+
+
+\section{Introduction}
+
+Le but de ce TP était de prendre en main ns2 (logiciel de simulation de réseaux) et de réaliser différentes expériences.
+
+
+\section{Paramètres de la simulation}
+
+
+\section{Code source du script TCL}
+
+
+\section{Analyse et résultats}
+
+
+
+\vfill
+{\raggedleft R\'ealis\'e avec \LaTeX{} \par}
+
+\end{document}

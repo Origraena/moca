@@ -7,6 +7,12 @@ M.~Naimi, M.~Trehel, and A.~Arnold.
 \newblock {\em Journal of Parallel and Distributed Computing}, 34(1):1--13,
   1996.
 
+\bibitem{naimi1988}
+Mohamed Naimi and Michel Trehel.
+\newblock How to detect a failure and regenerate the token in the log (n)
+  distributed algorithm for mutual exclusion.
+\newblock {\em Distributed Algorithms}, pages 155--166, 1988.
+
 \bibitem{sopena2005}
 J.~Sopena, L.~Arantes, M.~Bertier, and P.~Sens.
 \newblock A fault-tolerant token-based mutual exclusion algorithm using a
