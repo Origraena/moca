@@ -16,7 +16,7 @@ public class VertexArrayList<V> extends ArrayList<Vertex<V> > implements VertexC
 	}
 
 	public boolean add(Vertex<V> v) {
-		v.setID(size());
+		//v.setID(size());
 		return super.add(v);
 	}
 

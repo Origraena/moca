@@ -51,8 +51,8 @@ public class BipartedVertexCollection<Value> implements VertexCollection<Value> 
 	}
 
 	public void addInFirstSet(Vertex<Value> v) {
+		v.setID(_firstSet.size());
 		_firstSet.add(v);
-		v.setID(_firstSet.size()-1);
 		int i = _firstSet.size();
 		for (Vertex<Value> u : _secondSet) {
 			u.setID(i);

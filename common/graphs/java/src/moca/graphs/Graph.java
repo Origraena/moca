@@ -134,6 +134,7 @@ public class Graph<V,E> implements Iterable<V> {
 
 	public void addVertex(V value) {
 		Vertex<V> v = new Vertex<V>(value);
+		v.setID(getNbVertices());
 		_vertices.add(v);					// this method should change vertex id to match its index
 		_edges.onVertexAdded(v.getID());	// uses directly vertex class ?
 	}
