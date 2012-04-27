@@ -280,9 +280,12 @@ La première des propriétés que respecte cet algorithme est la sureté. En eff
 \end{itemize}
 Dans les deux cas, l'unicité du jeton est préservée et l'exclusion mutuelle est garantie.
 
-La seconde propriété est la vivacité c'est à dire le fait que tout site demandant à entrer en section critique le puisse dans un temps fini. Cette propriété est respectée grâce à l'arbre logique et à la file d'attente. En effet, chaque site voulant entrer en section critique fait la requête à son père dans l'arbre. Le fait que la structure d'arbre distribué soit toujours valide garantie que les requêtes parviennent à la racine de l'arbre. Or la racine de l'arbre étant le dernier nœud de la file d'attente, le site ayant fait la requête se retrouve le dernier dans la file d'attente. Par conséquent, quand son prédécesseur dans la file sortira de la section critique, il pourra y entrer.
+La seconde propriété est la vivacité c'est à dire le fait que tout site demandant à entrer en section critique le puisse dans un temps fini. Cette propriété est respectée grâce à l'arbre logique et à la file d'attente. En effet, chaque site voulant entrer en section critique fait la requête à son père dans l'arbre. Le fait que la structure d'arbre distribué soit toujours valide garantie que les requêtes parviennent à la racine de l'arbre. Or la racine de l'arbre étant le dernier nœud de la file d'attente, le site ayant fait la requête se retrouve le dernier dans la file d'attente. Par conséquent, quand son prédécesseur dans la file sortira de la section critique, il pourra y entrer. Dans l'hypothèse où un site ne reste pas éternellement en section critique, la propriété de vivacité est respectée par l'algorithme de Naimi-Trehel.
+
+Cependant cet algorithme n'étant pas parfait, il ne respecte pas l'ordre des demandes et n'est pas nativement tolérant aux pannes (bien qu'une extension de tolérance aux pannes \cite{naimi1988} puisse être ajoutée).
 
 
 \section{Complexité}
+Soit $M_n$ le nombre moyen de messages nécessaires pour que la demande d'un site atteigne la racine dans un réseau à $n$ nœuds. Naimi et Trehel prouvent dans leur article \cite{naimi1996} que $M_n \simeq H_{n-1} \simeq log(n-1) + 0.577$. C'est à dire que la complexité en nombre de message pour une requête est $\bigcirc(log(n))$.
 
 

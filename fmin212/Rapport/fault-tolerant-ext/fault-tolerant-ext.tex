@@ -2,5 +2,16 @@
 % !TEX root = ../rapport.tex
 
 \chapter{Extension tolérante aux pannes}\label{fault-tolerant-ext}
+Dans leur article \cite{naimi1996}, Naimi et Trehel propose d'utiliser une extension \cite{naimi1988} afin de rendre leur algorithme tolérant aux pannes. L'extension qu'ils proposent admet (en cas de panne) une complexité en nombre de messages de 4 broadcasts.
+
+De plus, l'extension nécessite d'avoir une borne supérieure sur le temps de réception d'un message et sur le temps d'exécution de la section critique. Enfin, la file d'attente doit être entièrement reconstruite en cas de panne.
+
+L'extension de tolérance aux pannes que nous allons présenter \cite{sopena2005} tente d'améliorer ces performances.
+
+\section{Description}
+
+Le principe de cet algorithme est de reconstituer la file d'attente à partir des portions restantes. Cependant, si la reconstitution n'est pas possible, une nouvelle file d'attente ainsi qu'un nouvel arbre logique seront reconstruits.
+
+Dans l'algorithme de Naimi-Trehel, chaque site connait sont successeur dans la file d'attente mais pas son prédécesseur.
 
 

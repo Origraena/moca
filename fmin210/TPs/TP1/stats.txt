@@ -1,0 +1,120 @@
+Tps Exécution : 10 sec.
+
+Connexion : udp 
+	* Arrivée : 126.31 ko/s (1.01 mb/s)
+	* Départ : 85.30 ko/s (682.42 kb/s)
+	* Perte : 39.29 ko/s (314.33 kb/s)
+	* Reception : 85.239000 ko/s (681.912000 kb/s)
+
+Tps Exécution : 10 sec.
+
+Connexion : tcp1 
+	* Arrivée : 55.98 ko/s (447.88 kb/s)
+	* Départ : 43.41 ko/s (347.24 kb/s)
+	* Perte : 10.06 ko/s (80.51 kb/s)
+	* Reception : 42.776000 ko/s (342.208000 kb/s)
+
+Tps Exécution : 10 sec.
+
+Connexion : tcp2 
+	* Arrivée : 104.09 ko/s (832.69 kb/s)
+	* Départ : 77.75 ko/s (622.02 kb/s)
+	* Perte : 26.33 ko/s (210.67 kb/s)
+	* Reception : 77.752000 ko/s (622.016000 kb/s)
+
+Tps Exécution : 10 sec.
+
+Connexion : tcp3 
+	* Arrivée : 73.28 ko/s (586.28 kb/s)
+	* Départ : 43.22 ko/s (345.77 kb/s)
+	* Perte : 30.06 ko/s (240.51 kb/s)
+	* Reception : 43.221000 ko/s (345.768000 kb/s)
+
+Tps Exécution : 10 sec.
+
+Connexion : Total 
+	* Arrivée : 359.67 ko/s (2.88 mb/s)
+	* Départ : 249.68 ko/s (2.00 mb/s)
+	* Perte : 105.75 ko/s (846.02 kb/s)
+	* Reception : 248.988000 ko/s (1.991904 mb/s)
+
+Connexion : udp 
+	* Arrivée : 126.31 ko/s (1.01 mb/s)
+	* Départ : 85.30 ko/s (682.42 kb/s)
+	* Perte : 39.29 ko/s (314.33 kb/s)
+	* Reception : 85.239000 ko/s (681.912000 kb/s)
+
+Connexion : tcp1 
+	* Arrivée : 55.98 ko/s (447.88 kb/s)
+	* Départ : 43.41 ko/s (347.24 kb/s)
+	* Perte : 10.06 ko/s (80.51 kb/s)
+	* Reception : 42.776000 ko/s (342.208000 kb/s)
+
+Connexion : tcp2 
+	* Arrivée : 104.09 ko/s (832.69 kb/s)
+	* Départ : 77.75 ko/s (622.02 kb/s)
+	* Perte : 26.33 ko/s (210.67 kb/s)
+	* Reception : 77.752000 ko/s (622.016000 kb/s)
+
+Connexion : tcp3 
+	* Arrivée : 73.28 ko/s (586.28 kb/s)
+	* Départ : 43.22 ko/s (345.77 kb/s)
+	* Perte : 30.06 ko/s (240.51 kb/s)
+	* Reception : 43.221000 ko/s (345.768000 kb/s)
+
+Connexion : Total 
+	* Arrivée : 359.67 ko/s (2.88 mb/s)
+	* Départ : 249.68 ko/s (2.00 mb/s)
+	* Perte : 105.75 ko/s (846.02 kb/s)
+	* Reception : 248.988000 ko/s (1.991904 mb/s)
+
+Connexion : udp 
+	* Arrivée : 126.31 ko/s (1.01 mb/s)
+	* Départ : 85.30 ko/s (682.42 kb/s)
+	* Perte : 39.29 ko/s (314.33 kb/s)
+	* Reception : 85.24 ko/s (681.91 kb/s)
+
+	* Debit moyen : 85.30 ko/s (682.42 kb/s)
+	* Taux d'arrivee : 0.67
+	* Taux de pertes : 0.33
+
+Connexion : tcp1 
+	* Arrivée : 55.98 ko/s (447.88 kb/s)
+	* Départ : 43.41 ko/s (347.24 kb/s)
+	* Perte : 10.06 ko/s (80.51 kb/s)
+	* Reception : 42.78 ko/s (342.21 kb/s)
+
+	* Debit moyen : 43.41 ko/s (347.24 kb/s)
+	* Taux d'arrivee : 0.76
+	* Taux de pertes : 0.24
+
+Connexion : tcp2 
+	* Arrivée : 104.09 ko/s (832.69 kb/s)
+	* Départ : 77.75 ko/s (622.02 kb/s)
+	* Perte : 26.33 ko/s (210.67 kb/s)
+	* Reception : 77.75 ko/s (622.02 kb/s)
+
+	* Debit moyen : 77.75 ko/s (622.02 kb/s)
+	* Taux d'arrivee : 0.75
+	* Taux de pertes : 0.25
+
+Connexion : tcp3 
+	* Arrivée : 73.28 ko/s (586.28 kb/s)
+	* Départ : 43.22 ko/s (345.77 kb/s)
+	* Perte : 30.06 ko/s (240.51 kb/s)
+	* Reception : 43.22 ko/s (345.77 kb/s)
+
+	* Debit moyen : 43.22 ko/s (345.77 kb/s)
+	* Taux d'arrivee : 0.59
+	* Taux de pertes : 0.41
+
+Connexion : Total 
+	* Arrivée : 359.67 ko/s (2.88 mb/s)
+	* Départ : 249.68 ko/s (2.00 mb/s)
+	* Perte : 105.75 ko/s (846.02 kb/s)
+	* Reception : 248.99 ko/s (1.99 mb/s)
+
+	* Debit moyen : 249.68 ko/s (2.00 mb/s)
+	* Taux d'arrivee : 0.69
+	* Taux de pertes : 0.31
+
