@@ -119,6 +119,7 @@ int init_structures() {
 	int i;
 	last = -1;
 	next = -1;
+	ch_pid = 0;
 	state = IDLE;
 	tokenPresent = 0;
 
@@ -181,6 +182,11 @@ int critSectionRequest() {
 	state = WAITING;
 	char *ip_tmp = inet_ntoa(this_site.neighbours[0].sin_addr);
 	strncpy (ask(msg), ip_tmp, SIZE);
+
+	if (ch_pid) {
+		printf ("Déjà en section critique.\n");
+		return -1;
+	}
 
 	if(tokenPresent == 1) {
 		takeCriticalSection();
@@ -570,6 +576,8 @@ int takeCriticalSection() {
 	if(pthread_create(&thread_id, NULL, (void*)(liberation), (void*)20) != 0)
 		fprintf(stderr, "Thread creation failure.\n");
 
+	ch_pid = thread_id;
+
 	return 0;
 }
 //}}}
@@ -591,6 +599,7 @@ void liberation(void* arg) {
 			printf("Envoi raté...");
 		}
 		next = -1;
+		ch_pid = 0;
 		tokenPresent = 0;
 	}
 	printf("Section critique relachee : %d accès\n", ++acces);
