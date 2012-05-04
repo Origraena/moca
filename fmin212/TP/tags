@@ -1,0 +1,128 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.8	//
+ACK_SEARCH_PREV	utils.h	/^	ACK_SEARCH_PREV =  13,$/;"	e	enum:msg_type
+ACK_SEARCH_QUEUE	utils.h	/^	ACK_SEARCH_QUEUE = 11,$/;"	e	enum:msg_type
+ARE_YOU_ALIVE	utils.h	/^	ARE_YOU_ALIVE =			7,$/;"	e	enum:msg_type
+CLEAN	site.c	12;"	d	file:
+CLEAN_NETWORK	networkUtils.h	29;"	d
+COMMIT	utils.h	/^	COMMIT =						6,$/;"	e	enum:msg_type
+CONNECTION	utils.h	/^	CONNECTION =			 12,$/;"	e	enum:msg_type
+DEF_FONC_SITE	networkUtils.h	3;"	d
+FREE_NETWORK	networkUtils.h	28;"	d
+HELLO	utils.h	/^	HELLO =							4,$/;"	e	enum:msg_type
+HELLOREP	utils.h	/^	HELLOREP =					5,$/;"	e	enum:msg_type
+IDLE	networkUtils.h	/^	IDLE = 1,$/;"	e	enum:site_state
+IPLONG	utils.h	21;"	d
+I_AM_ALIVE	utils.h	/^	I_AM_ALIVE =				8,$/;"	e	enum:msg_type
+MESSAGE	utils.h	/^	MESSAGE =						1,$/;"	e	enum:msg_type
+PORT_RECV	networkUtils.h	26;"	d
+PORT_SEND	networkUtils.h	25;"	d
+REQUEST	utils.h	/^	REQUEST =						2,$/;"	e	enum:msg_type
+SEARCH_PREV	utils.h	/^	SEARCH_PREV =				9,$/;"	e	enum:msg_type
+SEARCH_QUEUE	utils.h	/^	SEARCH_QUEUE =		 10,$/;"	e	enum:msg_type
+SIZE	utils.h	22;"	d
+TMESG	faultTolerantExt.c	4;"	d	file:
+TMESG	naimiTrehel.h	21;"	d
+TOKEN	utils.h	/^	TOKEN =							3,$/;"	e	enum:msg_type
+TOLERANCE	utils.h	20;"	d
+WAITING	networkUtils.h	/^	WAITING = 2,$/;"	e	enum:site_state
+WAITING_PERIOD	naimiTrehel.h	20;"	d
+WORKING	networkUtils.h	/^	WORKING = 3$/;"	e	enum:site_state
+_has_next	utils.h	/^	int _has_next;$/;"	m	struct:message
+_has_token	utils.h	/^	int _has_token;$/;"	m	struct:message
+_ip	utils.h	/^	char _ip[IPLONG];$/;"	m	struct:message
+_ip_asking_site	utils.h	/^	char _ip_asking_site[IPLONG];$/;"	m	struct:message
+_naimiTrehel_h	naimiTrehel.h	10;"	d
+_nb_access	utils.h	/^	int _nb_access;$/;"	m	struct:message
+_pos_next_queue	utils.h	/^	int _pos_next_queue;$/;"	m	struct:message
+_pred	utils.h	/^	struct sockaddr_in _pred[TOLERANCE];$/;"	m	struct:message	typeref:struct:message::sockaddr_in
+_sender	utils.h	/^	char _sender[IPLONG];$/;"	m	struct:message
+_typ_mes	utils.h	/^	msg_type _typ_mes;$/;"	m	struct:message
+_utils_h	utils.h	10;"	d
+acces	naimiTrehel.h	/^int acces;$/;"	v
+ask	utils.h	65;"	d
+backupSocketNeighbours	networkUtils.c	/^int backupSocketNeighbours() {$/;"	f
+broadcast	networkUtils.c	/^int broadcast(msg_t message) {$/;"	f
+broadcastAdd	networkUtils.h	/^	in_addr_t broadcastAdd;$/;"	m	struct:site
+ch_pid	naimiTrehel.h	/^int ch_pid;$/;"	v
+check	naimiTrehel.h	/^int check;$/;"	v
+checkNeighbour	faultTolerantExt.c	/^void checkNeighbour (void *arg) {$/;"	f
+critSectionRequest	faultTolerantExt.c	/^int critSectionRequest() {$/;"	f
+critSectionRequest	naimiTrehel.c	/^int critSectionRequest() {$/;"	f
+end_handler	site.c	/^void end_handler(int sig) {$/;"	f
+getIPaddress	networkUtils.c	/^char* getIPaddress() {$/;"	f
+getIPstrFromNb	networkUtils.c	/^char *getIPstrFromNb(int nb) {$/;"	f
+getMessageFromString	networkUtils.c	/^void getMessageFromString(char* string, msg_type* type, char** message) {$/;"	f
+getNeighbour	networkUtils.c	/^int getNeighbour(unsigned long s_addr) {$/;"	f
+handleAckSearchPrev	faultTolerantExt.c	/^int handleAckSearchPrev(msg_t msg) {$/;"	f
+handleAckSearchQueue	faultTolerantExt.c	/^int handleAckSearchQueue(msg_t msg) {$/;"	f
+handleAreYouAlive	faultTolerantExt.c	/^int handleAreYouAlive(msg_t msg){$/;"	f
+handleCommit	faultTolerantExt.c	/^int handleCommit (msg_t msg) {$/;"	f
+handleConnection	faultTolerantExt.c	/^int handleConnection (msg_t msg){$/;"	f
+handleHello	faultTolerantExt.c	/^int handleHello(msg_t mes) {$/;"	f
+handleHello	naimiTrehel.c	/^int handleHello(msg_t mes) {$/;"	f
+handleHelloRep	faultTolerantExt.c	/^int handleHelloRep(msg_t message, struct sockaddr_in* netParamsNeighbour) {$/;"	f
+handleHelloRep	naimiTrehel.c	/^int handleHelloRep(msg_t message, struct sockaddr_in* netParamsNeighbour) {$/;"	f
+handleIAmAlive	faultTolerantExt.c	/^int handleIAmAlive(msg_t m) {$/;"	f
+handleMessage	faultTolerantExt.c	/^int handleMessage(msg_t msg) {$/;"	f
+handleMessage	naimiTrehel.c	/^int handleMessage(msg_t msg) {$/;"	f
+handleRequest	faultTolerantExt.c	/^int handleRequest(msg_t msg) {$/;"	f
+handleRequest	naimiTrehel.c	/^int handleRequest(msg_t msg) {$/;"	f
+handleSearchPrev	faultTolerantExt.c	/^int handleSearchPrev (msg_t msg){$/;"	f
+handleSearchQueue	faultTolerantExt.c	/^int handleSearchQueue(msg_t msg){$/;"	f
+handleToken	faultTolerantExt.c	/^int handleToken(msg_t message) {$/;"	f
+handleToken	naimiTrehel.c	/^int handleToken(msg_t message) {$/;"	f
+hostsUpdate	networkUtils.c	/^int hostsUpdate(struct sockaddr_in netParamsNeighbour) {$/;"	f
+init_network	networkUtils.c	/^int init_network(int argc, char* argv[]) {$/;"	f
+init_structures	faultTolerantExt.c	/^int init_structures() {$/;"	f
+init_structures	naimiTrehel.c	/^int init_structures() {$/;"	f
+ip	utils.h	61;"	d
+ips	utils.h	57;"	d
+itoa	utils.c	/^void itoa(long n, char** res) {$/;"	f
+last	naimiTrehel.h	/^int last;$/;"	v
+liberation	faultTolerantExt.c	/^void liberation(void* arg) {$/;"	f
+liberation	naimiTrehel.c	/^void liberation(void* arg) {$/;"	f
+main	site.c	/^int main(int argc, char* argv[]) {$/;"	f
+message	utils.h	/^typedef struct message {$/;"	s
+msg_t	utils.h	/^} msg_t;$/;"	t	typeref:struct:message
+msg_type	utils.h	/^typedef enum msg_type {$/;"	g
+msg_type	utils.h	/^} msg_type;$/;"	t	typeref:enum:msg_type
+mut_check	naimiTrehel.h	/^pthread_mutex_t mut_check;$/;"	v
+nbNeighbours	networkUtils.h	/^	size_t nbNeighbours;$/;"	m	struct:site
+nb_acc	utils.h	63;"	d
+neighbours	networkUtils.h	/^	struct sockaddr_in* neighbours;$/;"	m	struct:site	typeref:struct:site::sockaddr_in
+neighboursTmp	networkUtils.h	/^	struct sockaddr_in *neighboursTmp;$/;"	m	struct:site	typeref:struct:site::sockaddr_in
+next	naimiTrehel.h	/^int next;$/;"	v
+next	utils.h	62;"	d
+pos	utils.h	58;"	d
+position	naimiTrehel.h	/^int position;$/;"	v
+pred	utils.h	59;"	d
+predec	naimiTrehel.h	/^struct sockaddr_in predec[TOLERANCE+1];$/;"	v	typeref:struct:sockaddr_in
+printNeighbours	networkUtils.c	/^void printNeighbours() {$/;"	f
+print_help	site.c	/^void print_help() {$/;"	f
+recoverSocketNeighbours	networkUtils.c	/^int recoverSocketNeighbours(struct sockaddr_in paramsNewNeighbour) {$/;"	f
+recvMessage	networkUtils.c	/^int recvMessage(msg_t* message, struct sockaddr_in* add) {$/;"	f
+running	networkUtils.h	/^	int running;$/;"	m	struct:site
+sdRecv	networkUtils.h	/^	int sdRecv;$/;"	m	struct:site
+sdSend	networkUtils.h	/^	int sdSend;$/;"	m	struct:site
+sendMessage	networkUtils.c	/^int sendMessage(int siteID, msg_t m) {$/;"	f
+sendMessageWithAdd	networkUtils.c	/^int sendMessageWithAdd(msg_t m) {$/;"	f
+site	networkUtils.h	/^typedef struct site {$/;"	s
+site	networkUtils.h	/^} site;$/;"	t	typeref:struct:site
+site_failure	faultTolerantExt.c	/^void site_failure(int sig) {$/;"	f
+site_state	networkUtils.h	/^typedef enum site_state {$/;"	g
+site_state	networkUtils.h	/^} site_state;$/;"	t	typeref:enum:site_state
+standardInput	site.c	/^void standardInput() {$/;"	f
+state	naimiTrehel.h	/^site_state state;$/;"	v
+takeCriticalSection	faultTolerantExt.c	/^int takeCriticalSection() {$/;"	f
+takeCriticalSection	naimiTrehel.c	/^int takeCriticalSection() {$/;"	f
+this_site	site.c	/^site this_site;$/;"	v
+tok	utils.h	64;"	d
+tokenPresent	naimiTrehel.h	/^int tokenPresent;$/;"	v
+type	utils.h	60;"	d
+waitForHellorep	faultTolerantExt.c	/^int waitForHellorep(int waitingPeriod) {$/;"	f
+waitForHellorep	naimiTrehel.c	/^int waitForHellorep(int waitingPeriod) {$/;"	f
