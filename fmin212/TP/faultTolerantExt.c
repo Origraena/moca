@@ -618,6 +618,7 @@ void checkNeighbour (void *arg) {
 	sigprocmask(SIG_BLOCK, &block, NULL);
 
 	struct sockaddr_in *pre = (struct sockaddr_in *)arg;
+	int failure = 0;
 
 	msg_t msg;
 	type(msg) = ARE_YOU_ALIVE;
@@ -625,21 +626,23 @@ void checkNeighbour (void *arg) {
 	tmpmes = inet_ntoa(pre->sin_addr);
 	memcpy (ip(msg), tmpmes, IPLONG * sizeof(char));
 
-	while (state == WAITING) {
+	while (state == WAITING && !failure) {
 		pthread_mutex_lock(&mut_check);
 		if (check) {
 			fprintf (stderr, "Site Failure Detected\n");
 			pthread_mutex_unlock(&mut_check);
 			kill(getpid(), SIGUSR1);
-			exit(1);
+			failure ++;
 		}
-		check --;
-		pthread_mutex_unlock(&mut_check);
+		else{
+			check --;
+			pthread_mutex_unlock(&mut_check);
 
-		if (sendMessageWithAdd(msg) == -1)
-			continue;
+			if (sendMessageWithAdd(msg) == -1)
+				continue;
 
-		sleep(2*TMESG);
+			sleep(2*TMESG);
+		}
 	}
 }
 //}}}
