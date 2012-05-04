@@ -599,9 +599,9 @@ void liberation(void* arg) {
 			printf("Envoi raté...");
 		}
 		next = -1;
-		ch_pid = 0;
 		tokenPresent = 0;
 	}
+	ch_pid = 0;
 	printf("Section critique relachee : %d accès\n", ++acces);
 }
 //}}}
