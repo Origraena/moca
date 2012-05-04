@@ -127,7 +127,7 @@ int init_structures() {
 	pthread_mutex_init(&mut_check, NULL);
 	check = 0;
 	acces = 0;
-	for (i=0; i<TOLERANCE+1; memset(&predec[i++], 0, sizeof(struct sockaddr_in)));
+	for (i=0; i<TOLERANCE+1; memset(&predec[i], 0, sizeof(struct sockaddr_in)), i++);
 
 	/* HELLO message broadcasting */
 	msg_t broad;
@@ -281,6 +281,8 @@ int critSectionRequest() {
 			}
 		}
 
+		printf ("Sortie de recherche de queue : %d\n", pos(max));
+
 		fcntl(this_site.sdRecv, F_SETFL, flags);
 
 		if (pos(max) < 0) {
@@ -352,7 +354,7 @@ int handleRequest(msg_t msg) {
 			type(msg) = COMMIT;
 			pos(msg) = position + 1;
 			int j;
-			for (j=0; j<TOLERANCE; pred(msg)[j] = predec[j], j++);
+			for (j=0; j<TOLERANCE; memcpy(pred(msg)+j,predec+j,sizeof(struct sockaddr_in)), j++);
 			if (sendMessageWithAdd(msg) == -1)
 				return -1;
 		}
