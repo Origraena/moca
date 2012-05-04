@@ -84,8 +84,52 @@ Le sous ensemble solution $S_{sol}$ se construit à l'aide du principe suivant :
 un poids $j>0$ donnés, on a $a_i \in S_{sol}$ si $T(i-1, j) = \mbox{FAUX} \wedge T(i,j) =
 \mbox{VRAI}$. Ceci n'est vrai que dans un sens et permet d'introduire l'implication suivante :
 \begin{equation}
+	\label{ineq}
 	T(i-1, j) \oplus T(i, j) = \mbox{VRAI} \Rightarrow a_i \in S_{sol} 
 \end{equation}
+
+Ceci mérite quelques explications. Séparons les différents cas possibles et présentons les dans un
+tableau : \\
+\begin{center}
+\begin{tabular}{|c|c|c|} \hline
+	\backslashbox{$T(i-1, j)$}{$T(i,j)$} & VRAI & FAUX \\	\hline
+	VRAI & Cas 1 & Cas 2 \\ \hline
+	FAUX & Cas 3 & Cas 4 \\ \hline
+\end{tabular}
+\end{center}
+
+Analysons les différents cas : \begin{enumerate}
+	\item Dans ce cas, l'ensemble des $i-1$ premiers objets possède un sous-ensemble vérifiant les
+		contraintes imposées. On peut donc en déduire qu'il existe un sous-ensemble ne contenant pas
+		$a_i$ et vérifiant ces mêmes contraintes\footnote{Attention, celà ne veut pas dire qu'il
+		n'existe pas de sous-ensembles vérifiant les contraintes et contenant $a_i$}. C'est cet ensemble
+		qui nous intéresse
+	\item Ce cas est un cas interdit par la formule de calcul de la ligne $i$. En effet, si $T(i-1, j)
+		=$ VRAI, alors $T(i,j) =$ VRAI par construction.
+	\item C'est ce cas qui est intéressant, puisqu'il nous indique que l'ajout de l'objet $a_i$ permet
+		de trouver une solution au problème du sous-ensemble pour les valeurs données. On a donc $a_i$
+		appartenant bel et bien à la solution.
+	\item Ce cas indique jusque que la solution n'existe pas.
+\end{enumerate}
+
+De ces principes, on peut déduire l'algorithme \ref{recsol} de reconstruction de la solution.
+\begin{algorithm}
+	\caption{Construct-sol}
+	\label{recsol}
+	\begin{algorithmic}[1]
+		\STATE $S \leftarrow \emptyset$
+		\IF{$i = 0$ \OR $j=0$}
+			\STATE Retourne $S$
+		\ELSE
+			\IF{$T(i-1,j) = \FALSE$}
+				\STATE Retourne $a_i \cup$ Construct-sol($i-1$,$j-a_i$)
+			\ELSE
+				\STATE Retourne Construct-sol($i-1$, $j$)
+			\ENDIF
+		\ENDIF
+	\end{algorithmic}
+\end{algorithm}
+
 
 \subsubsection{Complexité}
 
