@@ -31,7 +31,7 @@ public class AcyclicGraphLocalizer extends AbstractLocalizer implements Localize
 		final int nbVertices = graph.getNbVertices();
 		int i,j,id;
 		boolean ended;
-		boolean marked[] = new boolean[nbVertices];
+		int marked[] = new int[nbVertices];
 		ArrayList<ArrayList<Integer> > positions = new ArrayList<ArrayList<Integer> >();
 		Iterator<NeighbourEdge> iterator;
 		ArrayList<Integer> previousList;
@@ -40,15 +40,15 @@ public class AcyclicGraphLocalizer extends AbstractLocalizer implements Localize
 		// sources
 		positions.add(new ArrayList<Integer>());
 		for (i = 0 ; i < nbVertices ; i++) {
-			marked[i] = false;
+			marked[i] = -1;
 			ended = false;
 			for (j = 0 ; (j < nbVertices) && !ended ; j++) {
 				if ((i != j) && (graph.isEdge(j,i)))
 					ended = true;
 			}
-			if (j == nbVertices) {
+			if (!ended) {
 				positions.get(0).add(new Integer(i));
-				marked[i] = true;
+				marked[i] = 0;
 			}
 		}
 
@@ -61,9 +61,9 @@ public class AcyclicGraphLocalizer extends AbstractLocalizer implements Localize
 				iterator = graph.neighbourIterator(previousVertex);
 				while (iterator.hasNext()) {
 					id = iterator.next().getIDV();
-					if (marked[id] == false) {
+					if (marked[id] < i-1) {
 						positions.get(i).add(new Integer(id));
-						marked[id] = true;
+						marked[id] = i;
 					}
 				}
 			}
