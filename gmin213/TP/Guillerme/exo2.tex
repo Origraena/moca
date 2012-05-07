@@ -13,7 +13,7 @@ suivante : $$
 \left \lbrace
 \begin{array}{l}
 	min z = \sum_{i=1}^m w_ix_i \\
-	\sum_{x_j / e_i \in x_j} x_j \geq 1 \quad \forall e_i \in E \\
+	\sum_{j / e_i \in S_j} x_j \geq 1 \quad \forall e_i \in E \\
 	x_i \in \{0, 1\}
 \end{array} \right.
 $$
@@ -31,17 +31,15 @@ x_i = \left \{ \begin{array}{rcl}
 	$$
 
 Cherchons à démontrer que cette procédure d'arrondis garantit une solution réalisable. Pour ce
-faire, nous allons procéder par l'absurde. Supposons qu'il existe un sommet $k$ qui ne repsecte pas
-sa contrainte d'intégrité associée, à savoir : $$
-\sum_{x_j / e_k \in x_j} < 1 $$
+faire, considérons l'ensemble $C$ des sous-ensembles sélectionnés par la procédure d'arrondis : $$ C
+= \{ S_i : x_i \geq \frac{1}{f} \} $$
 
-Les variables $x_j$ de cette contrainte étant définies positives et entières, le cas pris en
-considération si dessus implique que toutes les variables de l'inéquation sont nulles pour le
-programme en nombres entiers et donc : $$
-\forall x_j / e_k \in x_j < \frac{1}{f} $$ dans le cas de la version relaxée du problème. Or ceci
-n'est possible que si le nombre de sous-ensemble contenant $x_k$ est supérieur à $f$, ce qui est
-impossible par définition. Tous les sommets respectent donc leur contrainte d'intégrité et on en
-déduit que la procédure d'arrondis garantit une solution réalisable.
+Soir un élément quelconque $c$, par définition de $f$, $c$ appartient à, au plus $f$ sous-ensembles.
+De plus, par définition du problème, on a : $$
+\sum_{j : e \in S_j} x_j \geq 1 $$
+
+On a donc au moins un des $x_j \geq \frac{1}{f}$, et donc $c$ est couvert par la solution. Cette
+procédure d'arrondis garantit une solution réalisable.
 
 \subsection{Existence d'un algorithme $f$-approché}
 

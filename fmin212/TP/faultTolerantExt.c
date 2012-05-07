@@ -176,6 +176,7 @@ int init_structures() {
 // }}}
 
 // {{{ critSectionRequest
+// Ask for critical section
 int critSectionRequest() {
 	msg_t msg;
 	type(msg) = REQUEST;
@@ -183,27 +184,33 @@ int critSectionRequest() {
 	char *ip_tmp = inet_ntoa(this_site.neighbours[0].sin_addr);
 	strncpy (ask(msg), ip_tmp, SIZE);
 
+	// If already in SC just return -1
 	if (ch_pid) {
 		printf ("Déjà en section critique.\n");
 		return -1;
 	}
 
+	// Owns Token ?
 	if(tokenPresent == 1) {
 		takeCriticalSection();
 		return 0;
 	}
+	// Sends request to last
 	else if(last != -1) {
+		// Get ip of last
 		char *tmpter = getIPstrFromNb (last);
 		printf ("Envoi message à last : %d, adresse : %s.\n", last, tmpter);
 		strncpy(ip(msg), tmpter, IPLONG);
 		free (tmpter);
+
 		if(sendMessageWithAdd(msg) == -1){
 			fprintf (stderr, "Problème lors de la requête!!!\n");
 			return -1;
 		}
 
-		last = -1;
+//		last = -1; 
 
+		// Arms a timer
 		time_t timeStart, timeCur;
 		int flags = fcntl(this_site.sdRecv, F_GETFL);
 		int flags2 = flags | O_NONBLOCK;
@@ -212,6 +219,7 @@ int critSectionRequest() {
 		timeStart = time(&timeStart);
 		timeCur = time(&timeCur);
 
+		// Wait for an answer
 		while(timeCur - timeStart < (2*TMESG)) {
 			timeCur = time(&timeCur);
 
@@ -223,11 +231,13 @@ int critSectionRequest() {
 				return handleCommit(msg);
 			}
 			else {
+				// TODO: Work on reaction when receiving request while waiting commit
 				if (type(msg) == REQUEST)
 					printf ("Réception d'une requête en attendant un COMMIT.\n");
 				else if (type(msg) == TOKEN) {
 					printf ("Réception du TOKEN Impeccable... \n");
 					handleToken(msg);
+					last = -1;
 					return 0;
 				}
 				else
@@ -235,11 +245,13 @@ int critSectionRequest() {
 			}
 		}
 
+		// If receive no answers
 		fcntl(this_site.sdRecv, F_SETFL, flags);
 
 		memset (&msg, 0, SIZE);
 		type(msg) = SEARCH_QUEUE;
 		nb_acc(msg) = acces;
+		// Broadcast Search_Queue
 		broadcast(msg);
 
 		msg_t max;
@@ -250,6 +262,7 @@ int critSectionRequest() {
 		timeStart = time(&timeStart);
 		timeCur = time(&timeCur);
 
+		// Wait for ACK_SEARCH_QUEUE
 		while(timeCur - timeStart < 2*TMESG) {
 			timeCur = time(&timeCur);
 			memset (&msg, 0, SIZE);
@@ -259,20 +272,26 @@ int critSectionRequest() {
 
 			switch(type(msg)) {
 				case ACK_SEARCH_QUEUE:
+					// Save greatest position in the queue
 					if (pos(msg) > pos(max))
 						memcpy(&max, (void *) &msg, SIZE);
 					break;
+					// Another site discovers the failure
 				case SEARCH_QUEUE:
+					// The other site hasn't priority, just continue
 					if (nb_acc(msg) > acces) 
 						continue;
+					// Both of sites have the same numbers of access, defines priority with ip
 					if (nb_acc(msg) == acces) {
 						char *ip_pers = inet_ntoa(this_site.neighbours[0].sin_addr);
 						if (strcmp(ip_pers, ips(msg)) <= 0)
 							continue;
 					}
+					// If the other has the priority, just change next and ask it for CS
 					unsigned long int ipa = (unsigned long int) inet_addr(ips(msg));
 					last = getNeighbour(ipa);
 					return critSectionRequest();
+					// TODO: Request processing
 				case REQUEST:
 					break;
 				default:
@@ -285,11 +304,14 @@ int critSectionRequest() {
 
 		fcntl(this_site.sdRecv, F_SETFL, flags);
 
+		// No other site in the queue, juste regenerate TOKEN
 		if (pos(max) < 0) {
+			last = -1;
 			tokenPresent = 1;
 			takeCriticalSection();
 		}
 		else {
+			// Ask for connection to the site with the highest position
 			unsigned long int ipa = (unsigned long int) inet_addr(ip(msg));
 			last = getNeighbour(ipa);
 			strncpy(ip(msg), ips(max),IPLONG *sizeof(char));
@@ -301,9 +323,8 @@ int critSectionRequest() {
 			return critSectionRequest();
 		}
 	}
-	else{
-		fprintf (stderr, "Rien ne se passe comme prévu...\n");
-	}
+	else
+		fprintf (stderr, "Attention, Last = -1, et pas de TOKEN...\n");
 	return 0;
 }
 // }}}

@@ -6,7 +6,7 @@
 
 On considère le problème de la couverture minimale sous la forme suivante : $$
 \left \lbrace \begin{array}{l}
-	\min z = \sum_{j=1}^n x_i\\
+	\min z = \sum_{j=1}^n x_j\\
 	x_r + x_s \geq 1, \quad \forall \{v_r, v_s\} \in E \\
 	x_j \in \{0,1\} \quad j = 1, \dot, n
 \end{array} \right .
@@ -107,7 +107,7 @@ violée, l'hypothèse de départ est donc fausse. On a donc, $\forall (rs) \in V
 Mettons en évidence le pire des cas pouvant se présenter : pour une arête $(rs) \in V$, un seul
 sommet est nécessaire pour la couverture de cette dernière dans le cas de la couverture minimale,
 mais l'algorithme approché retourne : $x_r = x_s = \frac{1}{2}$. Après la phase d'arondis, on a $x_r
-= x_s = 1$ est donc les deux sommets appartiennent à la solution approchée, cette phase multiplie
+= x_s = 1$ et donc les deux sommets appartiennent à la solution approchée, cette phase multiplie
 donc au pire le nombre de sommets (pour chaque clause par 2), ce qui implique que le cardinal de la
 solution approximée est au plus 2 fois la solution optimale.
 

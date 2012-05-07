@@ -14,6 +14,7 @@
 
 site this_site;
 
+// {{{ Handler
 /* ending handler. Necessary to clean the environnement. */
 void end_handler(int sig) {
 	printf("\nSignal caught\n");
@@ -24,7 +25,9 @@ void end_handler(int sig) {
 	
 	this_site.running = 0;	
 }
+// }}}
 
+// {{{ print_help
 void print_help() {
 	printf("1. BROADCAST\n");
 	printf("2. MESSAGE\n");
@@ -37,7 +40,10 @@ void print_help() {
 	printf("9. PREDEC\n");
 	printf("10. PANNE\n");
 }
+// }}}
 
+// {{{ standardInput
+// Lecture de l'entrée standard
 void standardInput() {
 	msg_t envoi;
 	int rea;
