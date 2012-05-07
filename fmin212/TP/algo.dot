@@ -95,6 +95,7 @@ digraph Algo {
 
 	ans3->nb_conn[label="SEARCH_QUEUE"]
 	ans3->connect[label="ACK_SEARCH_QUEUE"]
+	ans3->regen[label="No Messages"]
 	Mess->recq[label="SEARCH_QUEUE"]
 	recq->sq[label="Y"]
 	recq->S[label="N"]
