@@ -65,6 +65,7 @@ void site_failure(int sig) {
 				fprintf (stdout, "Asking for connection\n");
 				last = getNeighbour(ipa);
 				fprintf (stdout, "New last after receiving I_AM_ALIVE message : %d\n", last);
+				state = IDLE;
 				critSectionRequest();
 				sortie++;
 				break;
@@ -131,6 +132,7 @@ void site_failure(int sig) {
 			strncpy(ip(msg), ips(min), IPLONG * sizeof(char));
 			last = getNeighbour((unsigned long int)inet_addr(ips(min)));
 			sendMessageWithAdd(msg);
+			state = IDLE;
 			critSectionRequest();
 		}
 	}
@@ -316,6 +318,7 @@ int critSectionRequest() {
 					unsigned long int ipa = (unsigned long int) inet_addr(ips(msg));
 					last = getNeighbour(ipa);
 					fprintf (stdout, "I don't have priority, changing my last (%d) and asking for CS again.\n", last);
+					state = IDLE;
 					return critSectionRequest();
 					// TODO: Request processing
 				case REQUEST:
@@ -347,6 +350,7 @@ int critSectionRequest() {
 				if (sendMessageWithAdd(msg) == -1)
 					return -1;
 			}
+			state = IDLE;
 			critSectionRequest();
 		}
 	}
