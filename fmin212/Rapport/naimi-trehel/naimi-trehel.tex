@@ -3,6 +3,8 @@
 
 \chapter{Algorithme d'exclusion mutuelle de Naimi-Trehel}\label{naimi-trehel}
 
+\section{Modèle utilisé}
+On considère un réseau distribué constitué de $n$ nœuds (sites). Ces sites communiquent uniquement en s'envoyant des messages par le biais d'un canal de communication fiable mais ne garantissant pas l'ordre des messages. On considère également que le réseau est synchrone, complet et que les temps de transmission des messages sont bornés.
 
 \section{Description}
 L'algorithme de Naimi-Trehel \cite{naimi1996} est basé sur le fait de conserver deux structures de données distribuées et un jeton. Le jeton est présent sur un des sites à la fois et matérialise la permission d'entrer en section critique. Les structures de données distribuées sont un arbre logique dynamique et une file d'attente.
@@ -14,10 +16,6 @@ La seconde structure de données est l'arbre logique dynamique. Cet arbre a pour
 
 \section{Exemple}
 
-\tikzstyle{vertex}=[circle,fill=black!25,minimum size=20pt,inner sep=0pt]
-\tikzstyle{edge} = [draw,thick,-]
-\tikzstyle{tree edge} = [draw, thick,->,red!75]
-\tikzstyle{queue edge} = [draw,thick,->,blue!50]
 
 Dans cet exemple, initialement, le nœud $a$ possède le jeton (figure \ref{naimi-trehel-exemple1}).
 \begin{figure}[H]
@@ -282,7 +280,7 @@ Dans les deux cas, l'unicité du jeton est préservée et l'exclusion mutuelle e
 
 La seconde propriété est la vivacité c'est à dire le fait que tout site demandant à entrer en section critique le puisse dans un temps fini. Cette propriété est respectée grâce à l'arbre logique et à la file d'attente. En effet, chaque site voulant entrer en section critique fait la requête à son père dans l'arbre. Le fait que la structure d'arbre distribué soit toujours valide garantie que les requêtes parviennent à la racine de l'arbre. Or la racine de l'arbre étant le dernier nœud de la file d'attente, le site ayant fait la requête se retrouve le dernier dans la file d'attente. Par conséquent, quand son prédécesseur dans la file sortira de la section critique, il pourra y entrer. Dans l'hypothèse où un site ne reste pas éternellement en section critique, la propriété de vivacité est respectée par l'algorithme de Naimi-Trehel.
 
-Cependant cet algorithme n'étant pas parfait, il ne respecte pas l'ordre des demandes et n'est pas nativement tolérant aux pannes (bien qu'une extension de tolérance aux pannes \cite{naimi1988} puisse être ajoutée).
+Cependant cet algorithme n'étant pas parfait, il ne respecte pas l'ordre des demandes et n'est pas nativement tolérant aux pannes (bien qu'une extension de tolérance aux pannes \cite{naimi1988} proposée par les auteurs puisse être ajoutée).
 
 
 \section{Complexité}
