@@ -445,7 +445,7 @@ int handleCommit (msg_t msg) {
 	position = pos(msg);
 	int i;
 	fprintf (stdout,"Copy the predecessor adress contained in received COMMIT.\n");
-	for (i=0; i<TOLERANCE; predec[i] = pred(msg)[i+1], i++);
+	for (i=0; i<TOLERANCE; predec[i+1] = pred(msg)[i], i++);
 
 	inet_aton(ips(msg),&(predec[0].sin_addr));
 
