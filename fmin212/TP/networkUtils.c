@@ -9,7 +9,7 @@ char* getIPaddress() {
     perror("Error when getting local host name ");
     return NULL;
   }
-  printf("Nom de l'hôte : %s.\n", ac);
+//  printf("Nom de l'hôte : %s.\n", ac);
 
 
 	struct ifaddrs *ifaddr, *ifa;
@@ -24,7 +24,7 @@ char* getIPaddress() {
 
 	/* Walk through linked list, maintaining head pointer so we
 	 	 can free list later */
-	printf("Adresses IP disponibles :\n");
+//	printf("Adresses IP disponibles :\n");
 	for (ifa = ifaddr; ifa != NULL; ifa = ifa->ifa_next) {
 		if (ifa->ifa_addr == NULL)
 			continue;
@@ -36,7 +36,7 @@ char* getIPaddress() {
 		if (family == AF_INET) {
 			/* Display interface name and family (including symbolic
 			 	 form of the latter for the common families) */
-			printf("%s", ifa->ifa_name);
+//			printf("%s", ifa->ifa_name);
 
 			s = getnameinfo(ifa->ifa_addr,
 					(family == AF_INET) ? sizeof(struct sockaddr_in) :
@@ -46,7 +46,7 @@ char* getIPaddress() {
 				printf("getnameinfo() failed: %s\n", gai_strerror(s));
 				exit(EXIT_FAILURE);
 			}
-			printf("\t<%s>\n", host);
+//			printf("\t<%s>\n", host);
 			if(ifa->ifa_name[0] != 'l' || ifa->ifa_name[1] == 'o') {
 				res = malloc(sizeof(char)*NI_MAXHOST);
 				strcpy(res, host);
@@ -55,8 +55,8 @@ char* getIPaddress() {
 		}
 	}
 
-  printf("Adresse choisie : %s\n", res);
-	printf("Adresse de broadcast : %s\n", inet_ntoa(*(struct in_addr *)&this_site.broadcastAdd));
+//  printf("Adresse choisie : %s\n", res);
+//	printf("Adresse de broadcast : %s\n", inet_ntoa(*(struct in_addr *)&this_site.broadcastAdd));
 	freeifaddrs(ifaddr);
 	return res;
 }
@@ -107,7 +107,7 @@ int init_network(int argc, char* argv[]) {
 	this_site.nbNeighbours = 0;
 	this_site.running = 1;
 
-	printf("Lancement du site\n");
+//	printf("Lancement du site\n");
 
 	//printf("Attente des autres sites…\n");
 	//return waitForHellorep(5);
@@ -156,7 +156,7 @@ int broadcast(msg_t message) {
 	netParamsNeighbour.sin_port = htons(PORT_RECV);
 	netParamsNeighbour.sin_addr.s_addr = this_site.broadcastAdd;
 
-	printf("Broadcast d'un message de type %d'\n", type(message));
+//	printf("Broadcast d'un message de type %d'\n", type(message));
 	if (sendto(this_site.sdSend, (void *)&message, SIZE, 0, (struct sockaddr *)&netParamsNeighbour,sizeof(netParamsNeighbour)) == -1) {
 		perror("sendto broadcast ");
 		return -1;
@@ -176,7 +176,7 @@ int sendMessage(int siteID, msg_t m) {
 	//printf("addr envoyee %ul ; ", netParamsNeighbour.sin_addr.s_addr);
 
 
-	printf("Envoi d'un message de type %d a %s\n", type(m), inet_ntoa(this_site.neighbours[siteID].sin_addr));
+//	printf("Envoi d'un message de type %d a %s\n", type(m), inet_ntoa(this_site.neighbours[siteID].sin_addr));
 	if (sendto(this_site.sdSend, (void *)&m, SIZE, 0, (struct sockaddr *)&netParamsNeighbour,sizeof(netParamsNeighbour)) == -1) {
 		perror("sendto message ");
 		return -1;
@@ -191,7 +191,7 @@ int sendMessageWithAdd(msg_t m) {
 	netParamsNeighbour.sin_port = htons(PORT_RECV);
 	inet_aton(ip(m), &netParamsNeighbour.sin_addr);
 
-	printf("Envoi d'un message de type %d a %s\n", type(m), inet_ntoa(netParamsNeighbour.sin_addr));
+//	printf("Envoi d'un message de type %d a %s\n", type(m), inet_ntoa(netParamsNeighbour.sin_addr));
 	if (sendto(this_site.sdSend, &m, SIZE, 0, (struct sockaddr *)&netParamsNeighbour,sizeof(netParamsNeighbour)) == -1) {
 		perror("sendto message ");
 		return -1;
@@ -202,7 +202,7 @@ int sendMessageWithAdd(msg_t m) {
 int hostsUpdate(struct sockaddr_in netParamsNeighbour) {
 	int indice = getNeighbour(netParamsNeighbour.sin_addr.s_addr);
 	if(indice == -1) {
-		printf("Hote inconnu. ");
+//		printf("Hote inconnu. ");
 		// backup neighbours sockets
 		if(backupSocketNeighbours() == -1)
 			return -1;
@@ -213,8 +213,8 @@ int hostsUpdate(struct sockaddr_in netParamsNeighbour) {
 		if(recoverSocketNeighbours(netParamsNeighbour) == -1)
 			return -1;
 	}
-	else
-		printf("Hote connu. ");
+//	else
+//		printf("Hote connu. ");
 
 	return 0;
 }
@@ -250,7 +250,7 @@ int recvMessage(msg_t* message, struct sockaddr_in* add) {
 
 	strncpy(message->_sender, inet_ntoa(netParamsNeighbour.sin_addr), 16);
 
-	printf("Message recu depuis l'adresse %s et le port %d. ", message->_sender, ntohs(netParamsNeighbour.sin_port));
+//	printf("Message recu depuis l'adresse %s et le port %d. ", message->_sender, ntohs(netParamsNeighbour.sin_port));
 
 	if(hostsUpdate(netParamsNeighbour) == -1) 
 		return -1;
@@ -262,7 +262,7 @@ int recvMessage(msg_t* message, struct sockaddr_in* add) {
 		add->sin_addr = netParamsNeighbour.sin_addr;
 	}
 
-	printf("Message de type %u.\n", message->_typ_mes);
+//	printf("Message de type %u.\n", message->_typ_mes);
 
 	return 0;
 }
