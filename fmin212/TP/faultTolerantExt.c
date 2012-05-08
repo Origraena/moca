@@ -399,7 +399,7 @@ int handleRequest(msg_t msg) {
 				return -1;
 		}
 		else if(tokenPresent == 1) {
-			fprintf(stdout, "request answer inet_addr(ip) %lu\n", (unsigned long int)ipt);
+			fprintf (stdout, "Sending TOKEN.\n");
 			type(msg) = TOKEN;
 			if(sendMessageWithAdd(msg) == -1){
 				fprintf (stderr, "======> Error while sending message <======\n");
@@ -414,6 +414,7 @@ int handleRequest(msg_t msg) {
 		if(sendMessage(last, msg) == -1)
 			return -1;
 	}
+
 	last = getNeighbour(ipt);
 	fprintf (stdout, "New last after receiving request : %d. \n", last);
 
@@ -588,6 +589,7 @@ int handleSearchQueue(msg_t msg){
 
 //{{{ handleIAmAlive
 int handleIAmAlive(msg_t m) {
+	fprintf (stdout, "I_AM_ALIVE received.\n");
 	pthread_mutex_lock(&mut_check);
 	if (check)
 		check++;
@@ -657,7 +659,7 @@ void liberation(void* arg) {
 		tokenPresent = 0;
 	}
 	ch_pid = 0;
-	printf("Section critique relachee : %d accès\n", ++acces);
+	fprintf(stdout, "CS released : %d access\n", ++acces);
 }
 //}}}
 
@@ -665,7 +667,7 @@ void liberation(void* arg) {
 void checkNeighbour (void *arg) {
 	pthread_detach(pthread_self());
 
-	printf("Je suis ici!\n");
+	fprintf(stdout, "Checking for predecessor viability.\n");
 
 	sigset_t block;
 	sigemptyset (&block);
@@ -675,6 +677,7 @@ void checkNeighbour (void *arg) {
 	struct sockaddr_in *pre = (struct sockaddr_in *)arg;
 	int failure = 0;
 
+	fprintf (stdout, "Sending ARE_YOU_ALIVE.\n");
 	msg_t msg;
 	type(msg) = ARE_YOU_ALIVE;
 	char *tmpmes;
@@ -693,6 +696,7 @@ void checkNeighbour (void *arg) {
 			check --;
 			pthread_mutex_unlock(&mut_check);
 
+			fprintf (stdout, "Sending ARE_YOU_ALIVE.\n");
 			if (sendMessageWithAdd(msg) == -1)
 				continue;
 
