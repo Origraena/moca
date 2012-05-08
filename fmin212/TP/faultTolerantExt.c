@@ -644,7 +644,6 @@ int handleConnection (msg_t msg){
 //{{{ Critical Section + Threads
 //{{{ takeCriticalSection
 int takeCriticalSection() {
-	last = -1;
 	fprintf(stdout, "Entering CS\n");
 	state = WORKING;
 	position = 0;
