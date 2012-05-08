@@ -35,7 +35,7 @@ void site_failure(int sig) {
 	fprintf (stdout, "Checking predecessor validity\n");
 	for (i=1; i<TOLERANCE+1; i++) {
 		if (!strcmp ("0.0.0.0", inet_ntoa(predec[i].sin_addr))) {
-			fprintf (stdout, "Bad ip address");
+			fprintf (stdout, "Bad ip address\n");
 			continue;
 		}
 		type(msg) = ARE_YOU_ALIVE;
@@ -61,7 +61,7 @@ void site_failure(int sig) {
 
 			// Receive I_AM_ALIVE --> Connection
 			fprintf (stdout, "Received I_AM_ALIVE\n");
-			if (type(msg) == I_AM_ALIVE && !isMe(ip(msg))) {
+			if (type(msg) == I_AM_ALIVE && !isMe(ips(msg))) {
 				handleIAmAlive(msg);
 				type(msg) = CONNECTION;
 				strncpy(ip(msg), ips(msg), IPLONG * sizeof(char));
