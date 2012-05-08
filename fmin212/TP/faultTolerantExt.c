@@ -258,8 +258,10 @@ int critSectionRequest() {
 				// TODO: Work on reaction when receiving request while waiting commit
 				if (type(msg) == REQUEST)
 					fprintf (stdout, "Received a REQUEST instead of a COMMIT.\n");
-				else if (type(msg) == TOKEN)
+				else if (type(msg) == TOKEN){
+					last = -1;
 					return handleToken(msg);
+				}
 				else
 					handleMessage(msg);
 			}
