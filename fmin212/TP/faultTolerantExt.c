@@ -200,7 +200,7 @@ int critSectionRequest() {
 	type(msg) = REQUEST;
 	state = WAITING;
 	char *ip_tmp = inet_ntoa(this_site.neighbours[0].sin_addr);
-	strncpy (ask(msg), ip_tmp, SIZE);
+	strncpy (ask(msg), ip_tmp, IPLONG);
 
 	// If already in SC just return -1
 	if (ch_pid) {
