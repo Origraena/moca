@@ -35,6 +35,14 @@
 \lstset{language=C, showstringspaces=false, numbers=left, numberstyle=\tiny, tabsize=4}
 
 
+
+\tikzstyle{vertex}=[circle,fill=black!25,minimum size=20pt,inner sep=0pt]
+\tikzstyle{edge} = [draw,thick,-]
+\tikzstyle{tree edge} = [draw, thick,->,red!75]
+\tikzstyle{queue edge} = [draw,thick,->,blue!50]
+\tikzstyle{cross} = [path picture={ \draw[black](path picture bounding box.south east) -- (path picture bounding box.north west) (path picture bounding box.south west) -- (path picture bounding box.north east);}]
+
+
 \pgfdeclarelayer{background}
 \pgfsetlayers{background,main}
 
