@@ -225,7 +225,7 @@ int critSectionRequest() {
 		// Get ip of last
 		char *tmpter = getIPstrFromNb (last);
 		fprintf (stdout, "Last is %d, sending it a request.\n", last);
-		strncpy(ip(msg), tmpter, IPLONG*sizeof(char));
+		strncpy(ip(msg), tmpter, IPLONG);
 		free (tmpter);
 
 		strncpy (ask(msg), inet_ntoa(this_site.neighbours[0].sin_addr), IPLONG);
@@ -234,8 +234,6 @@ int critSectionRequest() {
 			fprintf (stderr, "======> Sending request failure... <======\n");
 			return -1;
 		}
-
-		//		last = -1; 
 
 		// Arms a timer
 		time_t timeStart, timeCur;
@@ -453,6 +451,7 @@ int handleCommit (msg_t msg) {
 		return 0;
 
 	position = pos(msg);
+	last = -1;
 	int i;
 	fprintf (stdout,"Copy the predecessor adress contained in received COMMIT.\n");
 	for (i=0; i<TOLERANCE; predec[i+1] = pred(msg)[i], i++);
@@ -462,7 +461,6 @@ int handleCommit (msg_t msg) {
 	if(pthread_create(&thread_id, NULL, (void*)(checkNeighbour), (void*)predec) != 0)
 		fprintf(stderr, "Thread creation failure.\n");
 
-	last = -1;
 
 	return 0;
 }
@@ -474,15 +472,6 @@ int handleToken(msg_t message) {
 	tokenPresent = 1;
 	if(state == WAITING)
 		takeCriticalSection();
-	else if (next != -1) {
-		fprintf (stdout, "I send it to my next.\n");
-		type(message) = TOKEN;
-		tokenPresent = 0;
-		char *tmp = getIPstrFromNb(next);
-		strncpy (ip(message), tmp, IPLONG);
-		sendMessageWithAdd(message);
-		next = -1;
-	}
 
 	return 0;
 }
@@ -648,7 +637,7 @@ int takeCriticalSection() {
 	position = 0;
 	int i;
 	fprintf (stdout, "Reinitializing predecessor\n");
-	for (i=0; i<=TOLERANCE; memset(&(predec[i++]), 0, sizeof(struct sockaddr_in)));
+	for (i=0; i<=TOLERANCE; memset(predec + i++, 0, sizeof(struct sockaddr_in)));
 
 	/* exec CS */
 	pthread_t thread_id;
@@ -678,6 +667,8 @@ void liberation(void* arg) {
 		tokenPresent = 0;
 		position = -1;
 	}
+	else
+		last = -1;
 	ch_pid = 0;
 	fprintf(stdout, "CS released : %d access\n", ++acces);
 }
