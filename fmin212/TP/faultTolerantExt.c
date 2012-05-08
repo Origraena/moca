@@ -27,6 +27,11 @@ void site_failure(int sig) {
 	msg_t msg;
 	time_t timeStart, timeCur;
 
+		pthread_mutex_lock(&mut_check);
+		if (check)
+			check = 0;
+		pthread_mutex_unlock(&mut_check);
+
 	int flags = fcntl(this_site.sdRecv, F_GETFL);
 	int flags2 = flags | O_NONBLOCK;
 	fcntl(this_site.sdRecv, F_SETFL, flags2);
@@ -46,7 +51,7 @@ void site_failure(int sig) {
 
 		pthread_mutex_lock(&mut_check);
 		if (check)
-			check--;
+			check = 0;
 		pthread_mutex_unlock(&mut_check);
 
 		timeStart = time(&timeStart);
@@ -701,6 +706,7 @@ void checkNeighbour (void *arg) {
 	while (state == WAITING && !failure) {
 		pthread_mutex_lock(&mut_check);
 		if (check) {
+			check = 0;
 			fprintf (stderr, "Site Failure Detected\n");
 			pthread_mutex_unlock(&mut_check);
 			kill(getpid(), SIGUSR1);
