@@ -21,7 +21,6 @@ int init_structures() {
 	type(broad) = HELLO;
 	broadcast(broad);
 	
-	printf("\nAttente d'autres sites...\n");
 	waitForHellorep(WAITING_PERIOD);
 	
 	/* HELLO message broadcasting */

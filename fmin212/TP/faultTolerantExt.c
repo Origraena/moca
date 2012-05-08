@@ -209,10 +209,8 @@ int critSectionRequest() {
 	}
 
 	// Owns Token ?
-	if(tokenPresent == 1) {
-		takeCriticalSection();
-		return 0;
-	}
+	if(tokenPresent) 
+		return takeCriticalSection();
 	// Sends request to last
 	else if(last != -1) {
 		// Get ip of last
@@ -348,7 +346,7 @@ int critSectionRequest() {
 		}
 	}
 	else
-		fprintf (stderr, "======> Last = -1, but don't have TOKEN <======");
+		fprintf (stderr, "======> Last = -1, but don't have TOKEN <======\n");
 	return 0;
 }
 // }}}
@@ -447,6 +445,8 @@ int handleCommit (msg_t msg) {
 
 	if(pthread_create(&thread_id, NULL, (void*)(checkNeighbour), (void*)predec) != 0)
 		fprintf(stderr, "Thread creation failure.\n");
+
+	last = -1;
 
 	return 0;
 }
