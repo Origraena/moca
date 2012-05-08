@@ -14,6 +14,8 @@ int handleAckSearchPrev (msg_t msg);
 int handleAckSearchQueue (msg_t msg);
 int handleIAmAlive (msg_t msg);
 
+void whoIsAlive ();
+
 int isMe (char *ips);
 
 void checkNeighbour (void *arg);
@@ -102,7 +104,10 @@ void site_failure(int sig) {
 
 			pos(min) = -1;
 			if (type(msg) == ACK_SEARCH_PREV) {
-				min = pos(min) == -1 ? msg : (pos(min) > pos(msg) ? msg : min);
+				if (pos(min) == -1)
+					memcpy (&min, &msg, SIZE);
+				else if (pos(min) < pos(msg))
+					memcpy (&min, &msg, SIZE);
 				fprintf (stdout, "Got an answer.\n");
 			}
 			else if (type(msg) == REQUEST) {}
@@ -203,7 +208,7 @@ int critSectionRequest() {
 	strncpy (ask(msg), ip_tmp, IPLONG);
 
 	// If already in SC just return -1
-	if (ch_pid) {
+	if (state != IDLE) {
 		fprintf (stderr,"Already in critical section.\n");
 		return -1;
 	}
@@ -219,12 +224,14 @@ int critSectionRequest() {
 		strncpy(ip(msg), tmpter, IPLONG);
 		free (tmpter);
 
+		strncpy (ask(msg), inet_ntoa(this_site.neighbours[0].sin_addr), IPLONG);
+
 		if(sendMessageWithAdd(msg) == -1){
 			fprintf (stderr, "======> Sending request failure... <======\n");
 			return -1;
 		}
 
-//		last = -1; 
+		//		last = -1; 
 
 		// Arms a timer
 		time_t timeStart, timeCur;
@@ -257,97 +264,108 @@ int critSectionRequest() {
 		}
 
 		// If receive no answers
-		fprintf (stdout, "I didn't get any COMMIT, looking for the queue...\n");
-		fcntl(this_site.sdRecv, F_SETFL, flags);
-
-		memset (&msg, 0, SIZE);
-		type(msg) = SEARCH_QUEUE;
-		nb_acc(msg) = acces;
-		// Broadcast Search_Queue
-		fprintf (stdout, "Broadcasting SEARCH_QUEUE.\n");
-		broadcast(msg);
-
-		msg_t max;
-		pos(max) = -1;
-
-		fcntl(this_site.sdRecv, F_SETFL, flags2);
-
-		timeStart = time(&timeStart);
-		timeCur = time(&timeCur);
-
-		// Wait for ACK_SEARCH_QUEUE
-		fprintf (stdout, "Expecting ACK_SEARCH_QUEUE.\n");
-		while(timeCur - timeStart < 2*TMESG) {
-			timeCur = time(&timeCur);
-			memset (&msg, 0, SIZE);
-
-			if(recvMessage(&msg, NULL) == -1) 
-				continue;
-
-			switch(type(msg)) {
-				case ACK_SEARCH_QUEUE:
-					fprintf (stdout, "Got an ACK_SEARCH_QUEUE.\n");
-					// Save greatest position in the queue
-					if (pos(msg) > pos(max)) {
-						fprintf (stdout, "New position in QUEUE : %d.\n", pos(msg));
-						memcpy(&max, (void *) &msg, SIZE);
-					}
-					break;
-					// Another site discovers the failure
-				case SEARCH_QUEUE:
-					if (isMe(ips(msg)))
-						continue;
-					fprintf (stdout, "Another site discovered the failure.\n");
-					// The other site hasn't priority, just continue
-					if (nb_acc(msg) > acces) 
-						continue;
-					// Both of sites have the same numbers of access, defines priority with ip
-					if (nb_acc(msg) == acces) {
-						char *ip_pers = inet_ntoa(this_site.neighbours[0].sin_addr);
-						if (strcmp(ip_pers, ips(msg)) <= 0)
-							continue;
-					}
-					// If the other has the priority, just change next and ask it for CS
-					unsigned long int ipa = (unsigned long int) inet_addr(ips(msg));
-					last = getNeighbour(ipa);
-					fprintf (stdout, "I don't have priority, changing my last (%d) and asking for CS again.\n", last);
-					return critSectionRequest();
-					// TODO: Request processing
-				case REQUEST:
-					break;
-				default:
-					handleMessage(msg);
-					break;
-			}
-		}
-
-		fprintf (stdout, "Waiting time passed.\n");
-
-		fcntl(this_site.sdRecv, F_SETFL, flags);
-
-		// No other site in the queue, juste regenerate TOKEN
-		if (pos(max) < 0) {
-			fprintf (stdout, "No other sites in the queue, regenerate TOKEN (last = -1)\n");
-			tokenPresent = 1;
-			takeCriticalSection();
-		}
-		else {
-			// Ask for connection to the site with the highest position
-			unsigned long int ipa = (unsigned long int) inet_addr(ip(max));
-			last = getNeighbour(ipa);
-			fprintf (stdout, "Ask for Connection, new last = %d\n", last);
-			strncpy(ip(msg), ips(max),IPLONG *sizeof(char));
-			if (next(max)) {
-				type(msg) = CONNECTION;
-				if (sendMessageWithAdd(msg) == -1)
-					return -1;
-			}
-			return critSectionRequest();
-		}
+		whoIsAlive();
 	}
 	else
 		fprintf (stderr, "======> Last = -1, but don't have TOKEN <======\n");
 	return 0;
+}
+// }}}
+
+// {{{ whoIsAlive
+void whoIsAlive() {
+	time_t timeStart, timeCur;
+	int flags = fcntl(this_site.sdRecv, F_GETFL);
+	int flags2 = flags | O_NONBLOCK;
+	msg_t msg;
+	fprintf (stdout, "I didn't get any COMMIT, looking for the queue...\n");
+	fcntl(this_site.sdRecv, F_SETFL, flags);
+
+	memset (&msg, 0, SIZE);
+	type(msg) = SEARCH_QUEUE;
+	nb_acc(msg) = acces;
+	// Broadcast Search_Queue
+	fprintf (stdout, "Broadcasting SEARCH_QUEUE.\n");
+	broadcast(msg);
+
+	msg_t max;
+	pos(max) = -1;
+
+	fcntl(this_site.sdRecv, F_SETFL, flags2);
+
+	timeStart = time(&timeStart);
+	timeCur = time(&timeCur);
+
+	// Wait for ACK_SEARCH_QUEUE
+	fprintf (stdout, "Expecting ACK_SEARCH_QUEUE.\n");
+	while(timeCur - timeStart < 2*TMESG) {
+		timeCur = time(&timeCur);
+		memset (&msg, 0, SIZE);
+
+		if(recvMessage(&msg, NULL) == -1) 
+			continue;
+
+		switch(type(msg)) {
+			case ACK_SEARCH_QUEUE:
+				fprintf (stdout, "Got an ACK_SEARCH_QUEUE.\n");
+				// Save greatest position in the queue
+				if (pos(msg) > pos(max)) {
+					fprintf (stdout, "New position in QUEUE : %d.\n", pos(msg));
+					memcpy(&max, (void *) &msg, SIZE);
+				}
+				break;
+				// Another site discovers the failure
+			case SEARCH_QUEUE:
+				if (isMe(ips(msg)))
+					continue;
+				fprintf (stdout, "Another site discovered the failure.\n");
+				// The other site hasn't priority, just continue
+				if (nb_acc(msg) > acces) 
+					continue;
+				// Both of sites have the same numbers of access, defines priority with ip
+				if (nb_acc(msg) == acces) {
+					char *ip_pers = inet_ntoa(this_site.neighbours[0].sin_addr);
+					if (strcmp(ip_pers, ips(msg)) <= 0)
+						continue;
+				}
+				// If the other has the priority, just change next and ask it for CS
+				unsigned long int ipa = (unsigned long int) inet_addr(ips(msg));
+				last = getNeighbour(ipa);
+				fprintf (stdout, "I don't have priority, changing my last (%d) and asking for CS again.\n", last);
+				critSectionRequest();
+				return;
+				// TODO: Request processing
+			case REQUEST:
+				break;
+			default:
+				handleMessage(msg);
+				break;
+		}
+	}
+
+	fprintf (stdout, "Waiting time passed.\n");
+
+	fcntl(this_site.sdRecv, F_SETFL, flags);
+
+	// No other site in the queue, juste regenerate TOKEN
+	if (pos(max) < 0) {
+		fprintf (stdout, "No other sites in the queue, regenerate TOKEN (last = -1)\n");
+		tokenPresent = 1;
+		takeCriticalSection();
+	}
+	else {
+		// Ask for connection to the site with the highest position
+		unsigned long int ipa = (unsigned long int) inet_addr(ip(max));
+		last = getNeighbour(ipa);
+		fprintf (stdout, "Ask for Connection, new last = %d\n", last);
+		strncpy(ip(msg), ips(max),IPLONG *sizeof(char));
+		if (next(max)) {
+			type(msg) = CONNECTION;
+			if (sendMessageWithAdd(msg) == -1)
+				return;
+		}
+		critSectionRequest();
+	}
 }
 // }}}
 
@@ -392,8 +410,9 @@ int handleRequest(msg_t msg) {
 	}
 
 	if(last == -1) {
-		if(state == WAITING || state == WORKING) {
-			next = getNeighbour(ipt);
+		if(state != IDLE) {
+			if (next != -1)
+				next = getNeighbour(ipt);
 			fprintf (stdout, "Got a request, but expecting the TOKEN. Sending COMMIT to %d.\n", next);
 			type(msg) = COMMIT;
 			pos(msg) = position + 1;
@@ -650,9 +669,7 @@ int takeCriticalSection() {
 void liberation(void* arg) {
 	pthread_detach(pthread_self());
 
-
 	sleep((long int)arg);
-
 
 	state = IDLE;
 	if(next != -1) {
@@ -661,9 +678,9 @@ void liberation(void* arg) {
 		type(mes) = TOKEN;
 		if(sendMessage(next, mes) == -1) 
 			fprintf(stderr, "======> Error while sending message <====== \n");
-		next = -1;
+//		next = -1;
 		tokenPresent = 0;
-		position = -1;
+//		position = -1;
 	}
 	ch_pid = 0;
 	fprintf(stdout, "CS released : %d access\n", ++acces);
