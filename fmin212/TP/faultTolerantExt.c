@@ -124,7 +124,7 @@ void site_failure(int sig) {
 		if (pos(min) == -1) {
 			fprintf (stdout, "No answers, regenerating TOKEN\n");
 			tokenPresent = 1;
-			last = -1;
+			last = next;
 			takeCriticalSection();
 			sortie ++;
 		}
@@ -301,7 +301,7 @@ int critSectionRequest() {
 					// Save greatest position in the queue
 					if (pos(msg) > pos(max)) {
 						fprintf (stdout, "New position in QUEUE : %d.\n", pos(msg));
-						memcpy(&max, (void *) &msg, SIZE);
+						memcpy(&max, &msg, SIZE);
 					}
 					break;
 					// Another site discovers the failure
@@ -339,13 +339,14 @@ int critSectionRequest() {
 
 		// No other site in the queue, juste regenerate TOKEN
 		if (pos(max) < 0) {
-			fprintf (stdout, "No other sites in the queue, regenerate TOKEN (last = -1)\n");
+			fprintf (stdout, "No other sites in the queue, regenerate TOKEN (last = next)\n");
+			last = next;
 			tokenPresent = 1;
 			takeCriticalSection();
 		}
 		else {
 			// Ask for connection to the site with the highest position
-			unsigned long int ipa = (unsigned long int) inet_addr(ip(max));
+			unsigned long int ipa = (unsigned long int) inet_addr(ips(max));
 			last = getNeighbour(ipa);
 			fprintf (stdout, "Ask for Connection, new last = %d\n", last);
 			strncpy(ip(msg), ips(max),IPLONG *sizeof(char));
