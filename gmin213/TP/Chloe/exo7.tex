@@ -6,9 +6,133 @@
 \subsection{Sur le problème de la partition}
 \subsubsection{Condition nécessaire sur la somme des poids des $n$ objets}
 
+Les poids de chacun des objets étant des valeurs entières, pour qu'il existe deux sous-ensembles
+distincts ayant le même poids, il faut que la somme des poids des objets soit paire.
+
 \subsubsection{Récurrence}
 
+Introduisons l'expression booléenne $T(i,j) $ : \emph{Etant donnés les $i$ premiers éléments de la
+famille, il existe un sous-ensemble de ces $i$ éléments de poids $j$}. 
+
+Dans un premier temps il paraît évident que si $j=0$, le sous-ensemble existe : il s'agit de
+l'ensemble vide. \begin{equation}
+\forall i \in \mathbb{[}0, n \mathbb{]}, \quad T(i,0) = \mbox{VRAI} 
+\end{equation}
+
+De plus, si $j$ est égal au poids de l'un des $i$ premiers éléments, alors l'existence du
+sous-ensemble est avérée. Autrement dit, si l'on appelle $K_i$ l'ensemble formé par les poids des
+objets $i$, on a : \begin{equation}
+	\forall i \in \mathbb{[}0, n \mathbb{]}, \quad T(i,j \in K_i) = \mbox{VRAI}
+\end{equation}
+
+Troisièmement, l'ensemble des $i-1$ premiers objets est un sous ensemble de l'ensemble des $i$
+premiers objets : $E_{i-1} \subset E_i$. On en déduit donc, que s'il existe un sous ensemble de
+$E_{i-1}$ de poids $j$ tel que $T(i-1, j) = \mbox{VRAI}$, alors ce sous-ensemble est aussi un
+sous-ensemble de $E_i$ tel que $T(i, j) = \mbox{VRAI}$ et ce par le principe d'inclusion.
+\begin{equation}
+	\forall i \in \mathbb{[}0, n \mathbb{]}, \quad \mbox{ si } T(i-1, j) = \mbox{VRAI}, \mbox{
+	alors } T(i,j) = \mbox{VRAI}
+\end{equation}
+
+Enfin, considérons $S_j$ un sous-ensemble de $E_{i-1}$ de pois $j$ vérifiant donc $T(i-1, j) =
+\mbox{VRAI}$, alors $S_j \cup a_i$ est un sous-ensemble de $E_i$ de poids $j+p(a_i)$ et donc
+vérifiant $T(i,j+p(a_i)) = \mbox{VRAI}$. On en déduit donc :
+\begin{equation}
+	\forall i \in \mathbb{[}0, n \mathbb{]}, \quad \mbox{ si } T(i-1, j-p(a_i)) = \mbox{VRAI}, \mbox{
+	alors } T(i,j) = \mbox{VRAI}
+\end{equation}
+
+En réunissant les équations ci dessus dans une seule expression booléenne, on obtient la formule de
+la ligne $i$ en fonction de la ligne $i-1$ et $p(a_i)$ :
+\begin{equation}
+	T(i,j) = j == 0 \vee j == p(a_i) \vee T(i-1, j) \vee T(i-1, j-p(a_i))
+\end{equation}
+
+On peut alors donner un algorithme pour résoudre le problème de la partition : l'algorithme
+\ref{solvepart}.
+
+\begin{algorithm}
+	\caption{solve-partition}
+	\label{solvepart}
+	\begin{algorithmic}[1]
+		\STATE $p_{max} \leftarrow \sum_{i \in \mathbb{[}1, n \mathbb{]}} p(a_i)$
+		\IF{$p_{max} \equiv 1 \pmod{2}$}
+			\STATE Pas de solutions
+		\ELSE
+			\FOR {$j \in \mathbb{[}0,p_{max}\mathbb{]}$}
+				\IF{$j = 0$}
+					\STATE $T(0, j) \leftarrow \TRUE$
+				\ELSE
+					\STATE $T(0, j) \leftarrow \FALSE$
+				\ENDIF
+			\ENDFOR
+			\FOR{$i \in \mathbb{[}1, n \mathbb{]}$}
+				\FOR{$j \in \mathbb{[}0, p_{max}\mathbb{]}$}
+					\STATE $T(i, j) \leftarrow j = 0 \vee j = p(a_i) \vee T(i-1, j) \vee T(i-1, j-p(a_i))$
+				\ENDFOR
+			\ENDFOR
+			\IF{$T(n, p_{max} / 2) = \FALSE$}
+				\STATE Pas de solutions
+			\ELSE
+				\STATE Construire le sous ensemble solution
+			\ENDIF
+		\ENDIF
+	\end{algorithmic}
+\end{algorithm}
+
+Le sous ensemble solution $S_{sol}$ se construit à l'aide du principe suivant : pour une ligne $i>0$ et
+un poids $j>0$ donnés, on a $a_i \in S_{sol}$ si $T(i-1, j) = \mbox{FAUX} \wedge T(i,j) =
+\mbox{VRAI}$. Ceci n'est vrai que dans un sens et permet d'introduire l'implication suivante :
+\begin{equation}
+	\label{ineq}
+	T(i-1, j) \oplus T(i, j) = \mbox{VRAI} \Rightarrow a_i \in S_{sol} 
+\end{equation}
+
+Ceci mérite quelques explications. Séparons les différents cas possibles et présentons les dans un
+tableau : \\
+\begin{center}
+\begin{tabular}{|c|c|c|} \hline
+	\backslashbox{$T(i-1, j)$}{$T(i,j)$} & VRAI & FAUX \\	\hline
+	VRAI & Cas 1 & Cas 2 \\ \hline
+	FAUX & Cas 3 & Cas 4 \\ \hline
+\end{tabular}
+\end{center}
+
+Analysons les différents cas : \begin{enumerate}
+	\item Dans ce cas, l'ensemble des $i-1$ premiers objets possède un sous-ensemble vérifiant les
+		contraintes imposées. On peut donc en déduire qu'il existe un sous-ensemble ne contenant pas
+		$a_i$ et vérifiant ces mêmes contraintes\footnote{Attention, celà ne veut pas dire qu'il
+		n'existe pas de sous-ensembles vérifiant les contraintes et contenant $a_i$}. C'est cet ensemble
+		qui nous intéresse
+	\item Ce cas est un cas interdit par la formule de calcul de la ligne $i$. En effet, si $T(i-1, j)
+		=$ VRAI, alors $T(i,j) =$ VRAI par construction.
+	\item C'est ce cas qui est intéressant, puisqu'il nous indique que l'ajout de l'objet $a_i$ permet
+		de trouver une solution au problème du sous-ensemble pour les valeurs données. On a donc $a_i$
+		appartenant bel et bien à la solution.
+	\item Ce cas indique jusque que la solution n'existe pas.
+\end{enumerate}
+
+De ces principes, on peut déduire l'algorithme \ref{recsol} de reconstruction de la solution.
+\begin{algorithm}
+	\caption{Construct-sol}
+	\label{recsol}
+	\begin{algorithmic}[1]
+		\STATE $S \leftarrow \emptyset$
+		\IF{$i = 0$ \OR $j=0$}
+			\STATE Retourne $S$
+		\ELSE
+			\IF{$T(i-1,j) = \FALSE$}
+				\STATE Retourne $a_i \cup$ Construct-sol($i-1$,$j-a_i$)
+			\ELSE
+				\STATE Retourne Construct-sol($i-1$, $j$)
+			\ENDIF
+		\ENDIF
+	\end{algorithmic}
+\end{algorithm}
+
+
 \subsubsection{Complexité}
+
 
 \subsubsection{Jeux d'essais}
 

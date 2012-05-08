@@ -96,7 +96,7 @@ Supposons maintenant que $a_h$ est inséré durant la seconde phase, et intéres
 $p(a_j)\ \forall j \in [1;k(r)]$. 
 Puisque $a_h$ est inséré dans la seconde phase ($h \geq k(r)+1$), et que les $a_i$ sont
 rangés par ordre décroissant de poids, on a : $p(a_h) \leq p(a_j)\ \forall j \in [1;k(r)+1]$.\\
-Ce qui implique : $\sum_{j = 1}^{k(r)+1}p(a_h) \leq \sum_{j = 1}^{k(r)+1} \times p(a_j)$.\\
+Ce qui implique : $\sum_{j = 1}^{k(r)+1}p(a_h) \leq \sum_{j = 1}^{k(r)+1} p(a_j)$.\\
 Or, $\sum_{j=1}^{k(r)+1}p(a_j) \leq w(A)$. \\
 On a donc $(k(r)+1) \times p(a_h) \leq w(A) = 2 \times L$.
 
@@ -114,4 +114,7 @@ On a bien : $sol_{algo}(A) \leq r \times sol_{opt}(A)$.
 
 Nous pouvons en conclure que l'algorithme \ref{ex5_algo} renvoit bien une solution
 r-approchée.
+
+\subsection{Question 3}
+Complexité : $nlog(n) + 2^{k(r)+1} + n$
 

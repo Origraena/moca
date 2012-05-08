@@ -1,0 +1,50 @@
+\section{Coloration des sommets}
+
+\subsection{Exercice 1}
+
+Considérons $H$ un sous-graphe de $G$, il paraît évident qu'une coloration de $G$ est aussi une
+coloration de $H$. De plus, par le théroème de Brooks, si le degré maximal du sous graphe $H$ est
+inférieur à $\chi(G)$, alors $\chi(H) \leq \Delta \leq \chi(G)$.
+
+D'où, la propriété suivante :
+
+\begin{prop}
+	\label{subg}
+	Si $H$ est un sous-graphe de $G$ alors $\chi(H) \leq \chi(G)$.
+\end{prop}
+
+\subsection{Exercice 2}
+
+Chaque composante connexe de $G$ peut être vue comme un sous-graphe de ce dernier. Donc d'après la
+propriété \ref{subg}, on a : $\chi(G) \geq \max\{\chi(C), C\mbox{ composante connexe de }G\}$.
+Appelons $C_1, C_2, C_3, \dots, C_k$ les composantes connexes de $G$. Pour $1 \leq i \leq k$,
+appelons $c_i$ la coloration de la composante $C_i$ avec les couleurs $1, 2, \dots, \chi(C_i)$ et
+$c$ définie pour tout $v$ sommet de $G$ par $c(v) = c_i(v)$ si $v \in C_i$, dans la mesure où il
+n'existe aucune arête entre deux composantes connexes de $G$, $c$ est une coloration de $G$, ce qui
+implique $\chi(G) \leq \max\{\chi(C_i)\}$. On en déduit donc la propriété suivante :
+
+\begin{prop}
+	\label{maxcon}
+	$\chi(G) = \max\{\chi(C), C \mbox{ composante connexe de }G\}$
+\end{prop}
+
+\subsection{Exercice 3}
+
+Deux sommets de même couleur ne sont relié entre eux par aucune arête\footnote{Par définition de la
+coloration}. Ainsi tous les n\oe uds de la même couleur n'ont aucun entre eux et forment donc un
+stable. Ainsi, un graphe $k-$coloriable peut être divisé en $k$ sous-ensembles des sommets formant
+des stables et donc on en déduit la propriété suivante :
+
+\begin{prop}
+	\label{equiv}
+	Rechercher un $k-$stable est équivalent à montrer l'existence d'un graphe $k-$coloriable.
+\end{prop}
+
+\subsection{Exercice 4}
+
+Un graphe biparti étant un graphe $2-$stable, on en déduit par la propriété \ref{equiv} :
+
+\begin{prop}
+	\label{biparti}
+	Un graphe est biparti si et seulement si il est $2-$coloriable.
+\end{prop}

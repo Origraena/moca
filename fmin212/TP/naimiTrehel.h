@@ -24,6 +24,7 @@
 int last;
 int next;
 int tokenPresent;
+int ch_pid;
 site_state state;
 
 // Only needed for faul tolerant extension

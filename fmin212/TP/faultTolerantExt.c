@@ -119,6 +119,7 @@ int init_structures() {
 	int i;
 	last = -1;
 	next = -1;
+	ch_pid = 0;
 	state = IDLE;
 	tokenPresent = 0;
 
@@ -126,7 +127,7 @@ int init_structures() {
 	pthread_mutex_init(&mut_check, NULL);
 	check = 0;
 	acces = 0;
-	for (i=0; i<TOLERANCE+1; memset(&predec[i++], 0, sizeof(struct sockaddr_in)));
+	for (i=0; i<TOLERANCE+1; memset(&predec[i], 0, sizeof(struct sockaddr_in)), i++);
 
 	/* HELLO message broadcasting */
 	msg_t broad;
@@ -181,6 +182,11 @@ int critSectionRequest() {
 	state = WAITING;
 	char *ip_tmp = inet_ntoa(this_site.neighbours[0].sin_addr);
 	strncpy (ask(msg), ip_tmp, SIZE);
+
+	if (ch_pid) {
+		printf ("Déjà en section critique.\n");
+		return -1;
+	}
 
 	if(tokenPresent == 1) {
 		takeCriticalSection();
@@ -275,6 +281,8 @@ int critSectionRequest() {
 			}
 		}
 
+		printf ("Sortie de recherche de queue : %d\n", pos(max));
+
 		fcntl(this_site.sdRecv, F_SETFL, flags);
 
 		if (pos(max) < 0) {
@@ -346,7 +354,7 @@ int handleRequest(msg_t msg) {
 			type(msg) = COMMIT;
 			pos(msg) = position + 1;
 			int j;
-			for (j=0; j<TOLERANCE; pred(msg)[j] = predec[j], j++);
+			for (j=0; j<TOLERANCE; memcpy(pred(msg)+j,predec+j,sizeof(struct sockaddr_in)), j++);
 			if (sendMessageWithAdd(msg) == -1)
 				return -1;
 		}
@@ -570,6 +578,8 @@ int takeCriticalSection() {
 	if(pthread_create(&thread_id, NULL, (void*)(liberation), (void*)20) != 0)
 		fprintf(stderr, "Thread creation failure.\n");
 
+	ch_pid = thread_id;
+
 	return 0;
 }
 //}}}
@@ -593,6 +603,7 @@ void liberation(void* arg) {
 		next = -1;
 		tokenPresent = 0;
 	}
+	ch_pid = 0;
 	printf("Section critique relachee : %d accès\n", ++acces);
 }
 //}}}
@@ -609,6 +620,7 @@ void checkNeighbour (void *arg) {
 	sigprocmask(SIG_BLOCK, &block, NULL);
 
 	struct sockaddr_in *pre = (struct sockaddr_in *)arg;
+	int failure = 0;
 
 	msg_t msg;
 	type(msg) = ARE_YOU_ALIVE;
@@ -616,21 +628,23 @@ void checkNeighbour (void *arg) {
 	tmpmes = inet_ntoa(pre->sin_addr);
 	memcpy (ip(msg), tmpmes, IPLONG * sizeof(char));
 
-	while (state == WAITING) {
+	while (state == WAITING && !failure) {
 		pthread_mutex_lock(&mut_check);
 		if (check) {
 			fprintf (stderr, "Site Failure Detected\n");
 			pthread_mutex_unlock(&mut_check);
 			kill(getpid(), SIGUSR1);
-			exit(1);
+			failure ++;
 		}
-		check --;
-		pthread_mutex_unlock(&mut_check);
+		else{
+			check --;
+			pthread_mutex_unlock(&mut_check);
 
-		if (sendMessageWithAdd(msg) == -1)
-			continue;
+			if (sendMessageWithAdd(msg) == -1)
+				continue;
 
-		sleep(2*TMESG);
+			sleep(2*TMESG);
+		}
 	}
 }
 //}}}

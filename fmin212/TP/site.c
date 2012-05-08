@@ -35,6 +35,7 @@ void print_help() {
 	printf("7. TOKEN\n");
 	printf("8. STATE\n");
 	printf("9. PREDEC\n");
+	printf("10. PANNE\n");
 }
 
 void standardInput() {
@@ -100,6 +101,11 @@ void standardInput() {
 		case 9:
 			for (i=0; i<=TOLERANCE; printf("%s - ", inet_ntoa(predec[i].sin_addr)), i++);
 			printf("\n");
+			break;
+		case 10:
+			if (ch_pid)
+				pthread_kill (ch_pid, SIGKILL);
+			this_site.running = 0;
 			break;
 		default:
 			printf ("Invalid command\n");
