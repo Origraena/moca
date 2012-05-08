@@ -46,7 +46,7 @@ void site_failure(int sig) {
 
 		pthread_mutex_lock(&mut_check);
 		if (check)
-			check++;
+			check--;
 		pthread_mutex_unlock(&mut_check);
 
 		timeStart = time(&timeStart);
