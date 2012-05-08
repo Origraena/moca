@@ -462,6 +462,8 @@ int handleCommit (msg_t msg) {
 	if(pthread_create(&thread_id, NULL, (void*)(checkNeighbour), (void*)predec) != 0)
 		fprintf(stderr, "Thread creation failure.\n");
 
+	last = -1;
+
 	return 0;
 }
 //}}}
