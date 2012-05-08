@@ -102,7 +102,10 @@ void site_failure(int sig) {
 
 			pos(min) = -1;
 			if (type(msg) == ACK_SEARCH_PREV) {
-				min = pos(min) == -1 ? msg : (pos(min) > pos(msg) ? msg : min);
+				if (pos(min) == -1)
+					memcpy (&min, &msg, SIZE);
+				else if (pos(min) < pos(msg))
+					memcpy (&min, &msg, SIZE);
 				fprintf (stdout, "Got an answer.\n");
 			}
 			else if (type(msg) == REQUEST) {}
@@ -198,15 +201,15 @@ int init_structures() {
 int critSectionRequest() {
 	msg_t msg;
 	type(msg) = REQUEST;
-	state = WAITING;
 	char *ip_tmp = inet_ntoa(this_site.neighbours[0].sin_addr);
-	strncpy (ask(msg), ip_tmp, SIZE);
+	strncpy (ask(msg), ip_tmp, IPLONG);
 
 	// If already in SC just return -1
-	if (ch_pid) {
+	if (state != IDLE) {
 		fprintf (stderr,"Already in critical section.\n");
 		return -1;
 	}
+	state = WAITING;
 
 	// Owns Token ?
 	if(tokenPresent) 
@@ -216,15 +219,17 @@ int critSectionRequest() {
 		// Get ip of last
 		char *tmpter = getIPstrFromNb (last);
 		fprintf (stdout, "Last is %d, sending it a request.\n", last);
-		strncpy(ip(msg), tmpter, IPLONG);
+		strncpy(ip(msg), tmpter, IPLONG*sizeof(char));
 		free (tmpter);
+
+		strncpy (ask(msg), inet_ntoa(this_site.neighbours[0].sin_addr), IPLONG);
 
 		if(sendMessageWithAdd(msg) == -1){
 			fprintf (stderr, "======> Sending request failure... <======\n");
 			return -1;
 		}
 
-//		last = -1; 
+		//		last = -1; 
 
 		// Arms a timer
 		time_t timeStart, timeCur;
@@ -342,7 +347,7 @@ int critSectionRequest() {
 				if (sendMessageWithAdd(msg) == -1)
 					return -1;
 			}
-			return critSectionRequest();
+			critSectionRequest();
 		}
 	}
 	else
@@ -392,8 +397,9 @@ int handleRequest(msg_t msg) {
 	}
 
 	if(last == -1) {
-		if(state == WAITING || state == WORKING) {
-			next = getNeighbour(ipt);
+		if(state != IDLE) {
+			if (next == -1)
+				next = getNeighbour(ipt);
 			fprintf (stdout, "Got a request, but expecting the TOKEN. Sending COMMIT to %d.\n", next);
 			type(msg) = COMMIT;
 			pos(msg) = position + 1;
@@ -462,6 +468,7 @@ int handleToken(msg_t message) {
 	else if (next != -1) {
 		fprintf (stdout, "I send it to my next.\n");
 		type(message) = TOKEN;
+		tokenPresent = 0;
 		char *tmp = getIPstrFromNb(next);
 		strncpy (ip(message), tmp, IPLONG);
 		sendMessageWithAdd(message);
@@ -650,9 +657,7 @@ int takeCriticalSection() {
 void liberation(void* arg) {
 	pthread_detach(pthread_self());
 
-
 	sleep((long int)arg);
-
 
 	state = IDLE;
 	if(next != -1) {
