@@ -318,7 +318,7 @@ int critSectionRequest() {
 						if (strcmp(ip_pers, ips(msg)) <= 0)
 							continue;
 					}
-					// If the other has the priority, just change next and ask it for CS
+					// If the other has the priority, just change last and ask it for CS
 					unsigned long int ipa = (unsigned long int) inet_addr(ips(msg));
 					last = getNeighbour(ipa);
 					fprintf (stdout, "I don't have priority, changing my last (%d) and asking for CS again.\n", last);
@@ -406,15 +406,16 @@ int handleRequest(msg_t msg) {
 
 	if(last == -1) {
 		if(state != IDLE) {
-			if (next == -1)
+			if (next == -1) {
 				next = getNeighbour(ipt);
-			fprintf (stdout, "Got a request, but expecting the TOKEN. Sending COMMIT to %d.\n", next);
-			type(msg) = COMMIT;
-			pos(msg) = position + 1;
-			int j;
-			for (j=0; j<TOLERANCE; memcpy(pred(msg)+j,predec+j,sizeof(struct sockaddr_in)), j++);
-			if (sendMessageWithAdd(msg) == -1)
-				return -1;
+				fprintf (stdout, "Got a request, but expecting the TOKEN. Sending COMMIT to %d.\n", next);
+				type(msg) = COMMIT;
+				pos(msg) = position + 1;
+				int j;
+				for (j=0; j<TOLERANCE; memcpy(pred(msg)+j,predec+j,sizeof(struct sockaddr_in)), j++);
+				if (sendMessageWithAdd(msg) == -1)
+					return -1;
+			}
 		}
 		else if(tokenPresent == 1) {
 			fprintf (stdout, "Sending TOKEN.\n");
