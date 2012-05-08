@@ -316,8 +316,7 @@ int critSectionRequest() {
 					unsigned long int ipa = (unsigned long int) inet_addr(ips(msg));
 					last = getNeighbour(ipa);
 					fprintf (stdout, "I don't have priority, changing my last (%d) and asking for CS again.\n", last);
-					critSectionRequest();
-					return;
+					return critSectionRequest();
 					// TODO: Request processing
 				case REQUEST:
 					break;
@@ -346,7 +345,7 @@ int critSectionRequest() {
 			if (next(max)) {
 				type(msg) = CONNECTION;
 				if (sendMessageWithAdd(msg) == -1)
-					return;
+					return -1;
 			}
 			critSectionRequest();
 		}
@@ -469,6 +468,7 @@ int handleToken(msg_t message) {
 	else if (next != -1) {
 		fprintf (stdout, "I send it to my next.\n");
 		type(message) = TOKEN;
+		tokenPresent = 0;
 		char *tmp = getIPstrFromNb(next);
 		strncpy (ip(message), tmp, IPLONG);
 		sendMessageWithAdd(message);
@@ -666,9 +666,9 @@ void liberation(void* arg) {
 		type(mes) = TOKEN;
 		if(sendMessage(next, mes) == -1) 
 			fprintf(stderr, "======> Error while sending message <====== \n");
-		//		next = -1;
+		next = -1;
 		tokenPresent = 0;
-		//		position = -1;
+		position = -1;
 	}
 	ch_pid = 0;
 	fprintf(stdout, "CS released : %d access\n", ++acces);
