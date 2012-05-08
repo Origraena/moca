@@ -201,8 +201,47 @@ Quand le site A reçoit le message de type ACK\_SEARCH\_QUEUE depuis H, il peut 
 
 \section{Propriétés}
 
+\subsection{Vivacité}
+Nous allons tout d'abord voir pourquoi un site qui a une position dans la file entrera en section critique au bout d'un temps fini. Ensuite nous verrons pourquoi un site qui veut entrer en section critique obtiendra une place dans la file dans un temps fini.
+
+En l'absence de panne, on peut identifier les quatre invariants suivants :
+\begin{description}
+\item[I1] le site avec la plus petite position dans la file a le jeton
+\item[I2] l'ordre des positions respecte l'ordre de la file d'attente
+\item[I3] après que $S_i$ ait obtenue sa position, aucun site ne peut obtenir une position plus petite que celle de $S_i$
+\item[I4] deux sites ne peuvent pas avoir la même position
+\end{description}
+
+En l'absence de panne, ces invariants assurent qu'un site $S_i$ ayant une position obtienne le jeton au bout d'un temps fini. En effet, I1 et I2 assurent le site $S_i$ que le possesseur du jeton est un de ses prédécesseurs tandis que I2 et I3 garantissent qu'un site n'est jamais inséré avant les prédécesseurs de $S_i$. D'un autre côté, quand une panne survient, l'invariant I1 n'est plus exact si le jeton est perdu. Or, le mécanisme M2 rend vrai à nouveau l'invariant I1 au bout d'un temps fini. C'est à dire que le site qui a la plus petite position détecte la perte du jeton et le régénère au bout d'un temps fini.
+
+D'autre part, un site obtient une position au bout d'un temps fini car :
+
+\begin{itemize}
+\item Un site dont la demande de section critique est perdue la retransmet au bout d'un temps fini. La détection de panne du mécanisme M3 a lieu au bout de (au plus) $N*T_{msg}$.
+\item Une requête peut être perdue un nombre fini de fois.
+\end{itemize}
+
+
+\subsection{Sureté}
+Dans l'algorithme originel de Naimi-Trehel, il n'y a toujours qu'un seul jeton. Avec cette extension, les mécanismes M2 et M3 peuvent régénérer le jeton. Voyons donc pourquoi il ne peut toujours y avoir qu'un seul jeton.
+
+Un site régénère le jeton uniquement s'il a été perdu : par le mécanisme M2 (resp. M3), un site régénère le jeton ssi ce site n'a pas reçu de réponse à son message de type ACK\_SEARCH\_PREV (resp. ACK\_SEARCH\_QUEUE).
+
+Un seul site régénère le jeton car M2 et M3 ne sont pas compatibles et que deux sites ne peuvent régénérer le jeton en utilisant le même mécanisme.
+
+\subsection{Ordre des messages}
+Après avoir reçu un message de COMMIT, un site a la position $p$ dans la file ce qui assure qu'il accèdera à la section critique après au plus $p-1$ autres accès. En cas de panne, la reconstruction de la file d'attente garantie la conservation de l'ordre des messages.
 
 
 \section{Complexité}
+
+\subsection{Nombre de messages}
+Dans le pire des cas de restauration après une panne, l'extension tolérante aux pannes de Naimi-Trehel \cite{naimi1988} diffuse quatre messages. L'extension présentée ci-dessus envoi un message de COMMIT par demande de section critique et diffuse un message de type SEARCH\_PREV en cas de besoin. Mentionnons également que dans l'extension de Naimi-Trehel tous les successeurs des nœuds en panne doivent renvoyer leur requête alors que l'algorithme \cite{sopena2005} nécessite de renvoyer uniquement les requêtes perdues.
+
+\subsection{Temps}
+Pour détecter les sites défaillants, l'extension de Naimi-Trehel surveille la réception du jeton. Dans le pire des cas, un site attend $(N-1)\times(T_{msg}/T_{cs})$ avec $T_{msg}$ le temps maximum de transmission d'un message et $T_{cs}$ le temps moyen d'exécution de la section critique.
+L'algorithme \cite{sopena2005} surveille l'arrivée d'une demande de section critique au bout de la file mais également la réception du message de COMMIT par le site demandeur. Un site attend au plus $((N-1)+1)\times T_{msg}$ pour déceler une panne, ce qui ne dépend pas de $T_{cs}$.
+
+Un autre point important est que l'algorithme \cite{sopena2005} comporte moins de phases que celui de Naimi-Trehel pendant une restauration de panne ; la restauration est donc plus courte. Mieux encore, il peut arriver que la restauration soit faite en parallèle de l'exécution normale de l'algorithme dans le reste du réseau comme si aucune panne n'était survenue ; il n'est pas forcément nécessaire d'attendre d'avoir un arbre logique stable comme dans l'extension de Naimi-Trehel.
 
 
