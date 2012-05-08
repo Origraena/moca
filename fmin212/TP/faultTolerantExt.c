@@ -203,7 +203,6 @@ int init_structures() {
 int critSectionRequest() {
 	msg_t msg;
 	type(msg) = REQUEST;
-	state = WAITING;
 	char *ip_tmp = inet_ntoa(this_site.neighbours[0].sin_addr);
 	strncpy (ask(msg), ip_tmp, IPLONG);
 
@@ -212,6 +211,7 @@ int critSectionRequest() {
 		fprintf (stderr,"Already in critical section.\n");
 		return -1;
 	}
+	state = WAITING;
 
 	// Owns Token ?
 	if(tokenPresent) 
