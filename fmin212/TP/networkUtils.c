@@ -273,7 +273,7 @@ int getNeighbour(unsigned long s_addr) {
 	for(i = 0 ; i < this_site.nbNeighbours ; i++)
 		if(s_addr == this_site.neighbours[i].sin_addr.s_addr) {
 			indice = i;
-			\\printf ("%s\n", inet_ntoa(this_site.neighbours[i].sin_addr));
+//			printf ("%s\n", inet_ntoa(this_site.neighbours[i].sin_addr));
 			break;
 		}
 
