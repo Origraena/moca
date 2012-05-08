@@ -192,8 +192,7 @@ int sendMessageWithAdd(msg_t m) {
 	inet_aton(ip(m), &netParamsNeighbour.sin_addr);
 
 //	printf("Envoi d'un message de type %d a %s\n", type(m), inet_ntoa(netParamsNeighbour.sin_addr));
-	if (sendto(this_site.sdSend, &m, SIZE, 0, (struct sockaddr *)&netParamsNeighbour,sizeof(netParamsNeighbour)) == -1) {
-		perror("sendto message ");
+	if (sendto(this_site.sdSend, &m, SIZE, 0, (struct sockaddr *)&netParamsNeighbour,sizeof(netParamsNeighbour)) == -1) { perror("sendto message ");
 		return -1;
 	}
 	return 0;

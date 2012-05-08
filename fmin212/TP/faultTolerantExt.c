@@ -219,7 +219,7 @@ int critSectionRequest() {
 		// Get ip of last
 		char *tmpter = getIPstrFromNb (last);
 		fprintf (stdout, "Last is %d, sending it a request.\n", last);
-		strncpy(ip(msg), tmpter, IPLONG);
+		strncpy(ip(msg), tmpter, IPLONG*sizeof(char));
 		free (tmpter);
 
 		strncpy (ask(msg), inet_ntoa(this_site.neighbours[0].sin_addr), IPLONG);
