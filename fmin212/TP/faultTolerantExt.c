@@ -288,8 +288,10 @@ int critSectionRequest() {
 				case ACK_SEARCH_QUEUE:
 					fprintf (stdout, "Got an ACK_SEARCH_QUEUE.\n");
 					// Save greatest position in the queue
-					if (pos(msg) > pos(max))
+					if (pos(msg) > pos(max)) {
+						fprintf (stdout, "New position in QUEUE : %d.\n", pos(msg));
 						memcpy(&max, (void *) &msg, SIZE);
+					}
 					break;
 					// Another site discovers the failure
 				case SEARCH_QUEUE:
@@ -657,6 +659,7 @@ void liberation(void* arg) {
 			fprintf(stderr, "======> Error while sending message <====== \n");
 		next = -1;
 		tokenPresent = 0;
+		position = -1;
 	}
 	ch_pid = 0;
 	fprintf(stdout, "CS released : %d access\n", ++acces);
