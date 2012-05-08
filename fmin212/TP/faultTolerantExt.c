@@ -462,8 +462,6 @@ int handleCommit (msg_t msg) {
 	if(pthread_create(&thread_id, NULL, (void*)(checkNeighbour), (void*)predec) != 0)
 		fprintf(stderr, "Thread creation failure.\n");
 
-	last = -1;
-
 	return 0;
 }
 //}}}
@@ -471,7 +469,6 @@ int handleCommit (msg_t msg) {
 //{{{ handleToken
 int handleToken(msg_t message) {
 	fprintf (stdout, "TOKEN Received. \n");
-	last = -1;
 	tokenPresent = 1;
 	if(state == WAITING)
 		takeCriticalSection();
