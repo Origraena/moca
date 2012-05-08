@@ -14,6 +14,8 @@ int handleAckSearchPrev (msg_t msg);
 int handleAckSearchQueue (msg_t msg);
 int handleIAmAlive (msg_t msg);
 
+int isMe (char *ips);
+
 void checkNeighbour (void *arg);
 //}}}
 
@@ -295,6 +297,8 @@ int critSectionRequest() {
 					break;
 					// Another site discovers the failure
 				case SEARCH_QUEUE:
+					if (isMe(ips(msg)))
+						continue;
 					fprintf (stdout, "Another site discovered the failure.\n");
 					// The other site hasn't priority, just continue
 					if (nb_acc(msg) > acces) 
@@ -711,4 +715,9 @@ void checkNeighbour (void *arg) {
 
 //}}}
 
+//{{{ isMe
+int isMe (char *ips) {
+	return strcmp(ips, inet_ntoa(this_site.neighbours[0].sin_addr)) ? 0 : 1;
+}
+//}}}
 
