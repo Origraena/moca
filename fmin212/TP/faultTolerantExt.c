@@ -329,7 +329,7 @@ int critSectionRequest() {
 		}
 		else {
 			// Ask for connection to the site with the highest position
-			unsigned long int ipa = (unsigned long int) inet_addr(ip(msg));
+			unsigned long int ipa = (unsigned long int) inet_addr(ip(max));
 			last = getNeighbour(ipa);
 			fprintf (stdout, "Ask for Connection, new last = %d\n", last);
 			strncpy(ip(msg), ips(max),IPLONG *sizeof(char));
