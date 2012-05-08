@@ -408,6 +408,7 @@ int handleRequest(msg_t msg) {
 		if(state != IDLE) {
 			if (next == -1) {
 				next = getNeighbour(ipt);
+				last = next;
 				fprintf (stdout, "Got a request, but expecting the TOKEN. Sending COMMIT to %d.\n", next);
 				type(msg) = COMMIT;
 				pos(msg) = position + 1;
