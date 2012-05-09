@@ -16,6 +16,8 @@
 site this_site;
 problem this_problem;
 
+int pipeW,pipeR;
+
 // {{{ Handler
 /* ending handler. Necessary to clean the environnement. */
 void end_handler(int sig) {
