@@ -690,6 +690,8 @@ void liberation(void* arg) {
 	this_problem.sent = 0;
 	this_problem.w1 = 0;
 	this_problem.w2 = 0;
+	int clef = 2;
+	write(pipeW,(void*)clef,sizeof(clef));
 
 	state = IDLE;
 	if(next != -1) {

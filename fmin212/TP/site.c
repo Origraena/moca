@@ -3,6 +3,7 @@
 #include <sys/select.h>
 #include <signal.h>
 #include <time.h>
+#include <unistd.h>
 
 
 #include "networkUtils.h"
@@ -121,6 +122,8 @@ void standardInput() {
 	}
 }
 
+int pipeW,pipeR;
+
 int main(int argc, char* argv[]) {
 	long seed = time(0);
 	srand(seed);
@@ -157,15 +160,22 @@ int main(int argc, char* argv[]) {
 
 	/* Execution loop */
 	print_help();
+	int pipefd[2];
+	if (pipe(pipefd) == -1) {
+		perror("pipe creation error");
+		CLEAN();
+		exit(EXIT_FAILURE);
+	}
+	pipeR = pipefd[0];
+	pipeW = pipefd[1];
 
 	while(this_site.running) {
 		/* select settings */
 		FD_ZERO(&socketRset);
 		FD_SET(STDIN_FILENO, &socketRset);
 		FD_SET(this_site.sdRecv, &socketRset);
+		FD_SET(pipeR,&socketRset);
 		
-		
-		printf("Je suis avant le select\n");
 		
 		/* select on all reading descriptors */
 		if(select(this_site.sdRecv+1, &socketRset, NULL, NULL, NULL) == -1) {
@@ -196,25 +206,23 @@ int main(int argc, char* argv[]) {
 				handleMessage(msg);
 		}
 
-		printf("Je suis avant le check\n");
-		/* checks if problem has been solved */
-		if (this_problem.processed) {
-			printf("Je suis processed\n");
+		if (FD_ISSET(pipeR,&socketRset)) {
 			if (!this_problem.sent) {
-				printf("Je n'ai pas envoye\n");
 				if (this_site.resource) {
 					printf("Requesting critical section...\n");
 					critSectionRequest();
 					this_problem.sent = 1;
 				}
 			}
+			else {
+				if(pthread_create(&this_problem.thread_id, NULL, (void*)(processingThreadFunction),0) != 0) {
+					fprintf(stderr, "Thread creation failure.\n");
+					CLEAN();
+					exit(EXIT_FAILURE);
+				}
+				pthread_detach(this_problem.thread_id);
+			}
 		}
-		else if (!this_problem.thread_id) {
-			if(pthread_create(&this_problem.thread_id, NULL, (void*)(processingThreadFunction),0) != 0)
-				fprintf(stderr, "Thread creation failure.\n");
-			pthread_detach(this_problem.thread_id);
-		}
-			
 
 	}
 	

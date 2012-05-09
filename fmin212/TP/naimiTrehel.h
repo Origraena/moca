@@ -49,5 +49,6 @@ int handleHelloRep(msg_t mes, struct sockaddr_in* netParamsNeighbour);
 int waitForHellorep(int waitingPeriod);
 
 extern struct problem this_problem;
+extern int fileW;
 
 #endif

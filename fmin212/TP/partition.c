@@ -99,8 +99,11 @@ void free_problem() {
 
 void processingThreadFunction(void* name) {
 //	init_problem(0);
+	int clef = 1;
 	partition(this_problem.weights,this_problem.n);
 	this_problem.processed = 1;
+	this_problem.sent = 0;
+	write(pipeW,(void*)clef,sizeof(clef));
 	this_problem.thread_id = 0;
 }
 

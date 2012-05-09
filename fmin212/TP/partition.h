@@ -5,6 +5,7 @@
 #include <sys/types.h>
 #include <pthread.h>
 #include <signal.h>
+#include <unistd.h>
 
 typedef struct problem {
 	int sent;
@@ -29,5 +30,6 @@ void free_problem();
 void processingThreadFunction(void*);
 
 extern problem this_problem;
+extern int pipeW;
 
 #endif // PARTITION_H_
