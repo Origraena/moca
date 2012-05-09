@@ -251,8 +251,10 @@ int recvMessage(msg_t* message, struct sockaddr_in* add) {
 
 //	printf("Message recu depuis l'adresse %s et le port %d. ", message->_sender, ntohs(netParamsNeighbour.sin_port));
 
-	if(hostsUpdate(netParamsNeighbour) == -1) 
-		return -1;
+	if (message->_typ_mes != RESOURCE) {
+		if(hostsUpdate(netParamsNeighbour) == -1) 
+			return -1;
+	}
 
 	if(add != NULL) {
 		bzero(add,sizeof(add));
@@ -264,8 +266,6 @@ int recvMessage(msg_t* message, struct sockaddr_in* add) {
 //	printf("Message de type %u.\n", message->_typ_mes);
 
 	return 0;
-
-	init();
 }
 
 int getNeighbour(unsigned long s_addr) {
