@@ -9,6 +9,7 @@
 int* partition(int* weights, const int n) {
 	if (!weights || (n <= 0))
 		return 0;
+	mix(this_problem.weights,this_problem.n);
 	uint i;
 	this_problem.result = malloc(sizeof(int)*n);
 	for (i = 0 ; i < n ; i++) {
@@ -70,7 +71,6 @@ void init_problem(char* filename) {
 	this_problem.result = 0;
 	this_problem.w1 = 0;
 	this_problem.w2 = 0;
-	mix(this_problem.weights,this_problem.n);
 	printf("Initialized problem!\n");
 }
 

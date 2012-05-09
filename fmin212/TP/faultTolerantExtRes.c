@@ -334,24 +334,10 @@ int critSectionRequest() {
 // {{{ handleMessage
 int handleMessage(msg_t msg) {
 	switch (type(msg)) {
-		case REQUEST:
-			return handleRequest(msg);
-		case TOKEN:
-			return handleToken(msg);
 		case HELLO:
 			return handleHello(msg);
 		case HELLOREP:
 			return handleHelloRep(msg, NULL);
-		case ARE_YOU_ALIVE:
-			return handleAreYouAlive(msg);
-		case SEARCH_PREV:
-			return handleSearchPrev(msg);
-		case SEARCH_QUEUE:
-			return handleSearchQueue(msg);
-		case CONNECTION:
-			return handleConnection(msg);
-		case I_AM_ALIVE:
-			return handleIAmAlive(msg);
 		case RESOURCE:
 			return handleResource(msg);
 		case SOLUTION:
