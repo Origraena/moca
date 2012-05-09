@@ -219,6 +219,8 @@ int main(int argc, char* argv[]) {
 		}
 
 		if (FD_ISSET(pipeR,&socketRset)) {
+			char buf[2];
+			read(pipeR,buf,sizeof(char)+sizeof(char));
 			printf("PIPE\n");
 			if (!this_problem.sent) {
 				if (this_site.resource) {
