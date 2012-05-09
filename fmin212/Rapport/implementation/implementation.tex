@@ -48,7 +48,7 @@ Une grande partie du développement a été réalisée sous Vim et sous XCode.
 			\draw[fl] (sc) --node[above] {N} (mes);
 			\draw[fl] (sc) --node[above] {O} (csrq);
 			\draw[fl] (mes) --node[above] {N} (quit);
-			\draw[fl] (quit) |- (-4, -1.5) --node[above left] {N} (1, -1.5) |- (sc.north);
+			\draw[fl] (quit) -- (-4, -1.5) --node[above left] {N} (1, -1.5) |- (sc.north);
 			\draw[thick, rounded corners=4pt] (mes) |-node[above left] {Y} (-4, -3.5) -- (inter);
 			\draw[fl] (inter) -- (ayalive);
 			\draw[fl] (inter) -- (conn);
@@ -57,14 +57,174 @@ Une grande partie du développement a été réalisée sous Vim et sous XCode.
 			\draw[fl] (ayalive) -- (iaalive);
 			\draw[fl] (conn) -- (next);
 			\draw[fl] (sq) -- (pos1);
-			\draw[fl](sp)--(pos2);
+			\draw[fl] (sp) -- (pos2);
 			\draw[fl] (quit) --node[above left] {O} (end);
+
+			\draw[fl] (iaalive.east) --(1, -4) -- (sc.south);
+			\draw[fl] (next.east) --(1, -7) -- (sc.south);
+			\draw[fl] (pos1.north) --node[left] {N} (sc.south);
+			\draw[fl] (pos1.east) --node[above] {O}  (ack1);
+			\draw[fl] (pos2.east) --node[above] {O} (ack2);
+			\draw[fl] (ack1.east) -- (5, -8.5) -- (5, -4) -- (1, -4) -- (sc.south);
+			\draw[fl] (ack2.east) -- (5, -10) -- (5, -4) -- (1, -4) -- (sc.south);
+			\draw[fl] (pos2.south) -- (1, -11) --node[below] {N} (5, -11) -- (5, -4) -- (1, -4) -- (sc.south);
+			\draw[fl] (csrq.north) -- (4, -1.5) -- (1, -1.5) -- (sc.north);
+		\end{tikzpicture}
+	\end{center}
+	\caption{Procédure principale}
+\end{figure}
+
+\begin{figure}
+	\begin{center}
+		\begin{tikzpicture}[scale=1.7]
+			\tikzset{debfin/.style={ellipse, draw, text=red}, aff/.style={rectangle, draw,
+				fill=yellow!50}, test/.style={diamond, aspect=2.5, thick, draw=blue, fill=yellow!50,
+				text=blue}, act/.style={rectangle, draw, rounded corners=4pt, fill=blue!25},
+			fl/.style={->,>=latex, thick, rounded corners=4pt}}
+
+			\node[debfin] (begin) at (0,0) {Début};
+			\node[act] (sr) at (0, -1) {Demande Connection};
+			\node[test] (ci) at (0, -2.5) {Commit reçu?};
+			\node[act] (surv) at ( 0, -4) {Surveille pred};
+			\node[test] (alive) at (0, -5.5) {Pred en vie?};
+			\node[test] (token) at (0, -7) {Token?};
+			\node[act] (tkcs) at (0, -8.5) {Prendre SC};
+			\node[act] (m3) at (3, -2.5) {Cas M3};
+			\node[act] (apred) at (3, -5.5) {Questionne pred};
+			\node[test] (kpred) at (6, -5.5) {+ k pannes?};
+			\node[act] (m2) at (6, -4) {M2};
+			\node[act] (m1) at (6, -7) {M1};
+			\node[debfin] (end) at (0, -9.5) {Fin};
+
+			\draw[fl] (begin) -- (sr);
+			\draw[fl] (sr) -- (ci);
+			\draw[fl] (ci) --node[above] {N} (m3);
+			\draw[fl] (ci) --node[left] {O} (surv);
+			\draw[fl] (surv) -- (alive);
+			\draw[fl] (alive) --node[above] {N} (apred);
+			\draw[fl] (alive) --node[left] {O} (token);
+			\draw[fl] (token) -- (-1.5, -7) --node[left] {N} (-1.5, -4) -- (surv);
+			\draw[fl] (token) --node[left] {O} (tkcs);
+			\draw[fl] (tkcs) -- (end);
+			\draw[fl] (apred) -- (kpred);
+			\draw[fl] (kpred) --node[right] {O} (m2);
+			\draw[fl] (kpred) --node[right] {N} (m1);
+
+		\end{tikzpicture}
+	\end{center}
+	\caption{Procédure critSeqRequest}
+\end{figure}
+
+\begin{figure}
+	\begin{center}
+		\begin{tikzpicture}[scale=1.7]
+			\tikzset{debfin/.style={ellipse, draw, text=red}, aff/.style={rectangle, draw,
+				fill=yellow!50}, test/.style={diamond, aspect=2.5, thick, draw=blue, fill=yellow!50,
+				text=blue}, act/.style={rectangle, draw, rounded corners=4pt, fill=blue!25},
+			fl/.style={->,>=latex, thick, rounded corners=4pt}}
+
+			\node[debfin] (begin) at (0,0) {Début};
+			\node[act] (conn) at (0, -1) {Demande Connexion};
+			\node[aff] (lasr) at (0, -2) {Last$ = \max(pos)$};
+			\node[act] (con) at (0, -3) {critSecRequest};
+			\node[debfin] (end) at (0, -4) {Fin};
+
+			\draw[fl] (begin) -- (conn);
+			\draw[fl] (conn) -- (lasr);
+			\draw[fl] (lasr) -- (con);
+			\draw[fl] (con) -- (end);
+		\end{tikzpicture}
+	\end{center}
+	\caption{Procédure M1}
+\end{figure}
+
+\begin{figure}
+	\begin{center}
+		\begin{tikzpicture}[scale=1.7]
+			\tikzset{debfin/.style={ellipse, draw, text=red}, aff/.style={rectangle, draw,
+				fill=yellow!50}, test/.style={diamond, aspect=2.5, thick, draw=blue, fill=yellow!50,
+				text=blue}, act/.style={rectangle, draw, rounded corners=4pt, fill=blue!25},
+			fl/.style={->,>=latex, thick, rounded corners=4pt}}
+
+			\node[debfin] (begin) at (0, 0) {Début};
+			\node[act] (sp) at (0, -1) {Broadcast SEARCH\_PREV};
+			\node[act] (wait) at (0, -2) {Attends réponse};
+			\node[test] (viv) at (0, -3.5) {Réponses?};
+			\node[act] (regen) at (3, -3.5) {Regénération TOKEN};
+			\node[act] (tksc) at (6, -3.5) {Prendre SC};
+			\node[act] (conn) at (0, -5) {Demande Connexion};
+			\node[aff] (last) at (0, -6) {Last$ = \max(pos)$};
+			\node[act] (con) at (0, -7) {critSecRequest};
+			\node[debfin] (end1) at (0, -8) {Fin};
+
+			\draw[fl] (begin) -- (sp);
+			\draw[fl] (sp) -- (wait);
+			\draw[fl] (wait) -- (viv);
+			\draw[fl] (viv) --node[above] {N} (regen);
+			\draw[fl] (viv) --node[right] {O} (conn);
+			\draw[fl] (regen) -- (tksc);
+			\draw[fl] (tksc) |- (end1);
+			\draw[fl] (conn) -- (last);
+			\draw[fl] (last) -- (con);
+			\draw[fl] (con) -- (end1);
+
+		\end{tikzpicture}
+	\end{center}
+	\caption{Procédure M2}
+\end{figure}
+
+\begin{figure}
+	\begin{center}
+		\begin{tikzpicture}[scale=1.7]
+			\tikzset{debfin/.style={ellipse, draw, text=red}, aff/.style={rectangle, draw,
+				fill=yellow!50}, test/.style={diamond, aspect=2.5, thick, draw=blue, fill=yellow!50,
+				text=blue}, act/.style={rectangle, draw, rounded corners=4pt, fill=blue!25},
+			fl/.style={->,>=latex, thick, rounded corners=4pt}}
+
+			\node[debfin] (begin) at (0,0) {Début};
+			\node[act] (bsq) at (0, -1) {Broadcast SEARCH\_QUEUE};
+			\node[test] (mes) at (0, -3.5) {Message reçu?};
+			\node[act] (regen) at (-3, -3.5) {Regénération TOKEN};
+			\node[act] (tksc) at (-3, -2) {Prend SC};
+			\node[act] (sq) at (3, -3.5) {SEARCH\_QUEUE};
+			\node[test] (nbacc) at (3, -5) {nb\_acc sup?};
+			\node[aff] (last) at (3, -6.5) {Last$ = $emetteur};
+			\node[act] (con) at (3, -7.5) {critSecRequest};
+			\node[act] (ack) at (0, -5) {ACK\_SEARCH\_QUEUE};
+			\node[test] (next) at (0, -6.5) {Next?};
+			\node[act] (conn) at (-3, -6.5) {Envoi une requete};
+			\node[act] (aconn) at (0, -8) {Demande Connexion};
+			\node[aff] (flast) at (0, -9) {Last$ = $emetteur};
+			\node[act] (dd) at (0, -10) {critSecRequest};
+			\node[debfin] (end) at (0, -11) {Fin};
+
+			\draw[fl] (begin) -- (bsq);
+			\draw[fl] (bsq) -- (mes);
+			\draw[fl] (mes) --node[above] {N} (regen);
+			\draw[fl] (mes) --node[above] {O} (sq);
+			\draw[fl] (mes) --node[right] {O} (ack);
+			\draw[fl] (regen) -- (tksc);
+			\draw[fl] (tksc.west) -- (-5,  -2) |- (end);
+			\draw[fl] (sq) -- (nbacc);
+			\draw[fl] (nbacc.east) -- (5, -5) --node[right] {N} (5, -2) -- (0, -2) -- (mes);
+			\draw[fl] (nbacc) --node[right] {O} (last);
+			\draw[fl] (last) -- (con);
+			\draw[fl] (con) |- (end);
+			\draw[fl] (ack) -- (next);
+			\draw[fl] (next) --node[right] {O} (aconn);
+			\draw[fl] (next) --node[above] {N} (conn);
+			\draw[fl] (aconn) -- (flast);
+			\draw[fl] (flast) -- (dd);
+			\draw[fl] (dd) -- (end);
+
 
 
 		\end{tikzpicture}
 	\end{center}
+	\caption{Procédure M3}
 \end{figure}
 
+			
 \section{Phase d'initialisation}
 
 Je t'en laisse le soin
