@@ -81,11 +81,9 @@ void standardInput() {
 		case 3:
 			printNeighbours();
 			break;
-		//case 4:
-		//	do {
-		//		a = critSectionRequest();
-		//	} while (a == -2);
-		//	break;
+		case 4:
+			printf("Resource : %s\n",this_site.resource);
+			break;
 		case 5:
 			printf("Last : %d ", last);
 			if(last != -1)
