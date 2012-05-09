@@ -99,6 +99,7 @@ void free_problem() {
 
 void processingThreadFunction(void* name) {
 //	init_problem(0);
+	this_problem.sent = 1;
 	char clef[2] = "c";
 	partition(this_problem.weights,this_problem.n);
 	this_problem.processed = 1;

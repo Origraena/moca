@@ -233,7 +233,7 @@ int main(int argc, char* argv[]) {
 					}
 				}
 			}
-			else {
+			else if (this_problem.sent) {
 				if(pthread_create(&this_problem.thread_id, NULL, (void*)(processingThreadFunction),0) != 0) {
 					fprintf(stderr, "Thread creation failure.\n");
 					CLEAN();
