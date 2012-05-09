@@ -607,7 +607,7 @@ int takeCriticalSection() {
 	if(pthread_create(&thread_id, NULL, (void*)(liberation), (void*)20) != 0)
 		fprintf(stderr, "Thread creation failure.\n");
 
-	ch_pid = thread_id;
+	ch_pid = (int)thread_id;
 
 	return 0;
 }
