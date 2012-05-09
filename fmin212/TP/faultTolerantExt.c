@@ -167,13 +167,13 @@ int init_structures() {
 	/* HELLO message broadcasting */
     msg_t broad;
     memset(&broad, 0, SIZE);
-    type(broad) = RESOURCE;
+    type(broad) = HELLO;
     broadcast(broad);
 
     waitForHellorep(WAITING_PERIOD);
 
     memset(&broad, 0, SIZE);
-    type(broad) = RESOURCE;
+    type(broad) = HELLO;
     broadcast(broad);
 
     waitForHellorep(WAITING_PERIOD);
