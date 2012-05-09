@@ -221,8 +221,9 @@ int critSectionRequest() {
 				return handleCommit(msg);
 			else {
 				// TODO: Work on reaction when receiving request while waiting commit
-				if (type(msg) == REQUEST)
+				if (type(msg) == REQUEST) {
 					if (_verbose) fprintf (stdout, "Received a REQUEST instead of a COMMIT.\n");
+				}
 				else if (type(msg) == TOKEN){
 					last = -1;
 					return handleToken(msg);
