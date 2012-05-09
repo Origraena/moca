@@ -184,9 +184,10 @@ int main(int argc, char* argv[]) {
 		FD_SET(this_site.sdRecv, &socketRset);
 		FD_SET(pipeR,&socketRset);
 		
-		
+
+		int S = ((this_site.sdRecv > pipeW) && (this_site.sdRecv > pipeR)) ? this_site.sdRecv : (pipeW > pipeR) ? pipeW : pipeR;
 		/* select on all reading descriptors */
-		if(select(this_site.sdRecv+1, &socketRset, NULL, NULL, NULL) == -1) {
+		if(select(++S, &socketRset, NULL, NULL, NULL) == -1) {
 			if (errno == EINTR)
 				continue;
 			perror("select ");
