@@ -186,7 +186,6 @@ int main(int argc, char* argv[]) {
 		
 
 		int S = ((this_site.sdRecv > pipeW) && (this_site.sdRecv > pipeR)) ? this_site.sdRecv : (pipeW > pipeR) ? pipeW : pipeR;
-		printf("S = %i\n",S);
 		/* select on all reading descriptors */
 		if(select(++S, &socketRset, NULL, NULL, NULL) == -1) {
 			if (errno == EINTR)
@@ -207,7 +206,6 @@ int main(int argc, char* argv[]) {
 		
 		/* on message reception */
 		if(FD_ISSET(this_site.sdRecv, &socketRset)) {
-			printf("MSG\n");
 			if(recvMessage(&msg, NULL) == -1) {
 				CLEAN()
 				exit(EXIT_FAILURE);
@@ -221,7 +219,6 @@ int main(int argc, char* argv[]) {
 		if (FD_ISSET(pipeR,&socketRset)) {
 			char buf[2];
 			read(pipeR,buf,sizeof(char)+sizeof(char));
-			printf("PIPE\n");
 			if ((this_problem.processed) && (!this_problem.sent)) {
 				if (this_site.resource) {
 					printf("Requesting critical section...\n");
@@ -230,7 +227,6 @@ int main(int argc, char* argv[]) {
 				}
 			}
 			else {
-				printf("OTHER\n");
 				if(pthread_create(&this_problem.thread_id, NULL, (void*)(processingThreadFunction),0) != 0) {
 					fprintf(stderr, "Thread creation failure.\n");
 					CLEAN();
