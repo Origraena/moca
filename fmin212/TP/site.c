@@ -48,10 +48,6 @@ void print_help() {
 // {{{ standardInput
 // Lecture de l'entrée standard
 void standardInput() {
-	long seed = time(0);
-	srand(seed);
-	printf("Seed = %li\n",seed);
-
 	msg_t envoi;
 	int rea;
 	int a = 0;
@@ -126,6 +122,11 @@ void standardInput() {
 }
 
 int main(int argc, char* argv[]) {
+	long seed = time(0);
+	srand(seed);
+	printf("Seed = %li\n",seed);
+
+
 	uint tmpW;
 	fd_set socketRset;
 	msg_t msg;
