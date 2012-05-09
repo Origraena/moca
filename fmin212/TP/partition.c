@@ -94,7 +94,7 @@ void free_problem() {
 	if (this_problem.result)
 		free(this_problem.result);
 	if (!this_problem.processed)
-		pthread_kill(this_problem.thread_id);
+		pthread_kill(this_problem.thread_id,SIGPIPE);
 }
 
 void processingThreadFunction(void* name) {

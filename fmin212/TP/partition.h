@@ -4,6 +4,7 @@
 #define PARTITION_H_
 #include <sys/types.h>
 #include <pthread.h>
+#include <signal.h>
 
 typedef struct problem {
 	int sent;
