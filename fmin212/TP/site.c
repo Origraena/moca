@@ -164,7 +164,8 @@ int main(int argc, char* argv[]) {
 		FD_SET(STDIN_FILENO, &socketRset);
 		FD_SET(this_site.sdRecv, &socketRset);
 		
-
+		
+		printf("Je suis avant le select\n");
 		
 		/* select on all reading descriptors */
 		if(select(this_site.sdRecv+1, &socketRset, NULL, NULL, NULL) == -1) {
@@ -178,7 +179,9 @@ int main(int argc, char* argv[]) {
 		
 		/* on standard input */
 		if(FD_ISSET(STDIN_FILENO, &socketRset))
+		{
 			standardInput();
+		}
 		
 		
 		/* on message reception */
@@ -193,9 +196,12 @@ int main(int argc, char* argv[]) {
 				handleMessage(msg);
 		}
 
+		printf("Je suis avant le check\n");
 		/* checks if problem has been solved */
 		if (this_problem.processed) {
+			printf("Je suis processed\n");
 			if (!this_problem.sent) {
+				printf("Je n'ai pas envoye\n");
 				if (this_site.resource) {
 					printf("Requesting critical section...\n");
 					critSectionRequest();
