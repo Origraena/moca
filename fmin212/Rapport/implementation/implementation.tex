@@ -3,9 +3,36 @@
 
 \chapter{Implémentation et tests}\label{implementation}
 
-\section{Choix des outils}
-Nous avons choisi d'implémenter l'algorithme de Naimi-Trehel et l'extension de Sopena en C grâce à la bibliothèque standard pour le réseau. Ce choix s'explique par notre volonté de nous rapprocher le plus possible d'une implémentation utilisable dans des conditions réelles. Nous avons choisi d'utiliser le protocole UDP pour la transmission des messages afin que l'ordre des messages ne soit pas garanti et cela pour se rapprocher du modèle établi dans l'article.
+\section{Stratégie et mise en \oe uvre}
 
+L'implémentation des sites participant à l'algorithme a été réalisée en C, afin d'obtenir un
+architecture réellement distribuée pouvant s'exécuter sur des machines distinctes. Cette
+implémentation permet une plus grande modularité pour les phases de test, ainsi que la soumission de
+l'algorithme à des conditions physiques réelles lors de son exécution.
 
+Le choix du langage, quant à lui, s'est tout naturellement porté sur le C\footnote{Afin d'éviter
+	toute forme de digression déplacée dans ce rapport, la justification sera laissée au bon sens du
+lecteur}. 
 
+Une grande partie du développement a été réalisée sous Vim et sous XCode.
 
+\section{Phase d'initialisation}
+
+Je t'en laisse le soin
+
+\section{Problèmes rencontrés}
+
+Le premier problème s'est posé, peu après l'implémentation de l'algorithme de Naimi-Trehel, pour
+lequel des chaînes de caractères avaient été utilisées dans les échanges de message. L'utilisation
+de ces dernières étant plus sujette à débat lors de l'ajout de l'extension de tolérance aux pannes,
+nous avons décidé l'utilisation d'une structure de données spécifique aux messages permettant une
+gestion plus claire des paramètres à envoyer. L'adaptation de la sous-couche réseau à cette
+structure particulière s'est faite non sans peine en grande partie pour des raisons d'espace
+d'adressage.
+
+Un autre problème s'est présenté, lors des phases de debug à cause du caractère distribué de
+l'application, ce dernier ne permettant pas l'utilisation d'outils classiques tels que valgrind et
+gdb. Il a donc été difficile de pouvoir surveiller l'évolution dans le temps des variables d'états
+de chacun des sites. Dansce genre de situation, il est facile de se rendre compte que quelque chose
+ne fonctionne pas, mais beaucoup plus de comprendre le problème en lui-même et les causes de ce
+dernier. 
