@@ -16,6 +16,7 @@
 
 #include "networkUtils.h"
 #include "utils.h"
+#include "partition.h"
 
 #define WAITING_PERIOD 5
 #define TMESG					 3
@@ -42,8 +43,11 @@ int handleToken(msg_t mes);
 int takeCriticalSection();
 void liberation(void* arg);
 int handleHello(msg_t mes);
+int handleResource(msg_t mes);
+int handleSolution(msg_t mes);
 int handleHelloRep(msg_t mes, struct sockaddr_in* netParamsNeighbour);
 int waitForHellorep(int waitingPeriod);
 
+extern struct problem this_problem;
 
 #endif

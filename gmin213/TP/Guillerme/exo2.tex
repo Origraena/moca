@@ -13,7 +13,11 @@ suivante : $$
 \left \lbrace
 \begin{array}{l}
 	min z = \sum_{i=1}^m w_ix_i \\
+<<<<<<< HEAD
 	\sum_{x_j : e_i \in S_j} x_j \geq 1 \quad \forall e_i \in E \\
+=======
+	\sum_{j / e_i \in S_j} x_j \geq 1 \quad \forall e_i \in E \\
+>>>>>>> 1fcbeb357cf143821464d4111543a3762fdd056d
 	x_i \in \{0, 1\}
 \end{array} \right.
 $$
@@ -32,6 +36,7 @@ x_i = \left \{ \begin{array}{rcl}
 
 \subsection{Garantie d'une solution réalisable}
 Cherchons à démontrer que cette procédure d'arrondis garantit une solution réalisable. Pour ce
+<<<<<<< HEAD
 faire, nous allons procéder par l'absurde. Supposons qu'il existe un sommet $k$ qui ne repsecte pas
 sa contrainte d'intégrité associée, à savoir : $$
 \sum_{x_j : e_k \in S_j} < 1 $$
@@ -43,6 +48,17 @@ programme en nombres entiers et donc : $$
 n'est possible que si le nombre de sous-ensemble contenant $x_k$ est supérieur à $f$, ce qui est
 impossible par définition. Tous les sommets respectent donc leur contrainte d'intégrité et on en
 déduit que la procédure d'arrondis garantit une solution réalisable.
+=======
+faire, considérons l'ensemble $C$ des sous-ensembles sélectionnés par la procédure d'arrondis : $$ C
+= \{ S_i : x_i \geq \frac{1}{f} \} $$
+
+Soir un élément quelconque $c$, par définition de $f$, $c$ appartient à, au plus $f$ sous-ensembles.
+De plus, par définition du problème, on a : $$
+\sum_{j : e \in S_j} x_j \geq 1 $$
+
+On a donc au moins un des $x_j \geq \frac{1}{f}$, et donc $c$ est couvert par la solution. Cette
+procédure d'arrondis garantit une solution réalisable.
+>>>>>>> 1fcbeb357cf143821464d4111543a3762fdd056d
 
 \subsection{Existence d'un algorithme $f$-approché}
 

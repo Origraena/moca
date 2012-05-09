@@ -3,21 +3,28 @@
 
 \chapter{Algorithme d'exclusion mutuelle de Naimi-Trehel}\label{naimi-trehel}
 
+\section{Modèle utilisé}
+Considèrons un réseau distribué constitué de $n$ nœuds (sites). Ces sites communiquent uniquement en s'envoyant des messages par le biais d'un canal de communication fiable mais ne garantissant pas l'ordre des messages. On considère également que le réseau est synchrone, complet et que les temps de transmission des messages sont bornés.
 
 \section{Description}
-L'algorithme de Naimi-Trehel \cite{naimi1996} est basé sur le fait de conserver deux structures de données distribuées et un jeton. Le jeton est présent sur un des sites à la fois et matérialise la permission d'entrer en section critique. Les structures de données distribuées sont un arbre logique dynamique et une file d'attente.
+L'algorithme de Naimi-Trehel \cite{naimi1996} est basé sur deux structures de données distribuées
+ et un jeton. Le jeton est présent sur un des sites à la fois et matérialise la permission d'entrer
+ en section critique. Les structures de données distribuées sont un arbre logique dynamique et une
+ file d'attente vérifiant l'invariant suivant : \emph{La racine de l'arbre logique est égale à la
+ queue de la file d'attente.}
 
-La file d'attente stocke les sites qui ont demandé à entrer en section critique. La file d'attente étant distribuée, chaque site stocke uniquement son suivant (s'il y en a un) dans la file d'attente. La tête de la file est le site actuellement en section critique et la queue de la file est le dernier site à avoir demandé à y entrer. Quand un site demande à entrer en section critique, il est ajouté à la fin de la file. Quand un site quitte la section critique, il envoie le jeton à son suivant dans la file (s'il y en a un).
+La file d'attente stocke les sites qui ont demandé à entrer en section critique. Cette dernière
+étant distribuée, chaque site stocke uniquement son suivant (s'il y en a un) dans la file d'attente.
+La tête de la file est le site actuellement en section critique et la queue de la file est le
+dernier site à avoir demandé à y entrer. Quand un site demande à entrer en section critique, il est
+ajouté à la fin de la file et lorsqu'il la quitte, il envoie le jeton à son
+suivant dans la file (s'il y en a un).
 
 La seconde structure de données est l'arbre logique dynamique. Cet arbre a pour but d'indiquer aux sites lequel d'entre eux est le dernier dans la file d'attente. La structure étant distribuée, chaque site stocke uniquement son père dans l'arbre. Lorsqu'un site veut entrer en section critique, il transmet la requête à son père qui (s'il n'est pas racine) transmet la requête à son père jusqu'à ce que la requête atteigne la racine de l'arbre. Le site racine dans l'arbre étant également le dernier dans la file d'attente, il fixe son suivant au site qui a émis la requête. Puis tous les sites qui ont transmis la requête fixent leur père au site qui a émis la requête (désormais le dernier dans la file d'attente).
 
 
 \section{Exemple}
 
-\tikzstyle{vertex}=[circle,fill=black!25,minimum size=20pt,inner sep=0pt]
-\tikzstyle{edge} = [draw,thick,-]
-\tikzstyle{tree edge} = [draw, thick,->,red!75]
-\tikzstyle{queue edge} = [draw,thick,->,blue!50]
 
 Dans cet exemple, initialement, le nœud $a$ possède le jeton (figure \ref{naimi-trehel-exemple1}).
 \begin{figure}[H]
@@ -273,16 +280,17 @@ Le site $b$ relâche la section critique et envoie le jeton à son suivant : $c$
 
 
 \section{Propriétés}
-La première des propriétés que respecte cet algorithme est la sureté. En effet, il est nécessaire qu'au plus un processus à la fois entre en section critique. Ceci est garanti par la présence du jeton. Ce jeton est initialement présent chez un seul site. Lors du déroulement de l'algorithme, il y a deux possibilités pour qu'un autre site reçoive le jeton : 
+La première des propriétés que respecte cet algorithme est l'exclusivité. En effet, il est nécessaire qu'au plus un processus à la fois entre en section critique. Ceci est garanti par la présence du jeton. Ce jeton est initialement présent chez un seul site. Lors du déroulement de l'algorithme, il y a deux possibilités pour qu'un autre site reçoive le jeton : 
 \begin{itemize}
 	\item soit le site qui possède le jeton sort de la section critique avec un suivant non-nul. Il lui envoie alors le jeton et le perd pour lui-même.
 	\item soit le site qui possède le jeton reçoit une demande et n'est pas lui-même en section critique. Il envoie alors le jeton et le perd pour lui-même.
 \end{itemize}
 Dans les deux cas, l'unicité du jeton est préservée et l'exclusion mutuelle est garantie.
 
-La seconde propriété est la vivacité c'est à dire le fait que tout site demandant à entrer en section critique le puisse dans un temps fini. Cette propriété est respectée grâce à l'arbre logique et à la file d'attente. En effet, chaque site voulant entrer en section critique fait la requête à son père dans l'arbre. Le fait que la structure d'arbre distribué soit toujours valide garantie que les requêtes parviennent à la racine de l'arbre. Or la racine de l'arbre étant le dernier nœud de la file d'attente, le site ayant fait la requête se retrouve le dernier dans la file d'attente. Par conséquent, quand son prédécesseur dans la file sortira de la section critique, il pourra y entrer. Dans l'hypothèse où un site ne reste pas éternellement en section critique, la propriété de vivacité est respectée par l'algorithme de Naimi-Trehel.
+La seconde propriété est la vivacité c'est à dire le fait que tout site demandant à entrer en
+section critique y accède en un temps fini. Cette propriété est respectée grâce à l'arbre logique et à la file d'attente. En effet, chaque site voulant entrer en section critique fait la requête à son père dans l'arbre. Le fait que la structure d'arbre distribué soit toujours valide garantie que les requêtes parviennent à la racine de l'arbre. Or la racine de l'arbre étant le dernier nœud de la file d'attente, le site ayant fait la requête se retrouve le dernier dans la file d'attente. Par conséquent, quand son prédécesseur dans la file sortira de la section critique, il pourra y entrer. Dans l'hypothèse où un site ne reste pas éternellement en section critique, la propriété de vivacité est respectée par l'algorithme de Naimi-Trehel.
 
-Cependant cet algorithme n'étant pas parfait, il ne respecte pas l'ordre des demandes et n'est pas nativement tolérant aux pannes (bien qu'une extension de tolérance aux pannes \cite{naimi1988} puisse être ajoutée).
+Cependant cet algorithme n'étant pas parfait, il ne respecte pas l'ordre des demandes et n'est pas nativement tolérant aux pannes (bien qu'une extension de tolérance aux pannes \cite{naimi1988} proposée par les auteurs puisse être ajoutée).
 
 
 \section{Complexité}

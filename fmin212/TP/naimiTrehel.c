@@ -21,7 +21,6 @@ int init_structures() {
 	type(broad) = HELLO;
 	broadcast(broad);
 	
-	printf("\nAttente d'autres sites...\n");
 	waitForHellorep(WAITING_PERIOD);
 	
 	/* HELLO message broadcasting */
@@ -230,7 +229,11 @@ int waitForHellorep(int waitingPeriod) {
 			case HELLOREP:
 				handleHelloRep(msg, &netParamsNeighbour);
 				break;
-				
+
+			case RESOURCE:
+				handleResource(msg);
+				break;
+
 			default:
 				fprintf(stderr, "Type de message receptionne inconnu...\n");
 				break;
@@ -245,5 +248,4 @@ int waitForHellorep(int waitingPeriod) {
 	
 	return 0;
 }
-
 

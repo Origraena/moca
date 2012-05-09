@@ -36,6 +36,8 @@ typedef enum msg_type {
 	ACK_SEARCH_QUEUE = 11,
 	CONNECTION =			 12,
 	ACK_SEARCH_PREV =  13,
+	RESOURCE = 14,
+	SOLUTION = 15
 } msg_type;
 
 // Attempts to represent all kind of messages used in fault tolerant extensions

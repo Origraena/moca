@@ -87,9 +87,17 @@ int main(int argc, char** argv) {
 	}
 	printf("Result :\n");
 	int* result2 = partition(weights2,2*nb2);
+	int cpt1 = 0;
+	int cpt2 = 0;
 	if (result2) {
-		for (i = 0 ; i < 2*nb2 ; i++)
+		for (i = 0 ; i < 2*nb2 ; i++) {
 			printf("Item %i in partition %i\n",i,result2[i]);
+			if (result2[i] == 0)
+				cpt1+=weights2[i];
+			else
+				cpt2+=weights2[i];
+		}
+		printf("Partition 1 : %i\nPartition 2 : %i\n",cpt1,cpt2);
 		free(result2);
 	}
 	else 

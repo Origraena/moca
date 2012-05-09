@@ -8,12 +8,16 @@
 #include "networkUtils.h"
 #include "naimiTrehel.h"
 #include "utils.h"
+#include "partition.h"
 
 #define CLEAN()	printf("CLEAN...\n"); \
+				free_problem(this_problem); \
 				CLEAN_NETWORK()
 
 site this_site;
+problem this_problem;
 
+// {{{ Handler
 /* ending handler. Necessary to clean the environnement. */
 void end_handler(int sig) {
 	printf("\nSignal caught\n");
@@ -24,7 +28,9 @@ void end_handler(int sig) {
 	
 	this_site.running = 0;	
 }
+// }}}
 
+// {{{ print_help
 void print_help() {
 	printf("1. BROADCAST\n");
 	printf("2. MESSAGE\n");
@@ -37,7 +43,10 @@ void print_help() {
 	printf("9. PREDEC\n");
 	printf("10. PANNE\n");
 }
+// }}}
 
+// {{{ standardInput
+// Lecture de l'entrée standard
 void standardInput() {
 	msg_t envoi;
 	int rea;
@@ -72,11 +81,11 @@ void standardInput() {
 		case 3:
 			printNeighbours();
 			break;
-		case 4:
-			do {
-				a = critSectionRequest();
-			} while (a == -2);
-			break;
+		//case 4:
+		//	do {
+		//		a = critSectionRequest();
+		//	} while (a == -2);
+		//	break;
 		case 5:
 			printf("Last : %d ", last);
 			if(last != -1)
@@ -115,6 +124,7 @@ void standardInput() {
 }
 
 int main(int argc, char* argv[]) {
+	uint tmpW;
 	fd_set socketRset;
 	msg_t msg;
 	
@@ -130,18 +140,20 @@ int main(int argc, char* argv[]) {
 		perror ("sigaction");
 		exit(EXIT_FAILURE);
 	}
+	print_help();
+
+	/* problem init */
+	init_problem(0);
 	
+
 	/* network initialisation */
 	if(init_network(argc, argv) == -1) {
 		CLEAN()
 		exit(EXIT_FAILURE);
 	}
-	
-	/* Naimi-Trehel structures init */
-	init_structures();
-	
+
 	/* Execution loop */
-	print_help();
+	//print_help();
 
 	while(this_site.running) {
 		/* select settings */
@@ -149,6 +161,7 @@ int main(int argc, char* argv[]) {
 		FD_SET(STDIN_FILENO, &socketRset);
 		FD_SET(this_site.sdRecv, &socketRset);
 		
+
 		
 		/* select on all reading descriptors */
 		if(select(this_site.sdRecv+1, &socketRset, NULL, NULL, NULL) == -1) {
@@ -172,10 +185,28 @@ int main(int argc, char* argv[]) {
 				exit(EXIT_FAILURE);
 			}
 			
-			if(type(msg) == MESSAGE) {}
+			if((type(msg) == MESSAGE) || (type(msg) == SOLUTION)) {}
 			else
 				handleMessage(msg);
 		}
+
+		/* checks if problem has been solved */
+		if (this_problem.processed) {
+			if (!this_problem.sent) {
+				if (this_site.resource) {
+					printf("Requesting critical section...");
+					critSectionRequest();
+					this_problem.sent = 1;
+				}
+			}
+		}
+		else if (!this_problem.thread_id) {
+			if(pthread_create(&this_problem.thread_id, NULL, (void*)(processingThreadFunction),0) != 0)
+				fprintf(stderr, "Thread creation failure.\n");
+			pthread_detach(this_problem.thread_id);
+		}
+			
+
 	}
 	
 	CLEAN()

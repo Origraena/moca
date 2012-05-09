@@ -12,6 +12,236 @@ L'extension de tolérance aux pannes que nous allons présenter \cite{sopena2005
 
 Le principe de cet algorithme est de reconstituer la file d'attente à partir des portions restantes. Cependant, si la reconstitution n'est pas possible, une nouvelle file d'attente ainsi qu'un nouvel arbre logique seront reconstruits.
 
-Dans l'algorithme de Naimi-Trehel, chaque site connait sont successeur dans la file d'attente mais pas son prédécesseur.
+Dans l'algorithme de Naimi-Trehel, chaque site connait son successeur dans la file d'attente mais pas son prédécesseur. Pour permettre aux sites de connaitre leurs prédécesseurs dans la file d'attente, cette extension a ajouté un mécanisme de confirmation à chaque demande de section critique. Lorsqu'un site $S_j$ met à jour son suivant dans la file d'attente, il envoi un message de COMMIT à l'auteur de la requête pour lui en confirmer la réception. Ce message de COMMIT contient également l'identifiant de ses prédécesseurs.
+
+Grace à ce mécanisme, un ordre sur la file d'attente est conservé en partie par chaque site. Lorsqu'un site quitte la file, il perd sa connaissance sur celle-ci. Initialement, le site qui a le jeton est en position $0$ dans la file. Un message de COMMIT envoyé au site  $S_i$ qui demande la section critique par le site $S_j$ contient les informations suivantes :
+
+\begin{itemize}
+\item les $k$ prédécesseurs de $S_i$ dans la file. $k$ étant un paramètre configurable indiquant le nombre de pannes que l'extension peut supporter en utilisant le mécanisme M1 ci-dessous.
+\item la position de $S_i$ dans la file (égale à la position de son plus proche prédécesseur + 1). 
+\end{itemize}
+
+Après avoir reçu un message de COMMIT, $S_i$ vérifie périodiquement si son plus proche prédécesseur est encore en vie. Après avoir détecté une panne, le site $S_i$ commence une restauration du système en exécutant le mécanisme approprié parmi les suivants :
+\begin{description}
+\item[mécanisme M1] le site $S_i$ a reçu un message de COMMIT et il y a moins de $k$ sites en panne consécutifs dans la file d'attente.
+\item[mécanisme M2] le site $S_i$ a reçu un message de COMMIT mais il y a plus de $k$ sites en panne consécutifs dans la file d'attente.
+\item[mécanisme M3] le site $S_i$ n'a pas reçu de message de COMMIT.
+\end{description}
+Détaillons maintenant comment récupérer d'une panne dans ces trois cas.
+
+\subsection{M1}
+Lorsqu'un site $S_i$ détecte une panne de son plus proche prédécesseur dans la file, il envoi un message de type ARE\_YOU\_ALIVE à chacun de ses prédécesseurs depuis le plus proche jusqu'au plus lointain pour vérifier s'ils sont encore en vie.
+Il arrête d'envoyer des messages lorsqu'il reçoit un message de type I\_AM\_ALIVE de l'un de ses prédécesseurs. Celui-ci prend alors $S_i$ comme nouveau successeur. La file d'attente est alors reconstruite et l'ordre est préservé. De plus, l'arbre logique reste cohérent avec la file d'attente et l'invariant est respecté.
+
+\subsection{M2}
+Si aucun prédécesseur ne répond au message de type ARE\_YOU\_ALIVE, $S_i$ essaie de se reconnecter à la file d'attente en diffusant un message de type $SEARCH_PREV$ qui contient la position de $S_i$ dans la file. $S_i$ attend alors une réponse pendant deux fois le temps maximum de transmission d'un message. Tous les sites ayant une plus petite position que $S_i$ dans la file doivent répondre au message.
+
+Après avoir attendu le temps nécessaire, $S_i$ choisi parmi les sites qui lui ont répondu celui qui a la plus grande position dans la file comme son nouveau prédécesseur. $S_i$ se re-connecte alors à la file en envoyant au site choisi un message de type CONNECTION.
+
+À l'inverse, si après avoir attendu le temps nécessaire, $S_i$ n'a aucune réponse, il considère qu'il n'a aucun prédécesseur et que le jeton a été perdu. $S_i$ régénère alors le jeton et fixe sa position dans la file à $0$.
+
+\subsection{M3}
+Considérons maintenant le cas où le site qui détecte une panne n'a pas encore reçu de message de COMMIT et n'a donc pas de position dans la file. En l'absence de cette information, plusieurs sites peuvent détecter la même panne simultanément.
+
+\subsubsection{a)}
+Considérons la situation où seulement le site $S_i$ détecte la panne. Pour reconstituer lui-même la file, $S_i$ cherche le site qui a la plus grande position. Cette recherche est initiée par la diffusion d'un message de type SEARCH\_QUEUE. $S_i$ attend une réponse pendant deux fois le temps maximum nécessaire à la transmission d'un message. Tous les sites qui ont une position dans la file lui répondent avec un message de type ACK\_SEARCH\_QUEUE qui contient leur position dans la file ainsi que l'information sur le fait qu'ils aient ou pas un successeur. Parmi toutes les réponses, $S_i$ sélectionne le site $S_j$ avec la plus grande position. $S_i$ considère alors trois possibilités :
+\begin{description}
+\item[$S_j$ n'a pas de successeur.] $S_i$ renvoi une demande de section critique à $S_j$. Comme la requête est directement faite à un nœud en bout de file, il n'est pas nécessaire de passer par l'arbre logique.
+\item[$S_j$ a un successeur.] $S_i$ peut en conclure que le successeur de $S_j$ est en panne. $S_i$ envoi un message de type CONNECTION à $S_j$ pour le forcer à se reconnecter. $S_j$ considère alors $S_i$ comme son successeur.
+\item[$S_i$ n'a pas reçu de réponse.] Il peut conclure qu'il n'a plus de prédécesseur et que le jeton a été perdu. $S_i$ peut régénérer le jeton et initialiser sa propre position dans la file à $0$. Il est sûr qu'aucun autre site ne régénérera le jeton.
+\end{description}
+
+\subsubsection{b)}
+Considérons maintenant la situation où plusieurs sites détectent la panne en même temps. Ils vont tous commencer à chercher la file et certains vont régénérer un nouveau jeton. Ceci va conduire à une instabilité de la file ainsi qu'à la perte de la propriété d'unicité du jeton. Une élection est alors nécessaire. On considère qu'un site est élu s'il est toujours candidat après deux fois le temps maximum nécessaire à la transmission d'un message.
+
+Ayant envoyé un message de type SEARCH\_QUEUE aux autres sites comme décrit précédemment, le site $S_i$ est candidat pour se re-connecter à la file. Cependant, si $S_i$ reçoit un message de type SEARCH\_QUEUE depuis un autre site $S_j$, il sait que cet autre site est également candidat à la re-connection. 
+
+Si $S_j$ a moins accédé à la section critique que $S_i$ (cette information est incluse dans les messages de type SEARCH\_QUEUE) ou que le nombre d'accès des deux sites est le même mais que $S_j$ a un plus grand identifiant que $S_i$, $S_i$ perd l'élection et envoi une demande de section critique à $S_j$. Dans ce cas, $S_j$ aura la responsabilité de se reconnecter lui-même à la file.
+
+Si $S_j$ perd l'élection, il se comportera comme décrit précédemment. Si $S_j$ gagne l'élection, il se retrouvera dans la situation du mécanisme M3 a). La file est alors réparée.
+
+
+\subsubsection{Reconstruction de l'arbre\label{tree_rebuild}}
+Contrairement aux deux premiers mécanismes, l'ordre des demandes n'est pas préservé par le mécanisme M3. De plus, l'arbre logique doit être reconstruit pour être cohérent avec la file d'attente. Cependant, le reconstruction est faite dynamiquement, sans aucun message supplémentaire, car toute l'information nécessaire est présente dans les messages de type SEARCH\_QUEUE. En considérant que $S_i$ est le seul à avoir détecté la panne (M3 a) ) ou celui qui a gagné l'élection (M3 b) ), l'arbre logique est reconstruit comme suit :
+\begin{enumerate}
+\item tous les sites qui n'attendent pas le jeton considèrent $S_i$ comme leur père.
+\item tous les sites qui ont une position dans la file considèrent $S_i$ comme leur père.
+\item tous les sites sans position dans la file mais en attente du jeton prennent pour père dans l'arbre leur successeur dans la file.
+\end{enumerate}
+
+
+
+\section{Exemple}
+
+
+Dans cet exemple, nous considérons qu'il y a deux sites en panne (comme le montre la figure \ref{fault_tolerant_ex1}). La file d'attente est brisée en deux morceaux (G,H et A,B,C). Les sites G et H ont déjà une position dans la file tandis que les autres n'en ont pas. Le site G a le jeton et constitue le premier élément de la file. Le site D a envoyé une demande de section critique au site J et pendant qu'il attendait le message de COMMIT, il a accepté la demande de E. Ainsi, il y a une seconde file d'attente qui n'est pas encore connectée à la première. Notons que dans une telle configuration, l'arbre logique est également brisé.
+
+\begin{figure}[H]
+\centering
+	\subfigure[Arbre logique]
+	{
+		\begin{tikzpicture}[scale=1,auto,swap]
+			\node[vertex] (c) at (2,4.5) {$c$};
+			\node[vertex] (a) at (1,3) {$a$};
+			\node[vertex] (b) at (3,3.1) {$b$};
+			\node[vertex,cross] (i) at (0,1.5) {};
+			\node[vertex,cross] (j) at (2.5,1.5) {};
+			\node[vertex] (d) at (4.2,2.8) {d};
+			\node[vertex] (e) at (4.5,1.5) {e};
+			\node[vertex] (f) at (0,0) {f};
+			\node[vertex,fill=red!50] (g) at (1.5,0) {g};
+			\node[vertex] (h) at (3.5,0) {h};
+			
+	   		\foreach \source/ \dest in {f/i, i/a, a/c, g/j, h/j, j/b, b/c, d/e}
+	        		\path[tree edge] (\source) -- (\dest);
+		\end{tikzpicture}
+	}
+	\hspace{1cm}
+	\subfigure[File d'attente]
+	{
+		\begin{tikzpicture}[scale=1,auto,swap]
+			\node[vertex] (c) at (2,4.5) {$c$};
+			\node[vertex] (a) at (1,3) {$a$};
+			\node[vertex] (b) at (3,3.1) {$b$};
+			\node[vertex,cross] (i) at (0,1.5) {};
+			\node[vertex,cross] (j) at (2.5,1.5) {};
+			\node[vertex] (d) at (4.2,2.8) {d};
+			\node[vertex] (e) at (4.5,1.5) {e};
+			\node[vertex] (f) at (0,0) {f};
+			\node[vertex,fill=red!50] (g) at (1.5,0) {g};
+			\node[vertex] (h) at (3.5,0) {h};
+			
+	   		\foreach \source/ \dest in {i/a, j/i, g/h, h/j, a/b, b/c, d/e}
+	        		\path[queue edge] (\source) -- (\dest);
+		\end{tikzpicture}
+	}
+	\caption{(a)\label{fault_tolerant_ex1}}
+\end{figure}
+
+Supposons que les nœuds A et D détectent une panne en même temps. Ils diffusent tous les deux un message de type SEARCH\_QUEUE. Disons que A gagne l'élection : il est élu. Sur la figure \ref{fault_tolerant_ex2}, on peut voir comment l'arbre logique est mis à jour. Ayant une position dans la file, les sites G et H prennent A comme père dans l'arbre (cf \ref{tree_rebuild}), tout comme le site F qui n'attendait pas le jeton. Cependant, A, B et E, qui attendait le jeton mais n'avaient pas de position dans la file, prennent leur successeur dans la file comme père dans l'arbre.
+
+\begin{figure}[H]
+\centering
+	\subfigure[Arbre logique]
+	{
+		\begin{tikzpicture}[scale=1,auto,swap]
+			\node[vertex] (c) at (2,4.5) {$c$};
+			\node[vertex] (a) at (1,3) {$a$};
+			\node[vertex] (b) at (3,3.1) {$b$};
+			\node[vertex] (d) at (4.2,2.8) {d};
+			\node[vertex] (e) at (4.5,1.5) {e};
+			\node[vertex] (f) at (0,0) {f};
+			\node[vertex,fill=red!50] (g) at (1.5,0) {g};
+			\node[vertex] (h) at (3.5,0) {h};
+			
+	   		\foreach \source/ \dest in {f/a, g/a, h/a, a/b, b/c, d/e}
+	        		\path[tree edge] (\source) -- (\dest);
+		\end{tikzpicture}
+	}
+	\hspace{1cm}
+	\subfigure[File d'attente]
+	{
+		\begin{tikzpicture}[scale=1,auto,swap]
+			\node[vertex] (c) at (2,4.5) {$c$};
+			\node[vertex] (a) at (1,3) {$a$};
+			\node[vertex] (b) at (3,3.1) {$b$};
+			\node[vertex] (d) at (4.2,2.8) {d};
+			\node[vertex] (e) at (4.5,1.5) {e};
+			\node[vertex] (f) at (0,0) {f};
+			\node[vertex,fill=red!50] (g) at (1.5,0) {g};
+			\node[vertex] (h) at (3.5,0) {h};
+			
+	   		\foreach \source/ \dest in {g/h, a/b, b/c, d/e}
+	        		\path[queue edge] (\source) -- (\dest);
+		\end{tikzpicture}
+	}
+	\caption{(b)\label{fault_tolerant_ex2}}
+\end{figure}
+
+Quand le site A reçoit le message de type ACK\_SEARCH\_QUEUE depuis H, il peut conclure que le suivant de H est en panne. A envoi un message de type CONNECTION à H. Quand H le reçoit, il prend A comme successeur. D'autre part, comme D a perdu l'élection, il envoi une demande de section critique au nœud élu (A). Quand A reçoit la requête de D, il transmet le message à son père (B) qui lui-même la transmet à son père (C). Ces trois sites prennent D comme père. C prend D comme successeur et lui envoi un message de COMMIT. La figure \ref{fault_tolerant_ex3} montre la configuration finale en considérant que D et E n'ont pas encore reçu le message de COMMIT.
+
+\begin{figure}[H]
+\centering
+	\subfigure[Arbre logique]
+	{
+		\begin{tikzpicture}[scale=1,auto,swap]
+			\node[vertex] (c) at (2,4.5) {$c$};
+			\node[vertex] (a) at (1,3) {$a$};
+			\node[vertex] (b) at (3,3.1) {$b$};
+			\node[vertex] (d) at (4.2,2.8) {d};
+			\node[vertex] (e) at (4.5,1.5) {e};
+			\node[vertex] (f) at (0,0) {f};
+			\node[vertex,fill=red!50] (g) at (1.5,0) {g};
+			\node[vertex] (h) at (3.5,0) {h};
+			
+	   		\foreach \source/ \dest in {f/a, g/a, h/a, a/d, b/d, c/d, d/e}
+	        		\path[tree edge] (\source) -- (\dest);
+		\end{tikzpicture}
+	}
+	\hspace{1cm}
+	\subfigure[File d'attente]
+	{
+		\begin{tikzpicture}[scale=1,auto,swap]
+			\node[vertex] (c) at (2,4.5) {$c$};
+			\node[vertex] (a) at (1,3) {$a$};
+			\node[vertex] (b) at (3,3.1) {$b$};
+			\node[vertex] (d) at (4.2,2.8) {d};
+			\node[vertex] (e) at (4.5,1.5) {e};
+			\node[vertex] (f) at (0,0) {f};
+			\node[vertex,fill=red!50] (g) at (1.5,0) {g};
+			\node[vertex] (h) at (3.5,0) {h};
+			
+	   		\foreach \source/ \dest in {g/h, h/a, a/b, b/c, c/d, d/e}
+	        		\path[queue edge] (\source) -- (\dest);
+		\end{tikzpicture}
+	}
+	\caption{(c)\label{fault_tolerant_ex3}}
+\end{figure}
+
+
+\section{Propriétés}
+
+\subsection{Vivacité}
+Nous allons tout d'abord voir pourquoi un site qui a une position dans la file entrera en section critique au bout d'un temps fini. Ensuite nous verrons pourquoi un site qui veut entrer en section critique obtiendra une place dans la file dans un temps fini.
+
+En l'absence de panne, on peut identifier les quatre invariants suivants :
+\begin{description}
+\item[I1] le site avec la plus petite position dans la file a le jeton
+\item[I2] l'ordre des positions respecte l'ordre de la file d'attente
+\item[I3] après que $S_i$ ait obtenue sa position, aucun site ne peut obtenir une position plus petite que celle de $S_i$
+\item[I4] deux sites ne peuvent pas avoir la même position
+\end{description}
+
+En l'absence de panne, ces invariants assurent qu'un site $S_i$ ayant une position obtienne le jeton au bout d'un temps fini. En effet, I1 et I2 assurent le site $S_i$ que le possesseur du jeton est un de ses prédécesseurs tandis que I2 et I3 garantissent qu'un site n'est jamais inséré avant les prédécesseurs de $S_i$. D'un autre côté, quand une panne survient, l'invariant I1 n'est plus exact si le jeton est perdu. Or, le mécanisme M2 rend vrai à nouveau l'invariant I1 au bout d'un temps fini. C'est à dire que le site qui a la plus petite position détecte la perte du jeton et le régénère au bout d'un temps fini.
+
+D'autre part, un site obtient une position au bout d'un temps fini car :
+
+\begin{itemize}
+\item Un site dont la demande de section critique est perdue la retransmet au bout d'un temps fini. La détection de panne du mécanisme M3 a lieu au bout de (au plus) $N*T_{msg}$.
+\item Une requête peut être perdue un nombre fini de fois.
+\end{itemize}
+
+
+\subsection{Sureté}
+Dans l'algorithme originel de Naimi-Trehel, il n'y a toujours qu'un seul jeton. Avec cette extension, les mécanismes M2 et M3 peuvent régénérer le jeton. Voyons donc pourquoi il ne peut toujours y avoir qu'un seul jeton.
+
+Un site régénère le jeton uniquement s'il a été perdu : par le mécanisme M2 (resp. M3), un site régénère le jeton ssi ce site n'a pas reçu de réponse à son message de type ACK\_SEARCH\_PREV (resp. ACK\_SEARCH\_QUEUE).
+
+Un seul site régénère le jeton car M2 et M3 ne sont pas compatibles et que deux sites ne peuvent régénérer le jeton en utilisant le même mécanisme.
+
+\subsection{Ordre des messages}
+Après avoir reçu un message de COMMIT, un site a la position $p$ dans la file ce qui assure qu'il accèdera à la section critique après au plus $p-1$ autres accès. En cas de panne, la reconstruction de la file d'attente garantie la conservation de l'ordre des messages.
+
+
+\section{Complexité}
+
+\subsection{Nombre de messages}
+Dans le pire des cas de restauration après une panne, l'extension tolérante aux pannes de Naimi-Trehel \cite{naimi1988} diffuse quatre messages. L'extension présentée ci-dessus envoi un message de COMMIT par demande de section critique et diffuse un message de type SEARCH\_PREV en cas de besoin. Mentionnons également que dans l'extension de Naimi-Trehel tous les successeurs des nœuds en panne doivent renvoyer leur requête alors que l'algorithme \cite{sopena2005} nécessite de renvoyer uniquement les requêtes perdues.
+
+\subsection{Temps}
+Pour détecter les sites défaillants, l'extension de Naimi-Trehel surveille la réception du jeton. Dans le pire des cas, un site attend $(N-1)\times(T_{msg}/T_{cs})$ avec $T_{msg}$ le temps maximum de transmission d'un message et $T_{cs}$ le temps moyen d'exécution de la section critique.
+L'algorithme \cite{sopena2005} surveille l'arrivée d'une demande de section critique au bout de la file mais également la réception du message de COMMIT par le site demandeur. Un site attend au plus $((N-1)+1)\times T_{msg}$ pour déceler une panne, ce qui ne dépend pas de $T_{cs}$.
+
+Un autre point important est que l'algorithme \cite{sopena2005} comporte moins de phases que celui de Naimi-Trehel pendant une restauration de panne ; la restauration est donc plus courte. Mieux encore, il peut arriver que la restauration soit faite en parallèle de l'exécution normale de l'algorithme dans le reste du réseau comme si aucune panne n'était survenue ; il n'est pas forcément nécessaire d'attendre d'avoir un arbre logique stable comme dans l'extension de Naimi-Trehel.
 
 

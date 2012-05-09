@@ -29,6 +29,7 @@
 #define CLEAN_NETWORK()	close(this_site.sdSend); \
 						close(this_site.sdRecv); \
 						FREE_NETWORK()
+//#endif
 
 
 typedef struct site {
@@ -39,6 +40,7 @@ typedef struct site {
 	struct sockaddr_in* neighbours;
 	size_t nbNeighbours;
 	struct sockaddr_in *neighboursTmp;
+	char resource[17];
 } site;
 
 typedef enum site_state {
@@ -47,21 +49,24 @@ typedef enum site_state {
 	WORKING = 3
 } site_state;
 
-
 // ??????? ou comment faire de la prog objet en C ^^
+// Oh ça va hein !
 extern site this_site;
+//extern problem this_problem;
 
 
 char* getIPaddress();
 int init_network(int argc, char** argv);
 int backupSocketNeighbours();
 int recoverSocketNeighbours(struct sockaddr_in paramsNewNeighbour);
+
 int hostsUpdate(struct sockaddr_in netParamsNeighbour);
 int recvMessage(msg_t *message, struct sockaddr_in* add);
 
 int broadcast(msg_t t);
 int sendMessage(int siteID, msg_t msg);
 int sendMessageWithAdd(msg_t msg);
+int sendMsg(char* add, char* m);
 void printNeighbours();
 void getMessageFromString(char* string, msg_type* type, char** message);
 int getNeighbour(unsigned long s_addr);
