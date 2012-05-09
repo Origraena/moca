@@ -222,7 +222,7 @@ int main(int argc, char* argv[]) {
 			char buf[2];
 			read(pipeR,buf,sizeof(char)+sizeof(char));
 			printf("PIPE\n");
-			if (!this_problem.sent) {
+			if ((this_problem.processed) && (!this_problem.sent)) {
 				if (this_site.resource) {
 					printf("Requesting critical section...\n");
 					critSectionRequest();
