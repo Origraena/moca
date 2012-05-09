@@ -111,7 +111,7 @@ void standardInput() {
 			break;
 		case 10:
 			if (ch_pid)
-				pthread_kill (ch_pid, SIGKILL);
+				pthread_kill ((pthread_t)ch_pid, SIGKILL);
 			this_site.running = 0;
 			break;
 		default:
