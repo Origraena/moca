@@ -687,7 +687,7 @@ void liberation(void* arg) {
 	sendMessageWithAdd(msg);
 
 	this_problem.processed = 0;
-	this_problem.sent = 0;
+	this_problem.sent = 1;
 	this_problem.w1 = 0;
 	this_problem.w2 = 0;
 	char clef[2] = "c";
