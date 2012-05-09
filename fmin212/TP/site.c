@@ -143,11 +143,6 @@ int main(int argc, char* argv[]) {
 		perror ("sigaction");
 		exit(EXIT_FAILURE);
 	}
-	print_help();
-
-	/* problem init */
-	init_problem(0);
-	
 
 	/* network initialisation */
 	if(init_network(argc, argv) == -1) {
@@ -157,8 +152,11 @@ int main(int argc, char* argv[]) {
 
 	init_structures();
 
+	/* problem init */
+	init_problem(0);
+
 	/* Execution loop */
-	//print_help();
+	print_help();
 
 	while(this_site.running) {
 		/* select settings */
