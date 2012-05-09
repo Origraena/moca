@@ -16,6 +16,7 @@
 site this_site;
 problem this_problem;
 
+int _verbose = 0;
 int pipeW,pipeR;
 
 // {{{ Handler

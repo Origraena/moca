@@ -22,7 +22,7 @@ void checkNeighbour (void *arg);
 
 //{{{ site_failure
 void site_failure(int sig) {
-	fprintf (stderr, "/* FAILURE OF A SITE SPOTTED */\n");
+	if (_verbose) fprintf (stderr, "/* FAILURE OF A SITE SPOTTED */\n");
 	int i=0;
 	int sortie = 0;
 	msg_t msg;
@@ -692,14 +692,14 @@ void liberation(void* arg) {
 	this_problem.w2 = 0;
 	char clef[2] = "c";
 	if (write(pipeW,clef,2*sizeof(char)) == -1)
-		perror("write error");
+		if (_verbose) perror("write error");
 	state = IDLE;
 	if(next != -1) {
-		fprintf (stdout, "Sending TOKEN.\n");
+		if (_verbose) fprintf (stdout, "Sending TOKEN.\n");
 		msg_t mes;
 		type(mes) = TOKEN;
 		if(sendMessage(next, mes) == -1) 
-			fprintf(stderr, "======> Error while sending message <====== \n");
+			if (_verbose) fprintf(stderr, "======> Error while sending message <====== \n");
 		next = -1;
 		tokenPresent = 0;
 		position = -1;
@@ -707,7 +707,7 @@ void liberation(void* arg) {
 	else
 		last = -1;
 	ch_pid = 0;
-	fprintf(stdout, "CS released : %d access\n", ++acces);
+	if (_verbose) fprintf(stdout, "CS released : %d access\n", ++acces);
 }
 //}}}
 
@@ -715,7 +715,7 @@ void liberation(void* arg) {
 void checkNeighbour (void *arg) {
 	pthread_detach(pthread_self());
 
-	fprintf(stdout, "Checking for predecessor viability.\n");
+	if (_verbose) fprintf(stdout, "Checking for predecessor viability.\n");
 
 	sigset_t block;
 	sigemptyset (&block);
@@ -725,7 +725,7 @@ void checkNeighbour (void *arg) {
 	struct sockaddr_in *pre = (struct sockaddr_in *)arg;
 	int failure = 0;
 
-	fprintf (stdout, "Sending ARE_YOU_ALIVE.\n");
+	if (_verbose) fprintf (stdout, "Sending ARE_YOU_ALIVE.\n");
 	msg_t msg;
 	type(msg) = ARE_YOU_ALIVE;
 	char *tmpmes;
@@ -736,7 +736,7 @@ void checkNeighbour (void *arg) {
 		pthread_mutex_lock(&mut_check);
 		if (check) {
 			check = 0;
-			fprintf (stderr, "Site Failure Detected\n");
+			if (_verbose) fprintf (stderr, "Site Failure Detected\n");
 			pthread_mutex_unlock(&mut_check);
 			kill(getpid(), SIGUSR1);
 			failure ++;
@@ -745,7 +745,7 @@ void checkNeighbour (void *arg) {
 			check --;
 			pthread_mutex_unlock(&mut_check);
 
-			fprintf (stdout, "Sending ARE_YOU_ALIVE.\n");
+			if (_verbose) fprintf (stdout, "Sending ARE_YOU_ALIVE.\n");
 			if (sendMessageWithAdd(msg) == -1)
 				continue;
 
@@ -778,7 +778,7 @@ int handleSolution(msg_t msg) {
 		this_problem.w2 = w2;
 	}
 	else
-		printf("[%s] Solution received but unused : %i / %i...\n",msg._sender,w1,w2);
+		if (_verbose) printf("[%s] Solution received but unused : %i / %i...\n",msg._sender,w1,w2);
 	return 1;
 }
 

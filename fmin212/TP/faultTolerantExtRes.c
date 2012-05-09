@@ -22,7 +22,7 @@ void checkNeighbour (void *arg);
 
 //{{{ site_failure
 void site_failure(int sig) {
-	fprintf (stderr, "/* FAILURE OF A SITE SPOTTED */\n");
+	if (_verbose) fprintf (stderr, "/* FAILURE OF A SITE SPOTTED */\n");
 	int i=0;
 	int sortie = 0;
 	msg_t msg;
@@ -38,10 +38,10 @@ void site_failure(int sig) {
 	fcntl(this_site.sdRecv, F_SETFL, flags2);
 
 	// Sends ARE_YOU_ALIVE to other pred
-	fprintf (stdout, "Checking predecessor validity\n");
+	if (_verbose) fprintf (stdout, "Checking predecessor validity\n");
 	for (i=1; i<TOLERANCE+1; i++) {
 		if (!strcmp ("0.0.0.0", inet_ntoa(predec[i].sin_addr))) {
-			fprintf (stdout, "Bad ip address\n");
+			if (_verbose) fprintf (stdout, "Bad ip address\n");
 			continue;
 		}
 		type(msg) = ARE_YOU_ALIVE;
@@ -66,15 +66,15 @@ void site_failure(int sig) {
 				continue;
 
 			// Receive I_AM_ALIVE --> Connection
-			fprintf (stdout, "Received I_AM_ALIVE\n");
+			if (_verbose) fprintf (stdout, "Received I_AM_ALIVE\n");
 			if (type(msg) == I_AM_ALIVE && !isMe(ips(msg))) {
 				handleIAmAlive(msg);
 				type(msg) = CONNECTION;
 				strncpy(ip(msg), ips(msg), IPLONG * sizeof(char));
 				sendMessageWithAdd(msg);
-				fprintf (stdout, "Asking for connection\n");
+				if (_verbose) fprintf (stdout, "Asking for connection\n");
 				last = getNeighbour(ipa);
-				fprintf (stdout, "New last after receiving I_AM_ALIVE message : %d\n", last);
+				if (_verbose) fprintf (stdout, "New last after receiving I_AM_ALIVE message : %d\n", last);
 				state = IDLE;
 				critSectionRequest();
 				sortie++;
@@ -89,13 +89,13 @@ void site_failure(int sig) {
 	// No pred is alive, broadcast SEARCH_PREV
 	fcntl(this_site.sdRecv, F_SETFL, flags);
 
-	fprintf (stdout, "No alive predecessor found, looking for other sites\n");
+	if (_verbose) fprintf (stdout, "No alive predecessor found, looking for other sites\n");
 	if (!sortie) {
 		msg_t min;
 
 		type(msg) = SEARCH_PREV;
 		pos(msg) = position;
-		fprintf (stdout, "Broadcasting SEARCH_PREV.\n");
+		if (_verbose) fprintf (stdout, "Broadcasting SEARCH_PREV.\n");
 		broadcast(msg);
 
 		fcntl(this_site.sdRecv, F_SETFL, flags2);
@@ -117,7 +117,7 @@ void site_failure(int sig) {
 					memcpy (&min, &msg, SIZE);
 				else if (pos(min) < pos(msg))
 					memcpy (&min, &msg, SIZE);
-				fprintf (stdout, "Got an answer.\n");
+				if (_verbose) fprintf (stdout, "Got an answer.\n");
 			}
 			else if (type(msg) == REQUEST) {}
 			else
@@ -128,7 +128,7 @@ void site_failure(int sig) {
 
 		// No answers, regenerate the TOKEN
 		if (pos(min) == -1) {
-			fprintf (stdout, "No answers, regenerating TOKEN\n");
+			if (_verbose) fprintf (stdout, "No answers, regenerating TOKEN\n");
 			tokenPresent = 1;
 			last = next;
 			takeCriticalSection();
@@ -137,7 +137,7 @@ void site_failure(int sig) {
 
 		// Got an answer, ask for connection
 		if (!sortie) {
-			fprintf (stdout, "Asking for connection\n");
+			if (_verbose) fprintf (stdout, "Asking for connection\n");
 			type(msg) = CONNECTION;
 			strncpy(ip(msg), ips(min), IPLONG * sizeof(char));
 			last = getNeighbour((unsigned long int)inet_addr(ips(min)));
@@ -177,7 +177,7 @@ int critSectionRequest() {
 
 	// If already in SC just return -1
 	if (state != IDLE) {
-		fprintf (stderr,"Already in critical section.\n");
+		if (_verbose) fprintf (stderr,"Already in critical section.\n");
 		return -1;
 	}
 	state = WAITING;
@@ -189,14 +189,14 @@ int critSectionRequest() {
 	else if(last != -1) {
 		// Get ip of last
 		char *tmpter = getIPstrFromNb (last);
-		fprintf (stdout, "Last is %d, sending it a request.\n", last);
+		if (_verbose) fprintf (stdout, "Last is %d, sending it a request.\n", last);
 		strncpy(ip(msg), tmpter, IPLONG);
 		free (tmpter);
 
 		strncpy (ask(msg), inet_ntoa(this_site.neighbours[0].sin_addr), IPLONG);
 
 		if(sendMessageWithAdd(msg) == -1){
-			fprintf (stderr, "======> Sending request failure... <======\n");
+			if (_verbose) fprintf (stderr, "======> Sending request failure... <======\n");
 			return -1;
 		}
 
@@ -210,7 +210,7 @@ int critSectionRequest() {
 		timeCur = time(&timeCur);
 
 		// Wait for an answer
-		fprintf (stdout, "Waiting for COMMIT.\n");
+		if (_verbose) fprintf (stdout, "Waiting for COMMIT.\n");
 		while(timeCur - timeStart < (2*TMESG)) {
 			timeCur = time(&timeCur);
 
@@ -222,7 +222,7 @@ int critSectionRequest() {
 			else {
 				// TODO: Work on reaction when receiving request while waiting commit
 				if (type(msg) == REQUEST)
-					fprintf (stdout, "Received a REQUEST instead of a COMMIT.\n");
+					if (_verbose) fprintf (stdout, "Received a REQUEST instead of a COMMIT.\n");
 				else if (type(msg) == TOKEN){
 					last = -1;
 					return handleToken(msg);
@@ -233,14 +233,14 @@ int critSectionRequest() {
 		}
 
 		// If receive no answers
-		fprintf (stdout, "I didn't get any COMMIT, looking for the queue...\n");
+		if (_verbose) fprintf (stdout, "I didn't get any COMMIT, looking for the queue...\n");
 		fcntl(this_site.sdRecv, F_SETFL, flags);
 
 		memset (&msg, 0, SIZE);
 		type(msg) = SEARCH_QUEUE;
 		nb_acc(msg) = acces;
 		// Broadcast Search_Queue
-		fprintf (stdout, "Broadcasting SEARCH_QUEUE.\n");
+		if (_verbose) fprintf (stdout, "Broadcasting SEARCH_QUEUE.\n");
 		broadcast(msg);
 
 		msg_t max;
@@ -252,7 +252,7 @@ int critSectionRequest() {
 		timeCur = time(&timeCur);
 
 		// Wait for ACK_SEARCH_QUEUE
-		fprintf (stdout, "Expecting ACK_SEARCH_QUEUE.\n");
+		if (_verbose) fprintf (stdout, "Expecting ACK_SEARCH_QUEUE.\n");
 		while(timeCur - timeStart < 2*TMESG) {
 			timeCur = time(&timeCur);
 			memset (&msg, 0, SIZE);
@@ -262,10 +262,10 @@ int critSectionRequest() {
 
 			switch(type(msg)) {
 				case ACK_SEARCH_QUEUE:
-					fprintf (stdout, "Got an ACK_SEARCH_QUEUE.\n");
+					if (_verbose) fprintf (stdout, "Got an ACK_SEARCH_QUEUE.\n");
 					// Save greatest position in the queue
 					if (pos(msg) > pos(max)) {
-						fprintf (stdout, "New position in QUEUE : %d.\n", pos(msg));
+						if (_verbose) fprintf (stdout, "New position in QUEUE : %d.\n", pos(msg));
 						memcpy(&max, &msg, SIZE);
 					}
 					break;
@@ -273,7 +273,7 @@ int critSectionRequest() {
 				case SEARCH_QUEUE:
 					if (isMe(ips(msg)))
 						continue;
-					fprintf (stdout, "Another site discovered the failure.\n");
+					if (_verbose) fprintf (stdout, "Another site discovered the failure.\n");
 					// The other site hasn't priority, just continue
 					if (nb_acc(msg) > acces) 
 						continue;
@@ -286,7 +286,7 @@ int critSectionRequest() {
 					// If the other has the priority, just change last and ask it for CS
 					unsigned long int ipa = (unsigned long int) inet_addr(ips(msg));
 					last = getNeighbour(ipa);
-					fprintf (stdout, "I don't have priority, changing my last (%d) and asking for CS again.\n", last);
+					if (_verbose) fprintf (stdout, "I don't have priority, changing my last (%d) and asking for CS again.\n", last);
 					state = IDLE;
 					return critSectionRequest();
 					// TODO: Request processing
@@ -298,13 +298,13 @@ int critSectionRequest() {
 			}
 		}
 
-		fprintf (stdout, "Waiting time passed.\n");
+		if (_verbose) fprintf (stdout, "Waiting time passed.\n");
 
 		fcntl(this_site.sdRecv, F_SETFL, flags);
 
 		// No other site in the queue, juste regenerate TOKEN
 		if (pos(max) < 0) {
-			fprintf (stdout, "No other sites in the queue, regenerate TOKEN (last = next)\n");
+			if (_verbose) fprintf (stdout, "No other sites in the queue, regenerate TOKEN (last = next)\n");
 			last = next;
 			tokenPresent = 1;
 			takeCriticalSection();
@@ -313,7 +313,7 @@ int critSectionRequest() {
 			// Ask for connection to the site with the highest position
 			unsigned long int ipa = (unsigned long int) inet_addr(ips(max));
 			last = getNeighbour(ipa);
-			fprintf (stdout, "Ask for Connection, new last = %d\n", last);
+			if (_verbose) fprintf (stdout, "Ask for Connection, new last = %d\n", last);
 			strncpy(ip(msg), ips(max),IPLONG *sizeof(char));
 			if (next(max)) {
 				type(msg) = CONNECTION;
@@ -325,7 +325,7 @@ int critSectionRequest() {
 		}
 	}
 	else
-		fprintf (stderr, "======> Last = -1, but don't have TOKEN <======\n");
+		if (_verbose) fprintf (stderr, "======> Last = -1, but don't have TOKEN <======\n");
 	return 0;
 }
 // }}}
@@ -343,7 +343,7 @@ int handleMessage(msg_t msg) {
 		case SOLUTION:
 			return handleSolution(msg);
 		default:
-			fprintf(stderr, "======> Uknown message type <======\n");
+			if (_verbose) fprintf(stderr, "======> Uknown message type <======\n");
 			return -1;
 	}
 }
@@ -356,7 +356,7 @@ int handleRequest(msg_t msg) {
 
 	// TODO: Add unknown Neighbour to the list of neighbour and handle REEQUEST
 	if(getNeighbour(ipt)==-1) {
-		fprintf (stderr, "======> Received a REQUEST from an unknown neighbour. <======\n");
+		if (_verbose) fprintf (stderr, "======> Received a REQUEST from an unknown neighbour. <======\n");
 		return 0;
 	}
 
@@ -365,7 +365,7 @@ int handleRequest(msg_t msg) {
 			if (next == -1) {
 				next = getNeighbour(ipt);
 				last = next;
-				fprintf (stdout, "Got a request, but expecting the TOKEN. Sending COMMIT to %d.\n", next);
+				if (_verbose) fprintf (stdout, "Got a request, but expecting the TOKEN. Sending COMMIT to %d.\n", next);
 				type(msg) = COMMIT;
 				pos(msg) = position + 1;
 				int j;
@@ -375,10 +375,10 @@ int handleRequest(msg_t msg) {
 			}
 		}
 		else if(tokenPresent == 1) {
-			fprintf (stdout, "Sending TOKEN.\n");
+			if (_verbose) fprintf (stdout, "Sending TOKEN.\n");
 			type(msg) = TOKEN;
 			if(sendMessageWithAdd(msg) == -1){
-				fprintf (stderr, "======> Error while sending message <======\n");
+				if (_verbose) fprintf (stderr, "======> Error while sending message <======\n");
 				return -1;
 			}
 			tokenPresent = 0;
@@ -392,7 +392,7 @@ int handleRequest(msg_t msg) {
 	}
 
 	last = getNeighbour(ipt);
-	fprintf (stdout, "New last after receiving request : %d. \n", last);
+	if (_verbose) fprintf (stdout, "New last after receiving request : %d. \n", last);
 
 	return 0;
 }
@@ -403,7 +403,7 @@ int handleCommit (msg_t msg) {
 	unsigned long int ipa = (unsigned long int)inet_addr(ips(msg));
 	pthread_t thread_id;
 
-	fprintf (stdout, "Got a COMMIT, creating a thread to verify validity of predecessor\n");
+	if (_verbose) fprintf (stdout, "Got a COMMIT, creating a thread to verify validity of predecessor\n");
 
 	if(!getNeighbour(ipa))
 		return 0;
@@ -411,13 +411,13 @@ int handleCommit (msg_t msg) {
 	position = pos(msg);
 	last = -1;
 	int i;
-	fprintf (stdout,"Copy the predecessor adress contained in received COMMIT.\n");
+	if (_verbose) fprintf (stdout,"Copy the predecessor adress contained in received COMMIT.\n");
 	for (i=0; i<TOLERANCE; predec[i+1] = pred(msg)[i], i++);
 
 	inet_aton(ips(msg),&(predec[0].sin_addr));
 
 	if(pthread_create(&thread_id, NULL, (void*)(checkNeighbour), (void*)predec) != 0)
-		fprintf(stderr, "Thread creation failure.\n");
+		if (_verbose) fprintf(stderr, "Thread creation failure.\n");
 
 
 	return 0;
@@ -426,7 +426,7 @@ int handleCommit (msg_t msg) {
 
 //{{{ handleToken
 int handleToken(msg_t message) {
-	fprintf (stdout, "TOKEN Received. \n");
+	if (_verbose) fprintf (stdout, "TOKEN Received. \n");
 	tokenPresent = 1;
 	if(state == WAITING)
 		takeCriticalSection();
@@ -441,7 +441,7 @@ int handleHello(msg_t mes) {
 	type(mes) = RESOURCE;
 	tok(mes) = tokenPresent;
 
-	fprintf (stdout, "HELLO received, sending RESOURCE\n");//TODO
+	if (_verbose) fprintf (stdout, "HELLO received, sending RESOURCE\n");//TODO
 
 	strncpy(ip(mes), ips(mes), IPLONG);
 
@@ -458,15 +458,15 @@ int handleHelloRep(msg_t message, struct sockaddr_in* netParamsNeighbour) {
 		for (i=0; i<this_site.nbNeighbours; i++)
 			if ((unsigned long int)this_site.neighbours[i].sin_addr.s_addr == ipLastJ){
 				last = i;
-				fprintf(stdout, "Get HELLOREP. TOKEN on site %d.\n", last);
+				if (_verbose) fprintf(stdout, "Get HELLOREP. TOKEN on site %d.\n", last);
 				if (i) {
 					tokenPresent = 0;
-					fprintf (stdout, "Throw up TOKEN\n");
+					if (_verbose) fprintf (stdout, "Throw up TOKEN\n");
 				}
 			}
 	}
 	else 
-		fprintf(stdout, "HELLOREP, but no TOKEN.\n");
+		if (_verbose) fprintf(stdout, "HELLOREP, but no TOKEN.\n");
 
 	return 0;
 }
@@ -485,7 +485,7 @@ int waitForHellorep(int waitingPeriod) {
 	int flags2 = flags | O_NONBLOCK;
 	fcntl(this_site.sdRecv, F_SETFL, flags2);
 
-	fprintf (stdout, "Expecting HELLOREP for network discover.\n");
+	if (_verbose) fprintf (stdout, "Expecting HELLOREP for network discover.\n");
 
 	//while((this_site.nbNeighbours < 2) || (timeCur - timeStart < waitingPeriod))
 	while(timeCur - timeStart < waitingPeriod) {
@@ -509,14 +509,14 @@ int waitForHellorep(int waitingPeriod) {
 				break;
 
 			default:
-				fprintf(stderr, "======> Unknown message type <======\n");
+				if (_verbose) fprintf(stderr, "======> Unknown message type <======\n");
 				break;
 		}
 	}
 
 	fcntl(this_site.sdRecv, F_SETFL, flags);
 
-	printf("End of network discovery : %ld sites found.\n", (long int)this_site.nbNeighbours);
+	if (_verbose) printf("End of network discovery : %ld sites found.\n", (long int)this_site.nbNeighbours);
 
 	return 0;
 }
@@ -525,7 +525,7 @@ int waitForHellorep(int waitingPeriod) {
 //{{{ handleAreYouAlive
 int handleAreYouAlive(msg_t msg){
 	type(msg) = I_AM_ALIVE;
-	fprintf (stdout, "ARE_YOU_ALIVE received, sending I_AM_ALIVE\n");
+	if (_verbose) fprintf (stdout, "ARE_YOU_ALIVE received, sending I_AM_ALIVE\n");
 	strncpy(ip(msg), ips(msg), IPLONG * sizeof(char));
 	return (sendMessageWithAdd(msg));
 }
@@ -533,37 +533,37 @@ int handleAreYouAlive(msg_t msg){
 
 //{{{ handleSearchPrev
 int handleSearchPrev (msg_t msg){
-	fprintf (stdout, "SEARCH_PREV received.");
+	if (_verbose) fprintf (stdout, "SEARCH_PREV received.");
 	if (position < pos(msg)) {
-		fprintf (stdout, "Sending ACK_SEARCH_PREV.\n");
+		if (_verbose) fprintf (stdout, "Sending ACK_SEARCH_PREV.\n");
 		type(msg) = ACK_SEARCH_PREV;
 		pos(msg) = position;
 		strncpy(ip(msg), ips(msg), IPLONG * sizeof(char));
 		return (sendMessageWithAdd(msg));
 	}
-	fprintf (stdout, "\n");
+	if (_verbose) fprintf (stdout, "\n");
 	return 0;
 }
 //}}}
 
 //{{{ handleSearchQueue
 int handleSearchQueue(msg_t msg){
-	fprintf (stdout, "SEARCH_QUEUE received.");
+	if (_verbose) fprintf (stdout, "SEARCH_QUEUE received.");
 	if (position >= 0) {
-		fprintf (stdout, "Sending ACK_SEARCH_QUEUE.\n");
+		if (_verbose) fprintf (stdout, "Sending ACK_SEARCH_QUEUE.\n");
 		type(msg) = ACK_SEARCH_QUEUE;
 		pos(msg) = position;
 		strncpy (ip(msg), ips(msg), IPLONG * sizeof(char));
 		return sendMessageWithAdd(msg) == -1;
 	}
-	fprintf (stdout, "\n");
+	if (_verbose) fprintf (stdout, "\n");
 	return 0;
 }
 //}}}
 
 //{{{ handleIAmAlive
 int handleIAmAlive(msg_t m) {
-	fprintf (stdout, "I_AM_ALIVE received.\n");
+	if (_verbose) fprintf (stdout, "I_AM_ALIVE received.\n");
 	pthread_mutex_lock(&mut_check);
 	if (check)
 		check++;
@@ -595,17 +595,17 @@ int handleConnection (msg_t msg){
 //{{{ Critical Section + Threads
 //{{{ takeCriticalSection
 int takeCriticalSection() {
-	fprintf(stdout, "Entering CS\n");
+	if (_verbose) fprintf(stdout, "Entering CS\n");
 	state = WORKING;
 	position = 0;
 	int i;
-	fprintf (stdout, "Reinitializing predecessor\n");
+	if (_verbose) fprintf (stdout, "Reinitializing predecessor\n");
 	for (i=0; i<=TOLERANCE; memset(predec + i++, 0, sizeof(struct sockaddr_in)));
 
 	/* exec CS */
 	pthread_t thread_id;
 	if(pthread_create(&thread_id, NULL, (void*)(liberation), (void*)20) != 0)
-		fprintf(stderr, "Thread creation failure.\n");
+		if (_verbose) fprintf(stderr, "Thread creation failure.\n");
 
 	ch_pid = (int)thread_id;
 
@@ -639,11 +639,11 @@ void liberation(void* arg) {
 
 	state = IDLE;
 	if(next != -1) {
-		fprintf (stdout, "Sending TOKEN.\n");
+		if (_verbose) fprintf (stdout, "Sending TOKEN.\n");
 		msg_t mes;
 		type(mes) = TOKEN;
 		if(sendMessage(next, mes) == -1) 
-			fprintf(stderr, "======> Error while sending message <====== \n");
+			if (_verbose) fprintf(stderr, "======> Error while sending message <====== \n");
 		next = -1;
 		tokenPresent = 0;
 		position = -1;
@@ -651,7 +651,7 @@ void liberation(void* arg) {
 	else
 		last = -1;
 	ch_pid = 0;
-	fprintf(stdout, "CS released : %d access\n", ++acces);
+	if (_verbose) fprintf(stdout, "CS released : %d access\n", ++acces);
 }
 //}}}
 
@@ -659,7 +659,7 @@ void liberation(void* arg) {
 void checkNeighbour (void *arg) {
 	pthread_detach(pthread_self());
 
-	fprintf(stdout, "Checking for predecessor viability.\n");
+	if (_verbose) fprintf(stdout, "Checking for predecessor viability.\n");
 
 	sigset_t block;
 	sigemptyset (&block);
@@ -669,7 +669,7 @@ void checkNeighbour (void *arg) {
 	struct sockaddr_in *pre = (struct sockaddr_in *)arg;
 	int failure = 0;
 
-	fprintf (stdout, "Sending ARE_YOU_ALIVE.\n");
+	if (_verbose) fprintf (stdout, "Sending ARE_YOU_ALIVE.\n");
 	msg_t msg;
 	type(msg) = ARE_YOU_ALIVE;
 	char *tmpmes;
@@ -680,7 +680,7 @@ void checkNeighbour (void *arg) {
 		pthread_mutex_lock(&mut_check);
 		if (check) {
 			check = 0;
-			fprintf (stderr, "Site Failure Detected\n");
+			if (_verbose) fprintf (stderr, "Site Failure Detected\n");
 			pthread_mutex_unlock(&mut_check);
 			kill(getpid(), SIGUSR1);
 			failure ++;
@@ -689,7 +689,7 @@ void checkNeighbour (void *arg) {
 			check --;
 			pthread_mutex_unlock(&mut_check);
 
-			fprintf (stdout, "Sending ARE_YOU_ALIVE.\n");
+			if (_verbose) fprintf (stdout, "Sending ARE_YOU_ALIVE.\n");
 			if (sendMessageWithAdd(msg) == -1)
 				continue;
 
@@ -717,12 +717,12 @@ int handleSolution(msg_t msg) {
 	w1 = msg._nb_access;
 	w2 = msg._has_next;
 	if ((this_problem.w1 == 0) || (this_problem.w1 > w1)) {
-		printf("[%s] New solution found : %i / %i !\n",msg._sender,w1,w2);
+		if (_verbose) printf("[%s] New solution found : %i / %i !\n",msg._sender,w1,w2);
 		this_problem.w1 = w1;
 		this_problem.w2 = w2;
 	}
 	else
-		printf("[%s] Solution received but unused : %i / %i...\n",msg._sender,w1,w2);
+		if (_verbose) printf("[%s] Solution received but unused : %i / %i...\n",msg._sender,w1,w2);
 	return 1;
 }
 

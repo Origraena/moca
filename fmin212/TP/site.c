@@ -17,6 +17,7 @@
 
 site this_site;
 problem this_problem;
+int _verbose = 0;
 
 // {{{ Handler
 /* ending handler. Necessary to clean the environnement. */
@@ -60,10 +61,15 @@ void standardInput() {
 
 	switch(rea) {
 		case 1:
-			printf("BROADCAST.\n");
-
-			type(envoi) = MESSAGE;
-			broadcast (envoi);
+			printf("Verbose\n");
+			if (_verbose) {
+				_verbose = 0;
+				printf("verbose mode desactivated...");
+			}
+			else {
+				_verbose = 1;
+				printf("verbose mode activated!");
+			}
 			break;
 		case 2:
 			printf ("TO : ");
@@ -199,7 +205,6 @@ int main(int argc, char* argv[]) {
 		/* on standard input */
 		if(FD_ISSET(STDIN_FILENO, &socketRset))
 		{
-			printf("STD\n");
 			standardInput();
 		}
 		
@@ -221,7 +226,7 @@ int main(int argc, char* argv[]) {
 			read(pipeR,buf,sizeof(char)+sizeof(char));
 			if ((this_problem.processed) && (!this_problem.sent)) {
 				if (this_site.resource) {
-					printf("Requesting critical section...\n");
+					if (_verbose) printf("Requesting critical section...\n");
 					critSectionRequest();
 					this_problem.sent = 1;
 				}
