@@ -163,47 +163,6 @@ int init_structures() {
 	check = 0;
 	acces = 0;
 	for (i=0; i<TOLERANCE+1; memset(&predec[i], 0, sizeof(struct sockaddr_in)), i++);
-
-	/* HELLO message broadcasting */
-    msg_t broad;
-    memset(&broad, 0, SIZE);
-    type(broad) = RESOURCE;
-    broadcast(broad);
-
-    waitForHellorep(WAITING_PERIOD);
-
-    memset(&broad, 0, SIZE);
-    type(broad) = RESOURCE;
-    broadcast(broad);
-
-    waitForHellorep(WAITING_PERIOD);
-
-    /* HELLO message broadcasting */
-    //broadcast(t, "");
-
-
-    if(this_site.nbNeighbours == 1)
-    	tokenPresent = 1;
-    else if(last == -1) {
-    	unsigned long int ip_max = 0;
-    	for(i = 0 ; i < this_site.nbNeighbours ; i++)
-    		if((unsigned long int)(this_site.neighbours[i].sin_addr.s_addr) > ip_max) {
-    			ip_max = this_site.neighbours[i].sin_addr.s_addr;
-    			last = i;
-    		}
-    	tokenPresent = (!last ? 1 : 0);
-    	if (tokenPresent)
-    		last = -1;
-    }
-
-    struct sigaction action;
-    memset(&action, 0, sizeof(action));
-    action.sa_handler = site_failure;
-    if (sigaction(SIGUSR1,&action,NULL)){
-    	perror ("sigaction ");
-    	return -1;
-    }
-
 	return 0;
 }
 // }}}
@@ -492,10 +451,11 @@ int handleToken(msg_t message) {
 
 //{{{ handleHello
 int handleHello(msg_t mes) {
-	type(mes) = HELLOREP;
+//	type(mes) = HELLOREP;	TODO
+	type(mes) = RESOURCE;
 	tok(mes) = tokenPresent;
 
-	fprintf (stdout, "HELLO received, sending HELLOREP\n");
+	fprintf (stdout, "HELLO received, sending RESOURCE\n");//TODO
 
 	strncpy(ip(mes), ips(mes), IPLONG);
 

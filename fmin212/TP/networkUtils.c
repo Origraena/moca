@@ -264,6 +264,8 @@ int recvMessage(msg_t* message, struct sockaddr_in* add) {
 //	printf("Message de type %u.\n", message->_typ_mes);
 
 	return 0;
+
+	init();
 }
 
 int getNeighbour(unsigned long s_addr) {

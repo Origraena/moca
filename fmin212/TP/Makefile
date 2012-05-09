@@ -10,7 +10,7 @@ CFLAGS  = -Wall -c -O2
 OFLAGS  = -o
 
 # Définit les fichiers en conflit
-CONFLICT = faultTolerantExt.c naimiTrehel.c resource.c
+CONFLICT = faultTolerantExt.c naimiTrehel.c resource.c faultTolerantExtRes.c
 # Sélectionne tous les .c excepté ceux contenus dans CONFLICT
 SRC = $(filter-out $(CONFLICT), $(wildcard *.c))
 # Réalise une copie de SRC en remplaçant .c par .o
