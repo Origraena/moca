@@ -224,10 +224,13 @@ Une grande partie du développement a été réalisée sous Vim et sous XCode.
 	\caption{Procédure M3}
 \end{figure}
 
-			
 \section{Phase d'initialisation}
+Une phase d'initialisation est nécessaire à l'algorithme de Naimi-Trehel. Lorsqu'un site se connecte, il broadcast un message de type HELLO. Pour garantir l'unicité du jeton, nous avons différencié deux cas :
+\begin{itemize}
+\item le site n'obtient aucune réponse à son message : il génère donc le jeton.
+\item le site obtient au moins une réponse : une élection est faite et le site élu gagne le jeton. Il devient le père des autres sites dans l'arbre logique.
+\end{itemize}
 
-Je t'en laisse le soin
 
 \section{Problèmes rencontrés}
 
@@ -242,6 +245,6 @@ d'adressage.
 Un autre problème s'est présenté, lors des phases de debug à cause du caractère distribué de
 l'application, ce dernier ne permettant pas l'utilisation d'outils classiques tels que valgrind et
 gdb. Il a donc été difficile de pouvoir surveiller l'évolution dans le temps des variables d'états
-de chacun des sites. Dansce genre de situation, il est facile de se rendre compte que quelque chose
+de chacun des sites. Dans ce genre de situation, il est facile de se rendre compte que quelque chose
 ne fonctionne pas, mais beaucoup plus de comprendre le problème en lui-même et les causes de ce
 dernier. 

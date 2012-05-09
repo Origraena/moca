@@ -3,6 +3,7 @@
 #include <sys/select.h>
 #include <signal.h>
 #include <time.h>
+#include <unistd.h>
 
 
 #include "networkUtils.h"
@@ -16,6 +17,7 @@
 
 site this_site;
 problem this_problem;
+int _verbose = 0;
 
 // {{{ Handler
 /* ending handler. Necessary to clean the environnement. */
@@ -59,10 +61,15 @@ void standardInput() {
 
 	switch(rea) {
 		case 1:
-			printf("BROADCAST.\n");
-
-			type(envoi) = MESSAGE;
-			broadcast (envoi);
+			printf("Verbose\n");
+			if (_verbose) {
+				_verbose = 0;
+				printf("verbose mode desactivated...");
+			}
+			else {
+				_verbose = 1;
+				printf("verbose mode activated!");
+			}
 			break;
 		case 2:
 			printf ("TO : ");
@@ -121,6 +128,8 @@ void standardInput() {
 	}
 }
 
+int pipeW,pipeR;
+
 int main(int argc, char* argv[]) {
 	long seed = time(0);
 	srand(seed);
@@ -157,18 +166,34 @@ int main(int argc, char* argv[]) {
 
 	/* Execution loop */
 	print_help();
+	int pipefd[2];
+	if (pipe(pipefd) == -1) {
+		perror("pipe creation error");
+		CLEAN();
+		exit(EXIT_FAILURE);
+	}
+	pipeR = pipefd[0];
+	pipeW = pipefd[1];
+
+	if(pthread_create(&this_problem.thread_id, NULL, (void*)(processingThreadFunction),0) != 0) {
+		fprintf(stderr, "Thread creation failure.\n");
+		CLEAN();
+		exit(EXIT_FAILURE);
+	}
+	pthread_detach(this_problem.thread_id);
+
 
 	while(this_site.running) {
 		/* select settings */
 		FD_ZERO(&socketRset);
 		FD_SET(STDIN_FILENO, &socketRset);
 		FD_SET(this_site.sdRecv, &socketRset);
+		FD_SET(pipeR,&socketRset);
 		
-		
-		printf("Je suis avant le select\n");
-		
+
+		int S = ((this_site.sdRecv > pipeW) && (this_site.sdRecv > pipeR)) ? this_site.sdRecv : (pipeW > pipeR) ? pipeW : pipeR;
 		/* select on all reading descriptors */
-		if(select(this_site.sdRecv+1, &socketRset, NULL, NULL, NULL) == -1) {
+		if(select(++S, &socketRset, NULL, NULL, NULL) == -1) {
 			if (errno == EINTR)
 				continue;
 			perror("select ");
@@ -196,25 +221,27 @@ int main(int argc, char* argv[]) {
 				handleMessage(msg);
 		}
 
-		printf("Je suis avant le check\n");
-		/* checks if problem has been solved */
-		if (this_problem.processed) {
-			printf("Je suis processed\n");
-			if (!this_problem.sent) {
-				printf("Je n'ai pas envoye\n");
-				if (this_site.resource) {
-					printf("Requesting critical section...\n");
-					critSectionRequest();
-					this_problem.sent = 1;
+		if (FD_ISSET(pipeR,&socketRset)) {
+			char buf[2];
+			read(pipeR,buf,sizeof(char)+sizeof(char));
+			if (this_problem.processed) {
+				if (!this_problem.sent) {
+					if (this_site.resource) {
+						if (_verbose) printf("Requesting critical section...\n");
+						critSectionRequest();
+						this_problem.sent = 1;
+					}
 				}
 			}
+			else if (this_problem.sent) {
+				if(pthread_create(&this_problem.thread_id, NULL, (void*)(processingThreadFunction),0) != 0) {
+					fprintf(stderr, "Thread creation failure.\n");
+					CLEAN();
+					exit(EXIT_FAILURE);
+				}
+				pthread_detach(this_problem.thread_id);
+			}
 		}
-		else if (!this_problem.thread_id) {
-			if(pthread_create(&this_problem.thread_id, NULL, (void*)(processingThreadFunction),0) != 0)
-				fprintf(stderr, "Thread creation failure.\n");
-			pthread_detach(this_problem.thread_id);
-		}
-			
 
 	}
 	

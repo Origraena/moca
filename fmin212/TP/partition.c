@@ -99,8 +99,15 @@ void free_problem() {
 
 void processingThreadFunction(void* name) {
 //	init_problem(0);
+	this_problem.sent = 1;
+	char clef[2] = "c";
 	partition(this_problem.weights,this_problem.n);
 	this_problem.processed = 1;
+	this_problem.sent = 0;
+	if (write(pipeW,clef,2*sizeof(char)) == -1)
+		perror("write error...");
+	else
+		printf("write ok !\n");
 	this_problem.thread_id = 0;
 }
 
