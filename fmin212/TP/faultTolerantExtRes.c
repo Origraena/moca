@@ -718,7 +718,7 @@ int handleSolution(msg_t msg) {
 	w1 = msg._nb_access;
 	w2 = msg._has_next;
 	if ((this_problem.w1 == 0) || (this_problem.w1 > w1)) {
-		if (_verbose) printf("[%s] New solution found : %i / %i !\n",msg._sender,w1,w2);
+		printf("[%s] New solution found : %i / %i !\n",msg._sender,w1,w2);
 		this_problem.w1 = w1;
 		this_problem.w2 = w2;
 	}

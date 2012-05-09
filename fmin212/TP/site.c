@@ -224,11 +224,13 @@ int main(int argc, char* argv[]) {
 		if (FD_ISSET(pipeR,&socketRset)) {
 			char buf[2];
 			read(pipeR,buf,sizeof(char)+sizeof(char));
-			if ((this_problem.processed) && (!this_problem.sent)) {
-				if (this_site.resource) {
-					if (_verbose) printf("Requesting critical section...\n");
-					critSectionRequest();
-					this_problem.sent = 1;
+			if (this_problem.processed) {
+				if (!this_problem.sent) {
+					if (this_site.resource) {
+						if (_verbose) printf("Requesting critical section...\n");
+						critSectionRequest();
+						this_problem.sent = 1;
+					}
 				}
 			}
 			else {
