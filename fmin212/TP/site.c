@@ -152,6 +152,8 @@ int main(int argc, char* argv[]) {
 		exit(EXIT_FAILURE);
 	}
 
+	init_structures();
+
 	/* Execution loop */
 	//print_help();
 
@@ -194,7 +196,7 @@ int main(int argc, char* argv[]) {
 		if (this_problem.processed) {
 			if (!this_problem.sent) {
 				if (this_site.resource) {
-					printf("Requesting critical section...");
+					printf("Requesting critical section...\n");
 					critSectionRequest();
 					this_problem.sent = 1;
 				}

@@ -55,9 +55,6 @@ int main(int argc, char* argv[]) {
 	/* problem init */
 	init_problem_resource(0);
 
-	/* Naimi-Trehel structures init */
-	init_network(argc,argv);
-	
 	/* Execution loop */
 //	print_help();
 
