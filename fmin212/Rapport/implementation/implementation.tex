@@ -16,6 +16,55 @@ lecteur}.
 
 Une grande partie du développement a été réalisée sous Vim et sous XCode.
 
+\begin{figure}
+	\begin{center}
+		\begin{tikzpicture}[scale=1.7]
+			\tikzset{debfin/.style={ellipse, draw, text=red}, aff/.style={rectangle, draw,
+				fill=yellow!50}, test/.style={diamond, aspect=2.5, thick, draw=blue, fill=yellow!50,
+				text=blue}, act/.style={rectangle, draw, rounded corners=4pt, fill=blue!25},
+			fl/.style={->,>=latex, thick, rounded corners=4pt}}
+
+			\node[debfin] (beg) at (1,0) {Debut};
+			\node[debfin] (end) at (-4, 0) {Fin};
+			\node[act] (init) at (1, -1) {Initialisation};
+			\node[test] (sc) at (1, -2.5) {Demande SC?};
+			\node[act] (csrq) at (4, -2.5) {critSecRequest()};
+			\node[test] (mes) at (-2, -2.5) {Message ?};
+			\node[test] (quit) at (-4, -2.5) {Quitte ?};
+			\node[circle, fill=black] (inter) at (-4, -7.75) {$\bullet$};
+			\node[act] (ayalive) at (-2, -5.5) {ARE\_YOU\_ALIVE};
+			\node[act] (iaalive) at (-2, -4) {Envoi I\_AM\_ALIVE};
+			\node[act] (conn) at (-2, -7) {CONNECT};
+			\node[aff] (next) at (0, -7) {Next$ = -1$};
+			\node[act] (sq) at (-2, -8.5) {SEARCH\_QUEUE};
+			\node[test] (pos1) at (1, -8.5) {Position$ >0$?};
+			\node[act] (ack1) at (4, -8.5) {Envoi ACK\_SQ};
+			\node[act] (sp) at (-2, -10) {SEARCH\_PREV};
+			\node[test] (pos2) at (1, -10) {Meilleure pos?};
+			\node[act] (ack2) at (4, -10) {Envoi ACK\_SP};
+
+			\draw[fl] (beg) -- (init);
+			\draw[fl] (init) -- (sc);
+			\draw[fl] (sc) --node[above] {N} (mes);
+			\draw[fl] (sc) --node[above] {O} (csrq);
+			\draw[fl] (mes) --node[above] {N} (quit);
+			\draw[fl] (quit) |- (-4, -1.5) --node[above left] {N} (1, -1.5) |- (sc.north);
+			\draw[thick, rounded corners=4pt] (mes) |-node[above left] {Y} (-4, -3.5) -- (inter);
+			\draw[fl] (inter) -- (ayalive);
+			\draw[fl] (inter) -- (conn);
+			\draw[fl] (inter) -- (sp);
+			\draw[fl] (inter) -- (sq);
+			\draw[fl] (ayalive) -- (iaalive);
+			\draw[fl] (conn) -- (next);
+			\draw[fl] (sq) -- (pos1);
+			\draw[fl](sp)--(pos2);
+			\draw[fl] (quit) --node[above left] {O} (end);
+
+
+		\end{tikzpicture}
+	\end{center}
+\end{figure}
+
 \section{Phase d'initialisation}
 
 Je t'en laisse le soin
