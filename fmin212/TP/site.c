@@ -169,6 +169,14 @@ int main(int argc, char* argv[]) {
 	pipeR = pipefd[0];
 	pipeW = pipefd[1];
 
+	if(pthread_create(&this_problem.thread_id, NULL, (void*)(processingThreadFunction),0) != 0) {
+		fprintf(stderr, "Thread creation failure.\n");
+		CLEAN();
+		exit(EXIT_FAILURE);
+	}
+	pthread_detach(this_problem.thread_id);
+
+
 	while(this_site.running) {
 		/* select settings */
 		FD_ZERO(&socketRset);
