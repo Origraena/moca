@@ -30,11 +30,11 @@ Après avoir reçu un message de COMMIT, $S_i$ vérifie périodiquement si son p
 Détaillons maintenant comment récupérer d'une panne dans ces trois cas.
 
 \subsection{M1}
-Lorsqu'un site $S_i$ détecte une panne de son plus proche prédécesseur dans la file, il envoi un message de type ARE\_YOU\_ALIVE à chacun de ses prédécesseurs depuis le plus proche jusqu'au plus lointain pour vérifier s'ils sont encore en vie.
+Lorsqu'un site $S_i$ détecte une panne de son plus proche prédécesseur dans la file, il envoie un message de type ARE\_YOU\_ALIVE à chacun de ses prédécesseurs depuis le plus proche jusqu'au plus lointain pour vérifier s'ils sont encore en vie.
 Il arrête d'envoyer des messages lorsqu'il reçoit un message de type I\_AM\_ALIVE de l'un de ses prédécesseurs. Celui-ci prend alors $S_i$ comme nouveau successeur. La file d'attente est alors reconstruite et l'ordre est préservé. De plus, l'arbre logique reste cohérent avec la file d'attente et l'invariant est respecté.
 
 \subsection{M2}
-Si aucun prédécesseur ne répond au message de type ARE\_YOU\_ALIVE, $S_i$ essaie de se reconnecter à la file d'attente en diffusant un message de type $SEARCH_PREV$ qui contient la position de $S_i$ dans la file. $S_i$ attend alors une réponse pendant deux fois le temps maximum de transmission d'un message. Tous les sites ayant une plus petite position que $S_i$ dans la file doivent répondre au message.
+Si aucun prédécesseur ne répond au message de type ARE\_YOU\_ALIVE, $S_i$ essaie de se reconnecter à la file d'attente en diffusant un message de type $SEARCH\_PREV$ qui contient la position de $S_i$ dans la file. $S_i$ attend alors une réponse pendant deux fois le temps maximum de transmission d'un message. Tous les sites ayant une plus petite position que $S_i$ dans la file doivent répondre au message.
 
 Après avoir attendu le temps nécessaire, $S_i$ choisi parmi les sites qui lui ont répondu celui qui a la plus grande position dans la file comme son nouveau prédécesseur. $S_i$ se re-connecte alors à la file en envoyant au site choisi un message de type CONNECTION.
 
