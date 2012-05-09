@@ -690,9 +690,9 @@ void liberation(void* arg) {
 	this_problem.sent = 0;
 	this_problem.w1 = 0;
 	this_problem.w2 = 0;
-	int clef = 2;
-	write(pipeW,(void*)clef,sizeof(clef));
-
+	char clef[2] = "c";
+	if (write(pipeW,clef,2*sizeof(char)) == -1)
+		perror("write error");
 	state = IDLE;
 	if(next != -1) {
 		fprintf (stdout, "Sending TOKEN.\n");
