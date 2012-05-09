@@ -3,9 +3,85 @@
 
 \chapter{Implémentation et tests}\label{implementation}
 
-\section{Choix des outils}
-Nous avons choisi d'implémenter l'algorithme de Naimi-Trehel et l'extension de Sopena en C grâce à la bibliothèque standard pour le réseau. Ce choix s'explique par notre volonté de nous rapprocher le plus possible d'une implémentation utilisable dans des conditions réelles. Nous avons choisi d'utiliser le protocole UDP pour la transmission des messages afin que l'ordre des messages ne soit pas garanti et cela pour se rapprocher du modèle établi dans l'article.
+\section{Stratégie et mise en \oe uvre}
+
+L'implémentation des sites participant à l'algorithme a été réalisée en C, afin d'obtenir un
+architecture réellement distribuée pouvant s'exécuter sur des machines distinctes. Cette
+implémentation permet une plus grande modularité pour les phases de test, ainsi que la soumission de
+l'algorithme à des conditions physiques réelles lors de son exécution.
+
+Le choix du langage, quant à lui, s'est tout naturellement porté sur le C\footnote{Afin d'éviter
+	toute forme de digression déplacée dans ce rapport, la justification sera laissée au bon sens du
+lecteur}. 
+
+Une grande partie du développement a été réalisée sous Vim et sous XCode.
+
+\begin{figure}
+	\begin{center}
+		\begin{tikzpicture}[scale=1.7]
+			\tikzset{debfin/.style={ellipse, draw, text=red}, aff/.style={rectangle, draw,
+				fill=yellow!50}, test/.style={diamond, aspect=2.5, thick, draw=blue, fill=yellow!50,
+				text=blue}, act/.style={rectangle, draw, rounded corners=4pt, fill=blue!25},
+			fl/.style={->,>=latex, thick, rounded corners=4pt}}
+
+			\node[debfin] (beg) at (1,0) {Debut};
+			\node[debfin] (end) at (-4, 0) {Fin};
+			\node[act] (init) at (1, -1) {Initialisation};
+			\node[test] (sc) at (1, -2.5) {Demande SC?};
+			\node[act] (csrq) at (4, -2.5) {critSecRequest()};
+			\node[test] (mes) at (-2, -2.5) {Message ?};
+			\node[test] (quit) at (-4, -2.5) {Quitte ?};
+			\node[circle, fill=black] (inter) at (-4, -7.75) {$\bullet$};
+			\node[act] (ayalive) at (-2, -5.5) {ARE\_YOU\_ALIVE};
+			\node[act] (iaalive) at (-2, -4) {Envoi I\_AM\_ALIVE};
+			\node[act] (conn) at (-2, -7) {CONNECT};
+			\node[aff] (next) at (0, -7) {Next$ = -1$};
+			\node[act] (sq) at (-2, -8.5) {SEARCH\_QUEUE};
+			\node[test] (pos1) at (1, -8.5) {Position$ >0$?};
+			\node[act] (ack1) at (4, -8.5) {Envoi ACK\_SQ};
+			\node[act] (sp) at (-2, -10) {SEARCH\_PREV};
+			\node[test] (pos2) at (1, -10) {Meilleure pos?};
+			\node[act] (ack2) at (4, -10) {Envoi ACK\_SP};
+
+			\draw[fl] (beg) -- (init);
+			\draw[fl] (init) -- (sc);
+			\draw[fl] (sc) --node[above] {N} (mes);
+			\draw[fl] (sc) --node[above] {O} (csrq);
+			\draw[fl] (mes) --node[above] {N} (quit);
+			\draw[fl] (quit) |- (-4, -1.5) --node[above left] {N} (1, -1.5) |- (sc.north);
+			\draw[thick, rounded corners=4pt] (mes) |-node[above left] {Y} (-4, -3.5) -- (inter);
+			\draw[fl] (inter) -- (ayalive);
+			\draw[fl] (inter) -- (conn);
+			\draw[fl] (inter) -- (sp);
+			\draw[fl] (inter) -- (sq);
+			\draw[fl] (ayalive) -- (iaalive);
+			\draw[fl] (conn) -- (next);
+			\draw[fl] (sq) -- (pos1);
+			\draw[fl](sp)--(pos2);
+			\draw[fl] (quit) --node[above left] {O} (end);
 
 
+		\end{tikzpicture}
+	\end{center}
+\end{figure}
 
+\section{Phase d'initialisation}
 
+Je t'en laisse le soin
+
+\section{Problèmes rencontrés}
+
+Le premier problème s'est posé, peu après l'implémentation de l'algorithme de Naimi-Trehel, pour
+lequel des chaînes de caractères avaient été utilisées dans les échanges de message. L'utilisation
+de ces dernières étant plus sujette à débat lors de l'ajout de l'extension de tolérance aux pannes,
+nous avons décidé l'utilisation d'une structure de données spécifique aux messages permettant une
+gestion plus claire des paramètres à envoyer. L'adaptation de la sous-couche réseau à cette
+structure particulière s'est faite non sans peine en grande partie pour des raisons d'espace
+d'adressage.
+
+Un autre problème s'est présenté, lors des phases de debug à cause du caractère distribué de
+l'application, ce dernier ne permettant pas l'utilisation d'outils classiques tels que valgrind et
+gdb. Il a donc été difficile de pouvoir surveiller l'évolution dans le temps des variables d'états
+de chacun des sites. Dansce genre de situation, il est facile de se rendre compte que quelque chose
+ne fonctionne pas, mais beaucoup plus de comprendre le problème en lui-même et les causes de ce
+dernier. 
