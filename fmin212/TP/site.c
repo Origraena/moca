@@ -52,7 +52,7 @@ void print_help() {
 void standardInput() {
 	msg_t envoi;
 	int rea;
-	int a = 0;
+//	int a = 0;
 	int i = 0;
 	char adip[20];
 
@@ -136,7 +136,7 @@ int main(int argc, char* argv[]) {
 	printf("Seed = %li\n",seed);
 
 
-	uint tmpW;
+//	uint tmpW;
 	fd_set socketRset;
 	msg_t msg;
 	

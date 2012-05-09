@@ -172,12 +172,6 @@ int init_structures() {
 
     waitForHellorep(WAITING_PERIOD);
 
-    memset(&broad, 0, SIZE);
-    type(broad) = HELLO;
-    broadcast(broad);
-
-    waitForHellorep(WAITING_PERIOD);
-
     /* HELLO message broadcasting */
     //broadcast(t, "");
 

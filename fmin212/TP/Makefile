@@ -16,7 +16,7 @@ SRC = $(filter-out $(CONFLICT), $(wildcard *.c))
 # Réalise une copie de SRC en remplaçant .c par .o
 OBJECTS = $(SRC:.c=.o)
 
-USE_FAULT_TOLERANT_EXT = 1
+USE_FAULT_TOLERANT_EXT = 0
 
 .PHONY: all clean
 
