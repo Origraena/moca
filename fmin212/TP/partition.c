@@ -107,6 +107,5 @@ void processingThreadFunction(void* name) {
 		perror("write error...");
 	else
 		printf("write ok !\n");
-	this_problem.thread_id = 0;
 }
 
