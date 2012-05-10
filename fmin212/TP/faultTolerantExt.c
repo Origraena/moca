@@ -653,7 +653,7 @@ int takeCriticalSection() {
 	/* exec CS */
 	pthread_t thread_id;
 	if(pthread_create(&thread_id, NULL, (void*)(liberation), (void*)20) != 0)
-		fprintf(stderr, "Thread creation failure.\n");
+		fprintf(stderr, "Thread creation failure : CS\n");
 
 	ch_pid = thread_id;
 
