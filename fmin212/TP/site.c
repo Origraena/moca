@@ -128,7 +128,7 @@ void standardInput() {
 	}
 }
 
-int pipeW,pipeR;
+int pipeW,pipeR,pipeW2,pipeR2;
 
 int main(int argc, char* argv[]) {
 	long seed = time(0);
@@ -174,6 +174,14 @@ int main(int argc, char* argv[]) {
 	}
 	pipeR = pipefd[0];
 	pipeW = pipefd[1];
+	if (pipe(pipefd) == -1) {
+		perror("pipe creation error");
+		CLEAN();
+		exit(EXIT_FAILURE);
+	}
+	pipeR2 = pipefd[0];
+	pipeW2 = pipefd[1];
+
 
 	if(pthread_create(&this_problem.thread_id, NULL, (void*)(processingThreadFunction),0) != 0) {
 		fprintf(stderr, "Thread creation failure.\n");
@@ -189,9 +197,10 @@ int main(int argc, char* argv[]) {
 		FD_SET(STDIN_FILENO, &socketRset);
 		FD_SET(this_site.sdRecv, &socketRset);
 		FD_SET(pipeR,&socketRset);
+		FD_SET(pipeR2,&socketRset);
 		
 
-		int S = ((this_site.sdRecv > pipeW) && (this_site.sdRecv > pipeR)) ? this_site.sdRecv : (pipeW > pipeR) ? pipeW : pipeR;
+		int S = ((this_site.sdRecv > pipeW) && (this_site.sdRecv > pipeR)) ? this_site.sdRecv : (pipeR2 > pipeR) ? pipeR2 : pipeR;
 		/* select on all reading descriptors */
 		if(select(++S, &socketRset, NULL, NULL, NULL) == -1) {
 			if (errno == EINTR)
@@ -233,7 +242,10 @@ int main(int argc, char* argv[]) {
 					}
 				}
 			}
-			else if (this_problem.sent) {
+		}
+
+		if (FD_ISSET(pipeR2,&socketRset)) {
+			if (!this_problem.thread_id) {
 				if(pthread_create(&this_problem.thread_id, NULL, (void*)(processingThreadFunction),0) != 0) {
 					fprintf(stderr, "Thread creation failure.\n");
 					CLEAN();
