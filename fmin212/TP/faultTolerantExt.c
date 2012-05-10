@@ -687,9 +687,6 @@ void liberation(void* arg) {
 //	this_problem.thread_id = 0;
 
 	state = IDLE;
-	char clef[2] = "c";
-	if (write(pipeW2,clef,2*sizeof(char)) == -1)
-		if (_verbose) perror("write error");
 	if(next != -1) {
 		if (_verbose) fprintf (stdout, "Sending TOKEN.\n");
 		msg_t mes;
@@ -704,6 +701,10 @@ void liberation(void* arg) {
 		last = -1;
 	ch_pid = 0;
 	if (_verbose) fprintf(stdout, "CS released : %d access\n", ++acces);
+	char clef[2] = "c";
+	if (write(pipeW2,clef,2*sizeof(char)) == -1)
+		if (_verbose) perror("write error");
+
 }
 //}}}
 
