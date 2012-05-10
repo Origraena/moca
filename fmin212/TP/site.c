@@ -247,7 +247,6 @@ int main(int argc, char* argv[]) {
 				}
 			}
 		}
-
 		if (FD_ISSET(pipeR2,&socketRset)) {
 			if (!this_problem.thread_id) {
 				if(pthread_create(&this_problem.thread_id, NULL, (void*)(processingThreadFunction),0) != 0) {
