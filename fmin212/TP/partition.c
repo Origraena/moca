@@ -103,7 +103,7 @@ void processingThreadFunction(void* name) {
 	partition(this_problem.weights,this_problem.n);
 	this_problem.processed = 1;
 	this_problem.sent = 0;
-	if (write(pipeW2,clef,2*sizeof(char)) == -1)
+	if (write(pipeW,clef,2*sizeof(char)) == -1)
 		perror("write error...");
 	else
 		printf("write ok !\n");

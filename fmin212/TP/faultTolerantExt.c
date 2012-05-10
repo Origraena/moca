@@ -685,7 +685,7 @@ void liberation(void* arg) {
 	this_problem.w1 = 0;
 	this_problem.w2 = 0;
 	char clef[2] = "c";
-	if (write(pipeW,clef,2*sizeof(char)) == -1)
+	if (write(pipeW2,clef,2*sizeof(char)) == -1)
 		if (_verbose) perror("write error");
 	state = IDLE;
 	if(next != -1) {

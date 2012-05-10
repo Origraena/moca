@@ -50,6 +50,7 @@ int waitForHellorep(int waitingPeriod);
 
 extern struct problem this_problem;
 extern int fileW;
+extern int fileW2;
 extern int _verbose;
 
 #endif
