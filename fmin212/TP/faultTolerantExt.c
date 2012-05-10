@@ -686,6 +686,7 @@ void liberation(void* arg) {
 	this_problem.w2 = 0;
 //	this_problem.thread_id = 0;
 
+	sleep(10);
 	state = IDLE;
 	if(next != -1) {
 		if (_verbose) fprintf (stdout, "Sending TOKEN.\n");

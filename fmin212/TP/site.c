@@ -72,18 +72,7 @@ void standardInput() {
 			}
 			break;
 		case 2:
-			printf ("TO : ");
-			int nbLus = read(STDIN_FILENO, adip, 15);
-			if (nbLus < 1) {
-				printf ("Error");
-				break;
-			}
-			type(envoi) = MESSAGE;
-			adip[15] = '\0';
-			strncpy(ip(envoi), adip, 16);
-			sendMessageWithAdd(envoi);
-
-			printf ("Send Message\n");
+			printf ("Processing thread id = %i\n",this_problem.thread_id);
 			break;
 		case 3:
 			printNeighbours();
@@ -188,7 +177,6 @@ int main(int argc, char* argv[]) {
 		CLEAN();
 		exit(EXIT_FAILURE);
 	}
-	pthread_detach(this_problem.thread_id);
 
 
 	while(this_site.running) {
@@ -237,18 +225,39 @@ int main(int argc, char* argv[]) {
 				if (!this_problem.sent) {
 					if (strcmp(this_site.resource,"none") != 0) {
 						if (this_problem.thread_id) {
+							if (_verbose) printf("Join thread...\n");
 							pthread_join(this_problem.thread_id,0);
 							this_problem.thread_id = 0;
+							if (_verbose) printf("Join thread!\n");
 						}
 						if (_verbose) printf("Requesting critical section...\n");
 						this_problem.sent = 1;
 						critSectionRequest();
 					}
+					else {
+						if (_verbose)
+								printf("No resource site !\n");
+						CLEAN()
+						exit(EXIT_FAILURE);
+					}
+				}
+				else {
+					if (_verbose)
+							printf("Sent = %i\n",this_problem.sent);
 				}
 			}
+			else {
+					if (_verbose)
+							printf("Processed = %i\n",this_problem.processed);
+					//buf[0] = 'c';
+					//buf[1] = '\0';
+					//write(pipeW2,buf,sizeof(char)*2);
+				}
 		}
 
 		if (FD_ISSET(pipeR2,&socketRset)) {
+			char buf[2];
+				read(pipeR2,buf,sizeof(char)*2);
 			if (!this_problem.thread_id) {
 				if(pthread_create(&this_problem.thread_id, NULL, (void*)(processingThreadFunction),0) != 0) {
 					fprintf(stderr, "Thread creation failure.\n");

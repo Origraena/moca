@@ -24,10 +24,17 @@ int* partition(int* weights, const int n) {
 			this_problem.w2 += weights[i];
 		}
 	}
+	if (this_problem.w2 > this_problem.w1) {
+			int tmp = this_problem.w1;
+			this_problem.w1 = this_problem.w2;
+			this_problem.w2 = tmp;
+		}
 	return this_problem.result;
 }
 
 void mix(int* weights, const int n) {
+	if (n <= 0)
+		return;
 	uint i;
 	uint j = 0;
 	uint cpt;
@@ -65,7 +72,7 @@ void init_problem(char* filename) {
 	printf("Initializing problem...\n");
 	this_problem.sent = 0;
 	this_problem.processed = 0;
-	this_problem.n = 10;
+	this_problem.n = 1000;
 	this_problem.weights = malloc(sizeof(int)*this_problem.n);
 	uint i;
 	for (i = 0 ; i < this_problem.n ; i++)
@@ -79,7 +86,7 @@ void init_problem(char* filename) {
 void init_problem_resource(char* filename) {
 	this_problem.sent = 0;
 	this_problem.processed = 0;
-	this_problem.n = 10;
+	this_problem.n = 1000;
 	this_problem.weights = malloc(sizeof(int)*this_problem.n);
 	uint i;
 	for (i = 0 ; i < this_problem.n ; i++)
