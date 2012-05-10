@@ -63,7 +63,7 @@ void init_problem(char* filename) {
 	printf("Initializing problem...\n");
 	this_problem.sent = 0;
 	this_problem.processed = 0;
-	this_problem.n = 15;
+	this_problem.n = 10;
 	this_problem.weights = malloc(sizeof(int)*this_problem.n);
 	uint i;
 	for (i = 0 ; i < this_problem.n ; i++)
@@ -77,7 +77,7 @@ void init_problem(char* filename) {
 void init_problem_resource(char* filename) {
 	this_problem.sent = 0;
 	this_problem.processed = 0;
-	this_problem.n = 15;
+	this_problem.n = 10;
 	this_problem.weights = malloc(sizeof(int)*this_problem.n);
 	uint i;
 	for (i = 0 ; i < this_problem.n ; i++)
