@@ -236,9 +236,9 @@ int main(int argc, char* argv[]) {
 			if (this_problem.processed) {
 				if (!this_problem.sent) {
 					if (strcmp(this_site.resource,"none") != 0) {
-						if (this_site.thread_id) {
-							pthread_join(this_site.thread_id,0);
-							this_site.thread_id = 0;
+						if (this_problem.thread_id) {
+							pthread_join(this_problem.thread_id,0);
+							this_problem.thread_id = 0;
 						}
 						if (_verbose) printf("Requesting critical section...\n");
 						this_problem.sent = 1;
