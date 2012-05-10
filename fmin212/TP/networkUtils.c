@@ -65,6 +65,8 @@ char* getIPaddress() {
 int init_network(int argc, char* argv[]) {
 	int enabled = 1;
 
+	this_site.resource[0] = 0;
+	strcpy(this_site.resource,"none");
 	/* sockets initialisation */
 	this_site.sdSend = socket(AF_INET, SOCK_DGRAM, 0);
 	if(this_site.sdSend < 0) {

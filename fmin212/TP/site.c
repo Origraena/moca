@@ -235,10 +235,10 @@ int main(int argc, char* argv[]) {
 			read(pipeR,buf,sizeof(char)+sizeof(char));
 			if (this_problem.processed) {
 				if (!this_problem.sent) {
-					if (this_site.resource) {
+					if (strcmp(this_site.resource,"none") != 0) {
 						if (_verbose) printf("Requesting critical section...\n");
-						critSectionRequest();
 						this_problem.sent = 1;
+						critSectionRequest();
 					}
 				}
 			}
