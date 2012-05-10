@@ -16,8 +16,9 @@
 site this_site;
 problem this_problem;
 
-int _verbose = 0;
+int _verbose = 1;
 int pipeW,pipeR;
+int pipeW2,pipeR2;
 
 // {{{ Handler
 /* ending handler. Necessary to clean the environnement. */

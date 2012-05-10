@@ -31,5 +31,6 @@ void processingThreadFunction(void*);
 
 extern problem this_problem;
 extern int pipeW;
+extern int pipeW2;
 
 #endif // PARTITION_H_
