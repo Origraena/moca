@@ -684,7 +684,7 @@ void liberation(void* arg) {
 	this_problem.sent = 0;
 	this_problem.w1 = 0;
 	this_problem.w2 = 0;
-	this_problem.thread_id = 0;
+//	this_problem.thread_id = 0;
 
 	state = IDLE;
 	char clef[2] = "c";
