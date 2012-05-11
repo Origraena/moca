@@ -23,6 +23,9 @@
 #ifndef _TSP_H
 #define _TSP_H
 
+#define ROW 0
+#define COL 1
+
 typedef struct tsp {
 	int nb_node;
 	int **mat;
@@ -37,4 +40,5 @@ gpointer hungAlgo (const gpointer tsp, gpointer tsp_sol);
 gpointer lightestString (const gpointer tsp, gpointer tsp_sol);
 gpointer opt2 (const gpointer tsp, gpointer tsp_sol);
 gpointer opt3 (const gpointer tsp, gpointer tsp_sol);
+
 #endif

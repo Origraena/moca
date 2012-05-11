@@ -1,7 +1,7 @@
 /*
  * =====================================================================================
  *
- *       Filename:  pb.h
+ *       Filename:  bb.h
  *
  *    Description:  
  *
@@ -16,39 +16,66 @@
  * =====================================================================================
  */
 
-#include <glib.h>
+//#include <glib.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #ifndef _BB_H
 #define _BB_H
 
-// This structure represents a B&B problem
-typedef struct bandb {
-	// Pointer on the tree of explorated solution
-	GNode *sol_tree	;
-	// Best valid solution
-	// It is dynamically updated during the algotrithm
-	gpointer curBestSol;
-	// The value of the current best valid solution
-	gpointer curSolVal;
-	// It represents a kind of buffer (it's useful in order to avoid dynamic memory allocation)
-	gpointer tempSol;
-	// Check if given solution is an admissible one
-	int (*checkSolValidity) (const gpointer data);
-	// Function to compare value of two solution in order to determine which one is the best
-	int (*compareSolution) (const gpointer data1, const gpointer data2);
-	// Function to compute optimal value of relaxed problem, returns value of solution
-	gpointer (*compCurSol) (const gpointer data, gpointer sol);
-	// Function to compute initial solution for the b&b problem
-	gpointer (*compInitSol) (const gpointer data, gpointer sol);
-} bb_t;
+#define NON_ACC -1
+#define ACC			-2
 
-// Init function
-void initBAndB (bb_t *bb, gpointer pb, int (*checkSolValidity) (const gpointer data), double (*compCurSol) (const gpointer data, gpointer, sol), gpointer (*compareSolution) (const gpointer d1, const gpointer d2), gpointer (*compInitSol) (const gpointer data, gpointer sol));
-// Free function
-void freeBAndB (bb_t *bb);
+typedef enum opt {
+	MIN = -1,
+	MAX =  1
+} opt_t;
 
-// B&B algorithm
-void execBAndB (bb_t *bb);
+// List of current solution relative to a given bound
+typedef struct b_list_sol {
+	struct b_list_sol *next;
+	void *var;
+} bls_t;
+
+#define SIZE_BLS sizeof(bls_t *) + sizeof(char *)
+
+// List of accpetable bound, containing pointer on list of current solution
+typedef struct list_sol {
+	int bound;
+	struct list_sol *next;
+	bls_t *first;
+} ls_t;
+
+#define SIZE_LS sizeof(int) + sizeof(ls_t *) + sizeof(bls_t *)
+
+// data structure representing a branch and bound problem
+typedef struct pb {
+	int bestsol;
+	ls_t *curnode;
+	opt_t order;
+	int (*compInitVal) (struct pb *p, void *s);
+	int (*compCurVal) (struct pb *p, void *s);
+	int (*selBraVar) (struct pb *p, void *s);
+	int (*stratBranch) (struct pb *p, void *branchnode, void *newnodes, void *var);
+	void (*copyData) (void *d1, void *d2);
+	void (*freeData) (void *d);
+} pb_t;
+
+#define SIZE_PB sizeof(int) + sizeof(ls_t *) + 4*sizeof(int *)
+
+// Create a new solution
+bls_t *newSol(void *variables);
+// Insert a solution at the right place in the list of acceptable bound
+void insSol (ls_t **lsol, bls_t *blsol, int b, opt_t order);
+// Retrieve the best current solution
+bls_t *popSol(ls_t **lsol, int *b);
+
+void freeBSol(bls_t **b, void (*freeData)(void *));
+void freeSol(ls_t **s, void (*freeData)(void *));
+
+pb_t *initPb (int (*compInitVal) (struct pb *, void *), int (*compCurVal) (struct pb *, void *), int (*selBraVar) (struct pb*, void *), int (*stratBranch) (struct pb *, void *, void *, void *), opt_t order, bls_t *initData(void *), void *data, void (*copyData) (void *, void*), void (*freeData) (void *));
+void freePb (pb_t *p);
+
+int resolve_pb (pb_t *pb, void *sol);
 #endif
