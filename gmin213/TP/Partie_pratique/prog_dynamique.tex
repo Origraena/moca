@@ -2,3 +2,42 @@
 % !TEX root = ../Rapport/rapport.tex
 
 \section{Programmation dynamique}
+
+\subsection{Problème de la partition}
+Le problème de la 2-partition de $n$ objets consiste à trouver deux sous-ensembles de ces $n$ objets tel que chacun des sous-ensembles ait le même poids. Les poids de chacun des objets étant des valeurs entières, pour qu’il existe deux sous-ensembles distincts ayant le même poids, il faut que la somme des poids des objets soit paire.
+
+Prenons un algorithme de résolution (présenté dans la section théorique) :
+\begin{algorithm}
+	\caption{solve-partition}
+	\label{solvepart}
+	\begin{algorithmic}[1]
+		\STATE $p_{max} \leftarrow \sum_{i \in \mathbb{[}1, n \mathbb{]}} p(a_i)$
+		\IF{$p_{max} \equiv 1 \pmod{2}$}
+			\STATE Pas de solutions
+		\ELSE
+			\FOR {$j \in \mathbb{[}0,p_{max}\mathbb{]}$}
+				\IF{$j = 0$}
+					\STATE $T(0, j) \leftarrow \TRUE$
+				\ELSE
+					\STATE $T(0, j) \leftarrow \FALSE$
+				\ENDIF
+			\ENDFOR
+			\FOR{$i \in \mathbb{[}1, n \mathbb{]}$}
+				\FOR{$j \in \mathbb{[}0, p_{max}\mathbb{]}$}
+					\STATE $T(i, j) \leftarrow j = 0 \vee j = p(a_i) \vee T(i-1, j) \vee T(i-1, j-p(a_i))$
+				\ENDFOR
+			\ENDFOR
+			\IF{$T(n, p_{max} / 2) = \FALSE$}
+				\STATE Pas de solutions
+			\ELSE
+				\STATE Construire le sous ensemble solution
+			\ENDIF
+		\ENDIF
+	\end{algorithmic}
+\end{algorithm}
+
+
+\subsection{Problème du sac à dos}
+
+
+\subsection{Problème du voyageur de commerce}
