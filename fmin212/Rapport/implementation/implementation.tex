@@ -1,22 +1,22 @@
 % !TEX encoding = UTF-8 Unicode
 % !TEX root = ../rapport.tex
 
-\chapter{Implémentation et tests}\label{implementation}
+\chapter{Implémentation}\label{implementation}
 
 \section{Stratégie et mise en \oe uvre}
 
-L'implémentation des sites participant à l'algorithme a été réalisée en C, afin d'obtenir un
-architecture réellement distribuée pouvant s'exécuter sur des machines distinctes. Cette
-implémentation permet une plus grande modularité pour les phases de test, ainsi que la soumission de
-l'algorithme à des conditions physiques réelles lors de son exécution.
-
+L'implémentation des sites participant à l'algorithme a été réalisée de manière à obtenir une
+architecture réellement distribuée pouvant s'exécuter sur des machines distinctes.
 Le choix du langage, quant à lui, s'est tout naturellement porté sur le C\footnote{Afin d'éviter
 	toute forme de digression déplacée dans ce rapport, la justification sera laissée au bon sens du
 lecteur}. 
+ Cette
+implémentation permet une plus grande modularité pour les phases de test, ainsi que la soumission de
+l'algorithme à des conditions physiques réelles lors de son exécution.
 
-Une grande partie du développement a été réalisée sous Vim et sous XCode.
+Le développement a été réalisée sous Vim et sous XCode et a été versionné à l'aide de git.
 
-\begin{figure}
+\begin{figure}[h]
 	\begin{center}
 		\begin{tikzpicture}[scale=1.7]
 			\tikzset{debfin/.style={ellipse, draw, text=red}, aff/.style={rectangle, draw,
@@ -200,9 +200,9 @@ Une grande partie du développement a été réalisée sous Vim et sous XCode.
 
 			\draw[fl] (begin) -- (bsq);
 			\draw[fl] (bsq) -- (mes);
-			\draw[fl] (mes) --node[above] {N} (regen);
-			\draw[fl] (mes) --node[above] {O} (sq);
-			\draw[fl] (mes) --node[right] {O} (ack);
+			\draw[fl] (mes) --node[above] {Aucun} (regen);
+			\draw[fl] (mes) --node[above] {Search Q} (sq);
+			\draw[fl] (mes) --node[right] {ACK} (ack);
 			\draw[fl] (regen) -- (tksc);
 			\draw[fl] (tksc.west) -- (-5,  -2) |- (end);
 			\draw[fl] (sq) -- (nbacc);
@@ -224,12 +224,31 @@ Une grande partie du développement a été réalisée sous Vim et sous XCode.
 	\caption{Procédure M3}
 \end{figure}
 
-\section{Phase d'initialisation}
+\subsection{Phase d'initialisation}
 Une phase d'initialisation est nécessaire à l'algorithme de Naimi-Trehel. Lorsqu'un site se connecte, il broadcast un message de type HELLO. Pour garantir l'unicité du jeton, nous avons différencié deux cas :
 \begin{itemize}
 \item le site n'obtient aucune réponse à son message : il génère donc le jeton.
 \item le site obtient au moins une réponse : une élection est faite et le site élu gagne le jeton. Il devient le père des autres sites dans l'arbre logique.
 \end{itemize}
+
+
+\subsection{Naimi-Trehel}
+Afin d'implémenter l'algorithme, nous avons utilisé deux sockets pour chaque site : une pour la lecture et une pour l'écriture. La boucle d'exécution est en attente passive (select). Enfin, les différents mécanismes ont été gérés grâces aux protocoles réseau standards.
+
+\subsection{Extension}
+Le mécanisme de surveillance du prédécesseur lors de la demande de section critique a été réalisée à l'aide d'un thread, permettant le traitement parallèle des messages provenant des autres sites. Cette architecture nous a forcé à utiliser des signaux lors de la détection d'une panne permettant de mettre en suspens toute autre activité pour se concentrer sur la résolution du problème. 
+
+Nous avons aussi redéfini la structure de données transitant sur le réseau de façon à pouvoir changer les adresses des prédécesseurs ainsi que d'autres informations tels que le nombre d'accès à la section critique (utile pour l'élection), ou la présence ou non d'un next dans la  file d'attente.
+
+
+\subsection{Application pratique}
+Nous avons décidé d'utiliser notre structure distribuée afin de résoudre un problème pratique : une approximation au problème de {\em Partition}.
+Pour cela nous avons mis en place un algorithme naïf 2-approché (qui consiste à parcourir les objets et à les mettre dans le sous-ensemble le plus léger).
+De plus afin de permettre la résolution distribuée, nous avons dû rendre cet algorithme non déterministe, ainsi l'ordre des objets est aléatoire pour chaque exécution.
+Chaque site va donc résoudre le problème avec un ordre donné dans un thread séparé, puis une fois la solution trouvée, va tenter d'accéder à la section critique (qui est représentée par un nouveau site {\em ressource}) afin d'y déposer sa solution.
+Une fois cette étape effectuée, le site génère un nouvel ordre sur les objets et recommence.
+
+La ressource garde uniquement la meilleure solution trouvée, ainsi au bout d'un laps de temps donné, il est possible de récupérer celle-ci.
 
 
 \section{Problèmes rencontrés}
