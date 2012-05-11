@@ -16,39 +16,46 @@
  * =====================================================================================
  */
 
-#include <glib.h>
+//#include <glib.h>
 #include <stdio.h>
 #include <stdlib.h>
 
 #ifndef _BB_H
 #define _BB_H
 
-// This structure represents a B&B problem
-typedef struct bandb {
-	// Pointer on the tree of explorated solution
-	GNode *sol_tree	;
-	// Best valid solution
-	// It is dynamically updated during the algotrithm
-	gpointer curBestSol;
-	// The value of the current best valid solution
-	gpointer curSolVal;
-	// It represents a kind of buffer (it's useful in order to avoid dynamic memory allocation)
-	gpointer tempSol;
-	// Check if given solution is an admissible one
-	int (*checkSolValidity) (const gpointer data);
-	// Function to compare value of two solution in order to determine which one is the best
-	int (*compareSolution) (const gpointer data1, const gpointer data2);
-	// Function to compute optimal value of relaxed problem, returns value of solution
-	gpointer (*compCurSol) (const gpointer data, gpointer sol);
-	// Function to compute initial solution for the b&b problem
-	gpointer (*compInitSol) (const gpointer data, gpointer sol);
-} bb_t;
+typedef struct b_list_sol {
+	struct list_sol *next;
+	char *var;
+} bls_t;
 
-// Init function
-void initBAndB (bb_t *bb, gpointer pb, int (*checkSolValidity) (const gpointer data), double (*compCurSol) (const gpointer data, gpointer, sol), gpointer (*compareSolution) (const gpointer d1, const gpointer d2), gpointer (*compInitSol) (const gpointer data, gpointer sol));
-// Free function
-void freeBAndB (bb_t *bb);
+#define SIZE_BLS sizeof(bls_t *) + sizeof(char *)
 
-// B&B algorithm
-void execBAndB (bb_t *bb);
+typedef struct list_sol {
+	int bound;
+	struct list_sol *next;
+	bls_t *first;
+} ls_t;
+
+#define SIZE_LS sizeof(int) + sizeof(ls_t *) + sizeof(bls_t *)
+
+typedef struct pb {
+	int bestsol;
+	ls_t *curnode;
+	int (*compInitVal) (struct pb *p);
+	int (*compCurVal) (struct pb *p, bls_t *s);
+	int (*selBraVar) (struct pb *p, bls_t *s);
+	int (*stratBranch) (struct pb *p);
+} pb_t;
+
+#define SIZE_PB sizeof(int) + sizeof(ls_t *) + 4*sizeof(int *)
+
+bls_t *newSol(int n);
+void insSol (ls_t *lsol, bls_t *blsol, int b);
+bls_t *popSol(ls_t *lsol, int b);
+
+void freeBSol(bls_t *b);
+void freeSol(ls_t* s);
+
+pb_t *initPb (int (*compInitVal) (struct pb *), int (*compCurVal) (struct pb *, bls_t *), int (*selBraVar) (struct pb*, bls_t*), int (*stratBranch) (struct pb *));
+void freePb (pb_t *p);
 #endif
