@@ -89,6 +89,22 @@ void freeSol(ls_t **s) {
 	*s = tmp;
 }
 
-pb_t *initPb (int (*compInitVal) (struct pb *), int (*compCurVal) (struct pb *, bls_t *), int (*selBraVar) (struct pb*, bls_t*), int (*stratBranch) (struct pb *));
+// Initialize branch and bound problem
+pb_t *initPb (int (*compInitVal) (struct pb *, bls_t *), int (*compCurVal) (struct pb *, bls_t *), int (*selBraVar) (struct pb*, bls_t*), int (*stratBranch) (struct pb *), opt_t order, bls_t *initData(void *), void *data) {
+	pb_t *new = (pb_t *) malloc (SIZE_PB);
+	new->compInitVal = compInitVal;
+	new->compCurVal = compCurVal;
+	new->selBraVar = selBraVar;
+	new->stratBranch = stratBranch;
+	new->order = order;
+
+	new->curnode = (ls_t *) malloc (SIZE_LS);
+	new->curnode->first = initData(data);
+	new->curnode->next = NULL;
+	new->curnode->bound = compInitVal(new, new->curnode->first);
+	new->bestsol = new->curnode->bound; 
+}
+
+// Free Branch and bound problem
 void freePb (pb_t *p);
 

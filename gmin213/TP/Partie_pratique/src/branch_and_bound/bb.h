@@ -67,6 +67,6 @@ bls_t *popSol(ls_t **lsol, int b);
 void freeBSol(bls_t *b);
 void freeSol(ls_t* s);
 
-pb_t *initPb (int (*compInitVal) (struct pb *), int (*compCurVal) (struct pb *, bls_t *), int (*selBraVar) (struct pb*, bls_t*), int (*stratBranch) (struct pb *));
+pb_t *initPb (int (*compInitVal) (struct pb *, bls_t *), int (*compCurVal) (struct pb *, bls_t *), int (*selBraVar) (struct pb*, bls_t*), int (*stratBranch) (struct pb *), opt_t order, bls_t *initData(void *), void *data);
 void freePb (pb_t *p);
 #endif
