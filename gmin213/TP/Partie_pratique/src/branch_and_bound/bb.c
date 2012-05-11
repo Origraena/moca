@@ -28,31 +28,44 @@ bls_t *newSol(void *variable) {
 }
 
 // Insert given solution at the right place in the list of all solution
-void insSol (ls_t **lsol, bls_t *blsol, int b, opt_t order) {
+void insSol (ls_t **lsol, bls_t *blsol, int b, opt_t order, strat_t str) {
 	int relb = order * b;
 	ls_t *tmpsol = *lsol;
-	if (relb > order * tmpsol->bound) {
-		ls_t *new = (ls_t *) malloc (SIZE_LS);
-		new->bound = b;
-		new->first = blsol;
-		new->next = tmpsol;
-		*lsol = new;
-		return;
-	}
+	switch (str) {
+		case BEST_FIRST:
+			if (relb > order * tmpsol->bound) {
+				ls_t *new = (ls_t *) malloc (SIZE_LS);
+				new->bound = b;
+				new->first = blsol;
+				new->last = blsol;
+				new->next = tmpsol;
+				*lsol = new;
+				return;
+			}
 
-	while (tmpsol->next && relb <= order * tmpsol->next->bound)
-		tmpsol = tmpsol->next;
+			while (tmpsol->next && relb <= order * tmpsol->next->bound)
+				tmpsol = tmpsol->next;
 
-	if (relb == tmpsol->bound) {
-		blsol->next = tmpsol->first;
-		tmpsol->first = blsol;
-	}
-	else {
-		ls_t *new = (ls_t *) malloc (SIZE_LS);
-		new->bound = b;
-		new->first = blsol;
-		new->next = tmpsol->next;
-		tmpsol->next = new;
+			if (relb == tmpsol->bound) {
+				blsol->next = tmpsol->first;
+				tmpsol->first = blsol;
+			}
+			else {
+				ls_t *new = (ls_t *) malloc (SIZE_LS);
+				new->bound = b;
+				new->first = blsol;
+				new->next = tmpsol->next;
+				tmpsol->next = new;
+			}
+			break;
+		case DEPTH_FIRST:
+			blsol->next = tmpsol->first;
+			tmpsol->first = blsol;
+			break;
+		case WIDTH_FIRST:
+			tmpsol->last->next = blsol;
+			tmpsol->last = blsol;
+			break;
 	}
 }
 
@@ -90,13 +103,14 @@ void freeSol(ls_t **s, void (*freeData)(void *)) {
 }
 
 // Initialize branch and bound problem
-pb_t *initPb (int (*compInitVal) (struct pb *, void *), int (*compCurVal) (struct pb *, void *), int (*selBraVar) (struct pb*, void *), int (*stratBranch) (struct pb *, void *, void *, void *, int), opt_t order, bls_t *initData(void *), void *data, void (*copyData) (void *, void*), void (*freeData) (void *)) {
+pb_t *initPb (int (*compInitVal) (void *), int (*compCurVal) (void *), int (*stratBranch) (void *, void **, size_t *), opt_t order, bls_t *initData(void *), void *data, void (*copyData) (void *, void*), void (*freeData) (void *), strat_t str, int (*acceptableSol) (void *)) {
 	pb_t *new = (pb_t *) malloc (SIZE_PB);
 	new->compInitVal = compInitVal;
 	new->compCurVal = compCurVal;
-	new->selBraVar = selBraVar;
 	new->stratBranch = stratBranch;
 	new->order = order;
+	new->strat = str;
+	new->acceptableSol = acceptableSol;
 	new->copyData = copyData;
 	new->freeData = freeData;
 
@@ -123,40 +137,27 @@ int resolve_pb (pb_t *pb, void *sol) {
 	int i = 0;
 
 	while (pb->curnode) {
-		int b = 0, ret = 0, nb_branch, size_data;
-		void *d1, *d2;
+		int b = 0, nb_branch;
+		size_t size_data;
+		void *d1;
+		// Choose a node
 		bls_t *tmp = popSol(&(pb->curnode), &b);
-		ret = pb->selBraVar(pb, tmp->var);
-		switch(ret) {
-			// Acceptable Solution
-			case ACC:
-				// Update current solution
-				pb->copyData(sol, tmp);
-				// Update best bound
-				pb->bestsol = b;
-				freeBSol (&tmp, pb->freeData);
-				break;
-			case NON_ACC:
-				freeBSol (&tmp, pb->freeData);
-				break;
-			default:
-				// Create a new branch point
-				// TODO Implement more than 2 branchpoints
-				nb_branch = pb->stratBranch(pb, tmp, d1, d2, ret);
-				if (d1) {
-					bls_t *b1 = newSol(d1);
-					int value = pb->compCurVal(pb, b1);
-					pb->bestsol = pb->order * value > pb->order * pb->bestsol ? value : pb->bestsol;
-					insSol(&(pb->curnode), b1, value, pb->order);
+		// Generate sons
+		nb_branch = pb->stratBranch(tmp, &d1, &size_data);
+		void *dtmp = d1;
+		for (i=0; i<nb_branch; i++) {
+			dtmp += size_data;
+			int heur = pb->compCurVal(dtmp);
+			if (heur * pb->order > pb->order * pb->bestsol) {
+				if (pb->acceptableSol(dtmp)) {
+					pb->copyData(sol, dtmp);
+					pb->bestsol = heur;
 				}
-				if (d2) {
-					bls_t *b2 = newSol(d2);
-					int value = pb->compCurVal(pb, b2);
-					pb->bestsol = pb->order * value > pb->order * pb->bestsol ? value : pb->bestsol;
-					insSol(&(pb->curnode), b2, value, pb->order);
-				}	
-				break;	
+				else
+					insSol(&(pb->curnode), dtmp, heur, pb->order, pb->strat);
+			}
 		}
+		freeBSol(&tmp, pb->freeData);
 	}
 	return pb->bestsol;
 }

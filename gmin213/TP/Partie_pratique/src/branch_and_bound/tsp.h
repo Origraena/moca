@@ -16,29 +16,31 @@
  * =====================================================================================
  */
 
-#include <glib.h>
 #include <stdio.h>
 #include <stdlib.h>
 
 #ifndef _TSP_H
 #define _TSP_H
 
-#define ROW 0
-#define COL 1
-
 typedef struct tsp {
 	int nb_node;
+	int *sol;
 	int **mat;
 } tsp_t;
 
+#define SIZE_TSP sizeof(int) + 2*sizeof(int *)
+
 void initTSPFromFile (tsp_t *tsp, FILE *in);
 
-int validTSP (const gpointer tsp);
-int bestSol (const gpointer val1, const gpointer val2);
-gpointer hungAlgo (const gpointer tsp, gpointer tsp_sol);
+int compCurVal (void *s);
+int stratBranch (void *branchpoint, void **newbranch, size_t *size);
+int acceptableSol (void *data);
 
-gpointer lightestString (const gpointer tsp, gpointer tsp_sol);
-gpointer opt2 (const gpointer tsp, gpointer tsp_sol);
-gpointer opt3 (const gpointer tsp, gpointer tsp_sol);
+void copyData (void *d1, void *d2);
+void freeData (void *d);
+
+int lightestString (void tsp);
+int opt2 (void * tsp);
+int opt3 (void * tsp);
 
 #endif

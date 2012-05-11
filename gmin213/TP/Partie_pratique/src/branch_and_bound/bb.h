@@ -32,6 +32,12 @@ typedef enum opt {
 	MAX =  1
 } opt_t;
 
+typedef enum strat {
+	BEST_FIRST = 1,
+	DEPTH_FIRST = 2,
+	WIDTH_FIRST = 3
+} strat_t;
+
 // List of current solution relative to a given bound
 typedef struct b_list_sol {
 	struct b_list_sol *next;
@@ -45,6 +51,7 @@ typedef struct list_sol {
 	int bound;
 	struct list_sol *next;
 	bls_t *first;
+	bls_t *last;
 } ls_t;
 
 #define SIZE_LS sizeof(int) + sizeof(ls_t *) + sizeof(bls_t *)
@@ -54,10 +61,12 @@ typedef struct pb {
 	int bestsol;
 	ls_t *curnode;
 	opt_t order;
-	int (*compInitVal) (struct pb *p, void *s);
-	int (*compCurVal) (struct pb *p, void *s);
-	int (*selBraVar) (struct pb *p, void *s);
-	int (*stratBranch) (struct pb *p, void *branchpoint, void *newnode1, void *newnode2, int var);
+	strat_t strat;
+
+	int (*compInitVal) (void *s);
+	int (*compCurVal) (void *s);
+	int (*stratBranch) (void *branchpoint, void **newbranch, size_t *size);
+	int (*acceptableSol) (void *data);
 	void (*copyData) (void *d1, void *d2);
 	void (*freeData) (void *d);
 } pb_t;
@@ -67,14 +76,14 @@ typedef struct pb {
 // Create a new solution
 bls_t *newSol(void *variables);
 // Insert a solution at the right place in the list of acceptable bound
-void insSol (ls_t **lsol, bls_t *blsol, int b, opt_t order);
+void insSol (ls_t **lsol, bls_t *blsol, int b, opt_t order, strat_t str);
 // Retrieve the best current solution
 bls_t *popSol(ls_t **lsol, int *b);
 
 void freeBSol(bls_t **b, void (*freeData)(void *));
 void freeSol(ls_t **s, void (*freeData)(void *));
 
-pb_t *initPb (int (*compInitVal) (struct pb *, void *), int (*compCurVal) (struct pb *, void *), int (*selBraVar) (struct pb*, void *), int (*stratBranch) (struct pb *, void *, void *, void *, int), opt_t order, bls_t *initData(void *), void *data, void (*copyData) (void *, void*), void (*freeData) (void *));
+pb_t *initPb (int (*compInitVal) (void *), int (*compCurVal) (void *), int (*stratBranch) (void *, void **, size_t *), opt_t order, bls_t *initData(void *), void *data, void (*copyData) (void *, void*), void (*freeData) (void *), strat_t str, int (*acceptableSol) (void *));
 void freePb (pb_t *p);
 
 int resolve_pb (pb_t *pb, void *sol);
