@@ -57,7 +57,7 @@ typedef struct pb {
 	int (*compInitVal) (struct pb *p, void *s);
 	int (*compCurVal) (struct pb *p, void *s);
 	int (*selBraVar) (struct pb *p, void *s);
-	int (*stratBranch) (struct pb *p, void *branchnode, void *newnodes, void *var);
+	int (*stratBranch) (struct pb *p, void *branchpoint, void *newnode1, void *newnode2, int var);
 	void (*copyData) (void *d1, void *d2);
 	void (*freeData) (void *d);
 } pb_t;
@@ -74,7 +74,7 @@ bls_t *popSol(ls_t **lsol, int *b);
 void freeBSol(bls_t **b, void (*freeData)(void *));
 void freeSol(ls_t **s, void (*freeData)(void *));
 
-pb_t *initPb (int (*compInitVal) (struct pb *, void *), int (*compCurVal) (struct pb *, void *), int (*selBraVar) (struct pb*, void *), int (*stratBranch) (struct pb *, void *, void *, void *), opt_t order, bls_t *initData(void *), void *data, void (*copyData) (void *, void*), void (*freeData) (void *));
+pb_t *initPb (int (*compInitVal) (struct pb *, void *), int (*compCurVal) (struct pb *, void *), int (*selBraVar) (struct pb*, void *), int (*stratBranch) (struct pb *, void *, void *, void *, int), opt_t order, bls_t *initData(void *), void *data, void (*copyData) (void *, void*), void (*freeData) (void *));
 void freePb (pb_t *p);
 
 int resolve_pb (pb_t *pb, void *sol);
