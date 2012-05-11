@@ -75,6 +75,7 @@ Contrairement aux deux premiers mécanismes, l'ordre des demandes n'est pas pré
 
 
 Dans cet exemple, nous considérons qu'il y a deux sites en panne (comme le montre la figure \ref{fault_tolerant_ex1}). La file d'attente est brisée en deux morceaux (G,H et A,B,C). Les sites G et H ont déjà une position dans la file tandis que les autres n'en ont pas. Le site G a le jeton et constitue le premier élément de la file. Le site D a envoyé une demande de section critique au site J et pendant qu'il attendait le message de COMMIT, il a accepté la demande de E. Ainsi, il y a une seconde file d'attente qui n'est pas encore connectée à la première. Notons que dans une telle configuration, l'arbre logique est également brisé.
+\par{}En effet un cas tel que celui-ci peut apparaître si le père de D était un des sites en panne, puis si avant la détection de la panne, E fait la demande à D qui ne peut donc pas retransmettre à son père.
 
 \begin{figure}[H]
 \centering
@@ -229,8 +230,10 @@ Un site régénère le jeton uniquement s'il a été perdu : par le mécanisme M
 
 Un seul site régénère le jeton car M2 et M3 ne sont pas compatibles et que deux sites ne peuvent régénérer le jeton en utilisant le même mécanisme.
 
-\subsection{Ordre des messages}
+\subsection{Ordre d'entrées dans la section critique}
 Après avoir reçu un message de COMMIT, un site a la position $p$ dans la file ce qui assure qu'il accèdera à la section critique après au plus $p-1$ autres accès. En cas de panne, la reconstruction de la file d'attente garantie la conservation de l'ordre des messages.
+
+Contrairement aux autres mécanismes, M3 ne préserve pas forcément l'ordre des demandes. Ceci est dû à l'élection qui a lieu lors de la détection des pannes par plusieurs sites simultanément.
 
 
 \section{Complexité}
