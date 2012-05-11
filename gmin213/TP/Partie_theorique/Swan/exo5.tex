@@ -2,7 +2,6 @@
 
 \section{Sur le problème de partition}\label{ex5}
 
-\subsection{D\'efinition}\label{ex5_def}
 Soit un ensemble d'objets $A = \{a_i : i \in [1;n]\}$ et une fonction de poids $p : A
 \rightarrow \mathbb{N}$.\\
 Le problème de décision est le suivant : \\
@@ -48,7 +47,7 @@ Soit l'algorithme suivant :
 \end{algorithm}
 \end{center}
 
-\subsection{Question 1}\label{ex5_q1}
+\subsection{r-approximation ; cas où $r \geq 2$}\label{ex5_q1}
 Montrons que $\forall r \geq 2$, la solution $A,\emptyset$ est une r-approximation.\\
 On sait que : $w(A) = w(Y_1) + w(Y_2)$ donc $w(Y_1) \geq \frac{w(A)}{2}$. Ie,
 $sol_{opt}(A) \geq \frac{w(A)}{2}$.
@@ -57,7 +56,7 @@ On a alors $w(Y_1) = 2 \times \frac{w_(A)}{2}$ et donc $w(Y_1) \leq 2 \times
 sol_{opt}(A)$.\\
 Nous avons bien $sol_{algo}(A) \leq 2 \times sol_{opt}(A) \leq r \times sol_{opt}(A)$.
 
-\subsection{Question 2}\label{ex5_q2}
+\subsection{Cas où $r < 2$}\label{ex5_q2}
 Soit $a_h$ le dernier \'el\'ement ins\'er\'e dans $Y_1$.\\
 
 \subsubsection{(a)}\label{ex5_q2_a}
@@ -115,7 +114,7 @@ On a bien : $sol_{algo}(A) \leq r \times sol_{opt}(A)$.
 Nous pouvons en conclure que l'algorithme \ref{ex5_algo} renvoit bien une solution
 r-approchée.
 
-\subsection{Question 3}
+\subsection{Complexité}
 % TODO
-Complexité : $nlog(n) + 2^{k(r)+1} + n$
+La complexité de l'algorithme est : $n.log(n) + 2^{k(r)+1} + n$
 

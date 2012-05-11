@@ -1,7 +1,7 @@
+% !TEX root = ../../Rapport/rapport.tex
 \section{Seuil d'approximation pour le problème de la coloration de sommets (resp.
 d'arêtes)}\label{ex11}
 
-\subsection{Définitions}\label{ex11_def}
 Soit un graphe quelconque $G = (V,E)$.
 
 \subsubsection{Coloration de sommets}\label{ex11_def_sommets}
@@ -18,14 +18,14 @@ soit $k \in \mathbb{N}$, est-il possible de trouver une fonction $\chi' : E \rig
 Son problème d'optimisation associé est de trouver $k$ le plus petit possible tel que $G$
 soit k-arêtes-colorable (on note $\chi'(G)$ un tel $k$).
 
-\subsection{Question 1}\label{ex11_q1}
+\subsection{Complexité}\label{ex11_q1}
 Ces deux problèmes de coloration appartiennent à la classe $NP$, de plus, celui de
 sommets est non approximable, tandis que celui d'arêtes l'est mais n'appartient pas à la 
 classe d'approximation $PTAS$.\\
 Nous nous intéressons à déterminer un seuil d'approximation pour le problème
 de coloration d'arêtes.
 
-\subsection{Question 2}\label{ex11_q2}
+\subsection{Algorithme approché avec performance relative meilleure que $\frac{4}{3}$}\label{ex11_q2}
 Supposons qu'il existe un algorithme $(\frac{4}{3} - \epsilon)$-approché pour le
 problème de coloration des arêtes.
 Nous avons alors $sol_A < \frac{4}{3} sol_{opt}$.
@@ -42,7 +42,7 @@ Cet algorithme renvoie donc la solution optimale.
 Si $sol_{opt} \geq 4$, l'algorithme renverra une solution strictement supérieure à 3.
 Ainsi il est possible de déterminer si la solution optimale est inférieure à 3.
 
-\subsection{Question 3}\label{ex11_q3}
+\subsection{Conclusion}\label{ex11_q3}
 Etant donné que si un algorithme de rapport strictement inférieur à $\frac{4}{3}$
 existait, nous pourrions répondre en temps polynomial au problème de savoir si un graphe est
 3-arêtes-colorable (qui est NP-complet),
