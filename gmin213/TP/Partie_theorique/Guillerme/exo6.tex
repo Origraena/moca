@@ -1,3 +1,4 @@
+% !TEX root = ../../Rapport/rapport.tex
 \section{Sur le problème du sac à dos simple}
 
 \subsection{Construction d'un algorithme approché}
@@ -45,9 +46,12 @@ La performance relative de l'algorithme est donc 2.
 \subsubsection{Complexité de l'algorithme}
 
 De façon très grossière, la construction de l'ensemble des sous-ensembles $S_k$ de $k$ éléments se
-fait en $k\times n^k$ opérations. On a donc une construction des sous-ensembles réalisée en : $$
-\sum_{i=1}^k i n^i $$. Soit une construction en $O(n^k)$.
+fait en $k\times n^k$ opérations. On a donc une construction des sous-ensembles réalisée en : 
+$$\sum_{i=1}^k i . n^i $$
+Soit une construction en $O(n^k)$.
 
 L'ensemble étant déjà trié, l'algorithme glouton s'exécute en $O(n)$, d'où une exécution totale de
 l'algorithme en $O(n^{k+1})$.
+
+% TODO
 
