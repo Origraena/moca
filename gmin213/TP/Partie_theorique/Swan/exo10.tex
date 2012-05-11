@@ -1,9 +1,8 @@
+% !TEX root = ../../Rapport/rapport.tex
 \section{Seuil d'approximation pour le problème Bin Packing}\label{ex10}
 
 \subsection{Question 1}\label{ex10_q1}
-Soit un ensemble $O = \{o_i : i \in [1;n]\}$ de $n$ objets.\\
-Soit une fonction $q : O \rightarrow \mathbb{N}$.\\
-Soit une taille de boîte $Q$.
+Soient un ensemble $O = \{o_i : i \in [1;n]\}$ de $n$ objets, une fonction $q : O \rightarrow \mathbb{N}$, une taille de boîte $Q$.
 
 Le problème de décision Bin Packing est le suivant :\\
 Existe-t-il une k-partition $O_1,...,O_k \subseteq O$ telle que :
@@ -12,11 +11,11 @@ Existe-t-il une k-partition $O_1,...,O_k \subseteq O$ telle que :
 	\item $\forall i,j \in \mathbb{N}$, $i \neq j$, $O_i \cap O_j = \emptyset$,
 	\item $\sum_{o_{ij} \in O_i} \leq Q\ \forall i \in [1;k]$.
 \end{itemize}
-
+~\\
 Le problème d'optimisation associé est :\\
-Minimiser $k \in \mathbb : \exists$ k-partition qui respecte les conditions ci-dessus.
+Minimiser $k \in \mathbb{N} : \exists$ k-partition qui respecte les conditions ci-dessus.
 
-Dans la suite on notera $B(O_i) = \sum_{o_{ij} \in O_i}q(o_i)$ la somme des poids des
+Dans la suite on notera $B(O_i) = \sum\limits_{o_{ij} \in O_i}q(o_i)$ la somme des poids des
 éléments de $O_i$, $B = B(O)$, et $K^*$ la solution optimale au problème d'optimisation.
 
 \subsection{Question 2}\label{ex10_q2}
