@@ -23,6 +23,12 @@
 #ifndef _BB_H
 #define _BB_H
 
+typedef enum opt {
+	MIN = -1,
+	MAX =  1
+} opt_t;
+
+// List of current solution relative to a given bound
 typedef struct b_list_sol {
 	struct list_sol *next;
 	char *var;
@@ -30,6 +36,7 @@ typedef struct b_list_sol {
 
 #define SIZE_BLS sizeof(bls_t *) + sizeof(char *)
 
+// List of accpetable bound, containing pointer on list of current solution
 typedef struct list_sol {
 	int bound;
 	struct list_sol *next;
@@ -38,9 +45,11 @@ typedef struct list_sol {
 
 #define SIZE_LS sizeof(int) + sizeof(ls_t *) + sizeof(bls_t *)
 
+// data structure representing a branch and bound problem
 typedef struct pb {
 	int bestsol;
 	ls_t *curnode;
+	opt_t order;
 	int (*compInitVal) (struct pb *p);
 	int (*compCurVal) (struct pb *p, bls_t *s);
 	int (*selBraVar) (struct pb *p, bls_t *s);
@@ -49,9 +58,11 @@ typedef struct pb {
 
 #define SIZE_PB sizeof(int) + sizeof(ls_t *) + 4*sizeof(int *)
 
+// Create a new solution
 bls_t *newSol(int n);
-void insSol (ls_t *lsol, bls_t *blsol, int b);
-bls_t *popSol(ls_t *lsol, int b);
+// Insert a solution at the right place in the list of acceptable bound
+void insSol (ls_t **lsol, bls_t *blsol, int b, opt_t order);
+bls_t *popSol(ls_t **lsol, int b);
 
 void freeBSol(bls_t *b);
 void freeSol(ls_t* s);
