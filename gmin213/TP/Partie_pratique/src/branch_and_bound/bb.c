@@ -90,7 +90,7 @@ void freeSol(ls_t **s, void (*freeData)(void *)) {
 }
 
 // Initialize branch and bound problem
-pb_t *initPb (int (*compInitVal) (struct pb *, void *), int (*compCurVal) (struct pb *, void *), int (*selBraVar) (struct pb*, void *), int (*stratBranch) (struct pb *, void *, void *, void *), opt_t order, bls_t *initData(void *), void *data, void (*copyData) (void *, void*), void (*freeData) (void *)) {
+pb_t *initPb (int (*compInitVal) (struct pb *, void *), int (*compCurVal) (struct pb *, void *), int (*selBraVar) (struct pb*, void *), int (*stratBranch) (struct pb *, void *, void *, void *, int), opt_t order, bls_t *initData(void *), void *data, void (*copyData) (void *, void*), void (*freeData) (void *)) {
 	pb_t *new = (pb_t *) malloc (SIZE_PB);
 	new->compInitVal = compInitVal;
 	new->compCurVal = compCurVal;
@@ -120,8 +120,11 @@ int resolve_pb (pb_t *pb, void *sol) {
 
 	pb->copyData(sol, pb->curnode->first->var);
 
+	int i = 0;
+
 	while (pb->curnode) {
-		int b = 0, ret = 0;
+		int b = 0, ret = 0, nb_branch, size_data;
+		void *d1, *d2;
 		bls_t *tmp = popSol(&(pb->curnode), &b);
 		ret = pb->selBraVar(pb, tmp->var);
 		switch(ret) {
@@ -138,9 +141,24 @@ int resolve_pb (pb_t *pb, void *sol) {
 				break;
 			default:
 				// Create a new branch point
+				// TODO Implement more than 2 branchpoints
+				nb_branch = pb->stratBranch(pb, tmp, d1, d2, ret);
+				if (d1) {
+					bls_t *b1 = newSol(d1);
+					int value = pb->compCurVal(pb, b1);
+					pb->bestsol = pb->order * value > pb->order * pb->bestsol ? value : pb->bestsol;
+					insSol(&(pb->curnode), b1, value, pb->order);
+				}
+				if (d2) {
+					bls_t *b2 = newSol(d2);
+					int value = pb->compCurVal(pb, b2);
+					pb->bestsol = pb->order * value > pb->order * pb->bestsol ? value : pb->bestsol;
+					insSol(&(pb->curnode), b2, value, pb->order);
+				}	
 				break;	
 		}
 	}
+	return pb->bestsol;
 }
 
 
