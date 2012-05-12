@@ -39,41 +39,41 @@ int stratBranch (void *branchpoint, void **newbranch, size_t *size) {
 
 int acceptableSol (void *data) {
 	tsp_t *t = (tsp_t *) data;
-	int nb_visited = 0, *visited = (int *) calloc (t->nb_node, 0);
-	int **mat = (int **) malloc (sizeof(int *) * t->nb_node), i;
 
-	for (i=0; i<t->nb_node; mat[i++] = (int *) calloc (t->nb_node, sizeof(int)));
-	for (i=0; i<t->nb_node; mat[t->sol[i]/t->nb_node][t->sol[i++]%t->nb_node]++);
+	int *node_deg = (int *) calloc (t->nb_node, sizeof(int)), i;
 
-	int node = 0, finchemin
-
-	for (i=0; i<t->nb_node; i++) 
-		if (t->mat[node][i]) {
-			nb_visited ++; visited[node]++;
-			node = i;
-			break;
+	for (i=0; i<t->nb_node; i++)
+		if (++node_deg[t->sol[i]/t->nb_node] > 2 || ++node_deg[t->sol[i]%t->nb_node] > 2) {
+			free (node_deg);
+			return 0;
 		}
 
-	if (!node) {
-		for (i=0; i<t->nb_node; i++)
-			free(mat[i]);
-		free (mat);
-		return 0;
-	}
+	free(node_deg);
+	return 1;
+}
 
-	while (nb_visited < t->nb_node) {
-		for (i=0; i<t->nb_node; i++)
-			if (mat[node][i]) {
-
-			}
+void copyData (void *d1, void *d2) {
+	tsp_t *tdest = (tsp_t *) d1, *tsrc = (tsp_t *) d2;
+	int i, j;
+	tdest->nb_node = tsrc->nb_node;
+	
+	for (i=0; i<tsrc->nb_node; i++) {
+		tdest->sol[i] = tsrc->sol[i];
+		for (j=0; j<tsrc->nb_node; tdest->mat[i][j] = tsrc->mat[i][j++]);
 	}
 }
 
-void copyData (void *d1, void *d2);
-void freeData (void *d);
+void freeData (void *d) {
+	int i;
+	tsp_t *t = (tsp_t *) data;
 
-int lightestString (void tsp);
-int opt2 (void * tsp);
-int opt3 (void * tsp);
+	for (i=0; i<t->nb_node; free(t->mat[i++]));
+	free(t->sol);
+	free(t);
+}
+
+int lightestString (void *data) {}
+int opt2 (void *data) {}
+int opt3 (void *data) {}
 
 

@@ -39,8 +39,8 @@ int acceptableSol (void *data);
 void copyData (void *d1, void *d2);
 void freeData (void *d);
 
-int lightestString (void tsp);
-int opt2 (void * tsp);
-int opt3 (void * tsp);
+int lightestString (void *data);
+int opt2 (void *data);
+int opt3 (void *data);
 
 #endif
