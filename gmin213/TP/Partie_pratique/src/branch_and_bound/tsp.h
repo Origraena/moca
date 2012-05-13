@@ -28,9 +28,10 @@ typedef struct tsp {
 	int **mat;
 } tsp_t;
 
-#define SIZE_TSP sizeof(int) + sizeof(int *) + sizeof(int **)
+#define SIZE_TSP sizeof(tsp_t)
 
 void initTSPFromFile (tsp_t **tsp, FILE *in);
+void createEmptyTSP (tsp_t **tsp, int);
 
 int compCurVal (void *s);
 int stratBranch (void *branchpoint, void **newbranch, size_t *size);

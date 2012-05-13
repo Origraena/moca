@@ -26,6 +26,16 @@ static inline int nbvoisin (tsp_t *t, int s) {
 	return vois;
 }
 
+void createEmptyTSP (tsp_t **tsp, int n) {
+	tsp_t *a = (tsp_t *) malloc (sizeof(tsp_t));
+	a->nb_node = n;
+	a->sol = (int *) calloc (n, sizeof(int));
+	a->mat = (int **) malloc (n*sizeof(int *));
+	int i;
+	for (i=0; i<n; a->mat[i] = (int *) malloc (n*sizeof(int)), i++);
+	*tsp = a;
+}
+
 int findACPM (tsp_t *t) {
 	char *mark = (char *) malloc (t->nb_node * sizeof(char));
 	char *src = (char *) malloc (t->nb_node * sizeof(char));
@@ -66,7 +76,8 @@ int findACPM (tsp_t *t) {
 		}
 
 		visited[curnode] ++;
-		t->sol[nb_marked -1] = src[next[1]] * t->nb_node + next[1];
+		if (next[1] != -1)
+			t->sol[nb_marked -1] = src[next[1]] * t->nb_node + next[1];
 		curnode = next[1];
 		nb_marked++;
 	}
@@ -78,16 +89,16 @@ int findACPM (tsp_t *t) {
 }
 
 void initTSPFromFile (tsp_t **tsp, FILE *in) {
-	tsp_t *t = (tsp_t *) malloc (SIZE_TSP);
-	int i, j;
+	tsp_t *t = (tsp_t *) malloc (sizeof(tsp_t));
+	int i, j, n;
 
-	fscanf(in, "%d\n", &i);
-	t->nb_node = i;
+	fscanf(in, "%d\n", &n);
+	t->nb_node = n;
 
-	t->sol = (int *) malloc (t->nb_node * sizeof(int));
-	t->mat = (int **) malloc (t->nb_node * sizeof(int *));
+	t->sol = (int *) calloc (n, sizeof(int));
+	t->mat = (int **) malloc (n * sizeof(int *));
 
-	for (i=0; i<t->nb_node; t->mat[i++] = (int *) malloc (t->nb_node * sizeof(int)));
+	for (i=0; i<t->nb_node; t->mat[i++] = (int *) malloc (n * sizeof(int)));
 
 	for (i=0; i<t->nb_node; i++) {
 		for (j=i+1; j<t->nb_node; j++) {
@@ -111,8 +122,42 @@ int compCurVal (void *s) {
 }
 
 int stratBranch (void *branchpoint, void **newbranch, size_t *size) {
+	tsp_t *bp = (tsp_t *)branchpoint;
+	*size = sizeof (tsp_t);
 
-	return 0;
+	// Find number of children
+	int *degre = (int *) calloc (bp->nb_node, sizeof (int)), i, j;
+	for (i=0; i<bp->nb_node; i++) {
+		degre[bp->sol[i]/bp->nb_node]++;
+		degre[bp->sol[i]%bp->nb_node]++;
+	}
+
+	int max = 0, ind_max = 0;
+	for (i=0; i<bp->nb_node; i++)
+		if (degre[i] > max) {
+			max = degre[i];
+			ind_max = i;
+		}
+
+	tsp_t *nb = (tsp_t *) malloc (max * sizeof(tsp_t));
+	tsp_t *tmp = nb;
+	for (i=0; i< max; i++) {
+		nb->nb_node = bp->nb_node;
+		nb->sol = (int *) malloc (bp->nb_node * sizeof(int));
+//		free(nb->sol);
+		nb->mat = (int **) malloc (sizeof(int*) *bp->nb_node);
+		for (j=0; j<bp->nb_node; nb->mat[j++] = (int *) malloc (sizeof(int)*bp->nb_node));
+		copyData(nb, bp);
+		printTSP (nb);
+		if (i)
+			printTSP (nb-1);
+		printTSP (bp);
+		nb ++;
+	}
+	*newbranch = tmp;
+//	free(nb);
+
+	return max;
 }
 
 int acceptableSol (void *data) {
@@ -145,7 +190,7 @@ void freeData (void *d) {
 	int i=0;
 	tsp_t *t = (tsp_t *) d;
 
-	for (i=0; i<t->nb_node; printf ("%d\n", i), free(t->mat[i]), i++);
+	for (i=0; i<t->nb_node; free(t->mat[i]), i++);
 
 	free(t->mat);
 	free(t->sol);
