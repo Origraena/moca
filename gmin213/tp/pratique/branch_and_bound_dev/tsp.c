@@ -51,38 +51,43 @@ int findACPM (tsp_t *t) {
 	int next[2] = {-1};
 	int mark_sol = 0;
 
-	while (curnode < t->nb_node && !nbvoisin(t, curnode)) {
-		curnode ++;
-		nb_marked ++;
-	}
-
 	for (i=0; i<t->nb_node; i++)
+		if (!nbvoisin(t, i)) {
+			nb_marked++;
+			visited[i]++;
+		}
+
+	while (curnode < t->nb_node && visited[curnode]) 
+		curnode ++;
+
+	if (curnode == t->nb_node)
+		return 0;
+
+	for (i=0; i<t->nb_node; i++) {
 		mark[i] = -1;
+		t->sol[i] = -1;
+	}
 
 	while (nb_marked < t->nb_node && curnode != -1) {
 		next[0] = -1;
 		next[1] = -1;
+		visited[curnode] ++;
 
 		for (i=0; i<t->nb_node; i++){
 			if (!visited[i]) {
 				if (t->mat[curnode][i] != -1) {
-					if (next[0] == -1){
-						next[0] = t->mat[curnode][i];
-						next[1] = i;
-					}
-					if (t->mat[curnode][i] < mark[i] || mark[i] == -1) {
+					if (mark[i] == -1 || t->mat[curnode][i] < mark[i]) {
 						src[i] = curnode;
 						mark[i] = t->mat[curnode][i];
 					}
-					if (mark[i] < next[0]) {
-						next[0] = mark[i];
-						next[1] = i;
-					}
+				}
+				if (next[0] == -1 || mark[i] < next[0]){
+					next[0] = mark[i];
+					next[1] = i;
 				}
 			}
 		}
 
-		visited[curnode] ++;
 		if (next[1] != -1)
 			t->sol[mark_sol++] = src[next[1]] * t->nb_node + next[1];
 		curnode = next[1];
@@ -91,6 +96,10 @@ int findACPM (tsp_t *t) {
 	free(visited);
 	free(src);
 	free(mark);
+
+	for (i=0; i<t->nb_node-2; i++)
+		if (t->sol[i] == -1)
+			return 0;
 
 	return nb_marked == t->nb_node ? 1 : 0;
 }
@@ -148,6 +157,10 @@ int stratBranch (void *branchpoint, void **newbranch, size_t *size) {
 			max = degre[i];
 			ind_max = i;
 		}
+
+	if (max <= 2) {
+		return 0;
+	}
 
 	int *nodes = (int *) malloc (sizeof(int) * max);
 	int zz = 0;
@@ -279,7 +292,9 @@ int compPartSolFromACPM (void *data, int a) {
 	copyData(s, t);
 
 	for (i=0; i<t->nb_node; t->mat[i][a] = -1, t->mat[a][i++] = -1);
-	findACPM(t);
+	if (!findACPM(t))
+		return 0;
+
 	int mina = -1, minb = -1, inda = -1, indb = -1;
 
 	for (i=0; i<t->nb_node; i++) {
