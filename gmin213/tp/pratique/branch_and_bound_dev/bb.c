@@ -173,6 +173,7 @@ int resolve_pb (pb_t *pb, void *sol) {
 		for (i=0; i<nb_branch; i++) {
 			z = (int **)dtmp;
 			y = (void *) *z;
+			pb->printData(y);
 			int heur = pb->compCurVal(y);
 			if (heur * pb->order > pb->order * pb->bestsol) {
 				if (pb->acceptableSol(y)) {

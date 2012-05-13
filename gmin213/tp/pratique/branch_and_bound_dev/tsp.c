@@ -52,16 +52,23 @@ int findACPM (tsp_t *t) {
 	int mark_sol = 0;
 
 	while (curnode < t->nb_node && !nbvoisin(t, curnode)) {
+		visited[curnode]++;
 		curnode ++;
 		nb_marked ++;
 	}
 
-	for (i=0; i<t->nb_node; i++)
+	printf ("Curnode : %d\n", curnode);
+	printTSP(t);
+
+	for (i=0; i<t->nb_node; i++) {
 		mark[i] = -1;
+		t->sol[i] = -1;
+	}
 
 	while (nb_marked < t->nb_node && curnode != -1) {
 		next[0] = -1;
 		next[1] = -1;
+		visited[curnode] ++;
 
 		for (i=0; i<t->nb_node; i++){
 			if (!visited[i]) {
@@ -82,7 +89,6 @@ int findACPM (tsp_t *t) {
 			}
 		}
 
-		visited[curnode] ++;
 		if (next[1] != -1)
 			t->sol[mark_sol++] = src[next[1]] * t->nb_node + next[1];
 		curnode = next[1];
@@ -148,6 +154,11 @@ int stratBranch (void *branchpoint, void **newbranch, size_t *size) {
 			max = degre[i];
 			ind_max = i;
 		}
+
+	if (max <= 2) {
+		free(degre);
+		return 0;
+	}
 
 	int *nodes = (int *) malloc (sizeof(int) * max);
 	int zz = 0;
