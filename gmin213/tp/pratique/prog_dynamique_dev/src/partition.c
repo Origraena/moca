@@ -1,6 +1,7 @@
 #include "partition.h"
 
 int* partition(int weights[], const int n) {
+	debug("Debut partition");
 	int wMax = 0;
 	uint i,j;
 	for (i = 0 ; i < n ; i++)
@@ -8,24 +9,28 @@ int* partition(int weights[], const int n) {
 	if (wMax % 2)
 		return 0;
 	wMax /= 2;
+	debug("wMax calcule");
 	int* T[n];
 	for (i = 0 ; i < n ; i++)
 		T[i] = malloc(sizeof(int)*(wMax+1));
+	debug("Premiere dimension allouee");
 	// init
 	for (j = 0 ; j <= wMax ; j++) {
 		T[0][j] = false;
 		if (j == 0)
 			T[0][j] = true;
 	}
+	debug("Matrice initialisee");
 	// process
 	for (i = 1 ; i < n ; i++) {
 		for (j = 0 ; j <= wMax ; j++) {
 			T[i][j] = ((j == 0)
 					|| (j == weights[i]) 
 					|| (T[i-1][j]) 
-					|| ((j - weights[i] >= 0) && (T[i-1][j-weights[i]])));
+					|| (((int)j - (int)weights[i] >= 0) && (T[i-1][j-weights[i]])));
 		}
 	}
+	debug("Recuperation du resultat…");
 	// result
 	int* sol = malloc(sizeof(int)*n);
 	for (i = 0 ; i < n ; i++)
