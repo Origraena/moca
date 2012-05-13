@@ -173,20 +173,25 @@ int resolve_pb (pb_t *pb, void *sol) {
 		for (i=0; i<nb_branch; i++) {
 			z = (int **)dtmp;
 			y = (void *) *z;
+			pb->printData(y);
 			int heur = pb->compCurVal(y);
 			if (heur * pb->order > pb->order * pb->bestsol) {
 				if (pb->acceptableSol(y)) {
 					pb->copyData(pb->best, y);
 					pb->bestsol = heur;
+					printf("=============> Nouvelle Solution : %d <==============\n", pb->bestsol);
 				}
 				else 
 					pb->curnode = insSol(pb->curnode, newSol(y), heur, pb->order, pb->strat);
 			}
-			else
+			else {
+				printf ("%d > %d ==> Pas de branchements\n", heur, pb->bestsol);
 				freeData(y);
+			}
 			dtmp += size_data;
 		}
-		free(d1);
+		if (nb_branch)
+			free(d1);
 		freeBSol(&tmp, pb->freeData);
 	}
 	copyData(sol, pb->best);
