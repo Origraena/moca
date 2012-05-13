@@ -17,31 +17,28 @@
  */
 
 #include "tsp.h"
+#include "bb.h"
 
 int main (int argc, char **argv) {
-	tsp_t t;
-
-	t.nb_node = 4;
-	t.mat = (int **) calloc (t.nb_node, sizeof (int *));
-
+	tsp_t *t;
+	FILE *in = fopen ("graph", "r");
 	int i;
-	for (i=0; i< t.nb_node; i++)
-		t.mat[i] = (int *) calloc (t.nb_node, sizeof (int));
 
-	t.mat[0][1] = 1;
-	t.mat[1][0] = 1;
-	t.mat[2][3] = 1;
-	t.mat[3][2] = 1;
+	initTSPFromFile (&t, in);
 
-	printf ("%d\n", validTSP((gpointer) &t));
+	lightestString(t);
+	printTSP(t);
+	printf ("Valeur de la solution : %d\n", compCurVal(t));
 
-	for (i=0; i< t.nb_node; i++)
-		free (t.mat[i]);
+	for (i=0; i<t->nb_node; t->sol[i++]=0);
 
-	free(t.mat);
+	findACPM(t);
+	printTSP(t);
+	printf ("Valeur de la solution : %d\n", compCurVal(t));
 
-	int a = 0, b = 1;
-	printf ("%d\n", bestSol((gpointer) &a, (gpointer) &b));
 
+	freeData((void *) t);
+
+	fclose(in);
 	return 0;
 }

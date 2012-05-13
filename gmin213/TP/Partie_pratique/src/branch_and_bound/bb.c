@@ -117,7 +117,7 @@ pb_t *initPb (int (*compInitVal) (void *), int (*compCurVal) (void *), int (*str
 	new->curnode = (ls_t *) malloc (SIZE_LS);
 	new->curnode->first = initData(data);
 	new->curnode->next = NULL;
-	new->curnode->bound = compInitVal(new, new->curnode->first);
+	new->curnode->bound = compInitVal(new->curnode->first);
 	new->bestsol = new->curnode->bound; 
 }
 

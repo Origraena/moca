@@ -28,9 +28,9 @@ typedef struct tsp {
 	int **mat;
 } tsp_t;
 
-#define SIZE_TSP sizeof(int) + 2*sizeof(int *)
+#define SIZE_TSP sizeof(int) + sizeof(int *) + sizeof(int **)
 
-void initTSPFromFile (tsp_t *tsp, FILE *in);
+void initTSPFromFile (tsp_t **tsp, FILE *in);
 
 int compCurVal (void *s);
 int stratBranch (void *branchpoint, void **newbranch, size_t *size);
@@ -43,4 +43,7 @@ int lightestString (void *data);
 int opt2 (void *data);
 int opt3 (void *data);
 
+void printTSP (tsp_t *t);
+
+int findACPM (tsp_t *t);
 #endif
