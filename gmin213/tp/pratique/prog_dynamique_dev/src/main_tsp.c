@@ -40,7 +40,6 @@ int main(int argc, char** argv) {
 	}
 	for (i = 0 ; i < nb ; i++) {
 		n = rand() % (nMax - nMin) + nMin;
-		v = rand() % (vMax - vMin) + vMin;
 		g = generateGraph(n,vMin,vMax);
 		timeS = time(0);
 		p = tsp(g);
