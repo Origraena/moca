@@ -26,12 +26,6 @@ int main (int argc, char **argv) {
 
 	initTSPFromFile (&t, in);
 
-//	tmp = (tsp_t *) malloc (sizeof(SIZE_TSP));
-//	tmp->mat = (int **) malloc (sizeof(int *) * t->nb_node);
-//	tmp->sol = (int *) malloc (sizeof(int) * t->nb_node);
-//	for (i=0; i<t->nb_node; i++)
-//		tmp->mat[i] = (int *) malloc (sizeof(int) *t->nb_node);
-//
 	createEmptyTSP(&tmp, t->nb_node);
 	copyData(tmp, t);
 

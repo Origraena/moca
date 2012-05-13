@@ -32,6 +32,7 @@ typedef struct tsp {
 
 void initTSPFromFile (tsp_t **tsp, FILE *in);
 void createEmptyTSP (tsp_t **tsp, int);
+void allocMem (void **a, void *b);
 
 int compCurVal (void *s);
 int stratBranch (void *branchpoint, void **newbranch, size_t *size);

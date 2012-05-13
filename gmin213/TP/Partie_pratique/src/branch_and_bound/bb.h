@@ -69,6 +69,7 @@ typedef struct pb {
 	int (*compCurVal) (void *s);
 	int (*stratBranch) (void *branchpoint, void **newbranch, size_t *size);
 	int (*acceptableSol) (void *data);
+	void (*allocMem) (void **d1, void *d2);
 	void (*copyData) (void *d1, void *d2);
 	void (*freeData) (void *d);
 } pb_t;
@@ -85,7 +86,7 @@ bls_t *popSol(ls_t **lsol, int *b);
 void freeBSol(bls_t **b, void (*freeData)(void *));
 void freeSol(ls_t **s, void (*freeData)(void *));
 
-pb_t *initPb (int (*compInitVal) (void *), int (*compCurVal) (void *), int (*stratBranch) (void *, void **, size_t *), opt_t order, void *data, void (*copyData) (void *, void*), void (*freeData) (void *), strat_t str, int (*acceptableSol) (void *), size_t size_data, int (*initData) (void *));
+pb_t *initPb (int (*compInitVal) (void *), int (*compCurVal) (void *), int (*stratBranch) (void *, void **, size_t *), opt_t order, void *data, void (*copyData) (void *, void*), void (*freeData) (void *), strat_t str, int (*acceptableSol) (void *), size_t size_data, int (*initData) (void *), void (*allocMem) (void **, void *));
 void freePb (pb_t *p);
 
 int resolve_pb (pb_t *pb, void *sol);

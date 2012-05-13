@@ -103,8 +103,8 @@ void freeSol(ls_t **s, void (*freeData)(void *)) {
 }
 
 // Initialize branch and bound problem
-pb_t *initPb (int (*compInitVal) (void *), int (*compCurVal) (void *), int (*stratBranch) (void *, void **, size_t *), opt_t order, void *data, void (*copyData) (void *, void*), void (*freeData) (void *), strat_t str, int (*acceptableSol) (void *), size_t size_data, int (*initData) (void *)) {
-	pb_t *new = (pb_t *) malloc (SIZE_PB);
+pb_t *initPb (int (*compInitVal) (void *), int (*compCurVal) (void *), int (*stratBranch) (void *, void **, size_t *), opt_t order, void *data, void (*copyData) (void *, void*), void (*freeData) (void *), strat_t str, int (*acceptableSol) (void *), size_t size_data, int (*initData) (void *), void (*allocMem) (void **, void *)) {
+	pb_t *new = (pb_t *) malloc (sizeof(pb_t));
 	new->compInitVal = compInitVal;
 	new->compCurVal = compCurVal;
 	new->stratBranch = stratBranch;
@@ -114,17 +114,21 @@ pb_t *initPb (int (*compInitVal) (void *), int (*compCurVal) (void *), int (*str
 	new->copyData = copyData;
 	new->freeData = freeData;
 	new->size_data = size_data;
+	new->allocMem = allocMem;
 
-	void *tmp1 = malloc (size_data), *tmp2 = malloc (size_data);
+	void *tmp1, *tmp2;
+	allocMem(&tmp1, data);
+	allocMem(&tmp2, data);
 	copyData (tmp1, data); copyData (tmp2, data);
 
 	new->bestsol = compInitVal(tmp2);
 	new->best =	tmp2;
 
-	new->curnode = (ls_t *) malloc (SIZE_LS);
+	new->curnode = (ls_t *) malloc (sizeof(ls_t));
 	new->curnode->first = newSol(tmp1);
 	new->curnode->next = NULL;
 	new->curnode->bound = initData(tmp1);
+	return new;
 }
 
 // Free Branch and bound problem

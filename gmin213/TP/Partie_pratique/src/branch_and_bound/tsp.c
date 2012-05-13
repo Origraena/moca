@@ -26,6 +26,12 @@ static inline int nbvoisin (tsp_t *t, int s) {
 	return vois;
 }
 
+void allocMem (void **a, void *b) {
+	tsp_t *t1, *t2 = (tsp_t *) b;
+	createEmptyTSP(&t1, t2->nb_node);
+	*a = t1;
+}
+
 void createEmptyTSP (tsp_t **tsp, int n) {
 	tsp_t *a = (tsp_t *) malloc (sizeof(tsp_t));
 	a->nb_node = n;
