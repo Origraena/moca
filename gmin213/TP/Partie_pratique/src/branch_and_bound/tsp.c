@@ -193,7 +193,7 @@ void freeData (void *d) {
 
 	free(t->mat);
 	free(t->sol);
-//	free(t);
+	free(t);
 }
 
 int lightestString (void *data) {
