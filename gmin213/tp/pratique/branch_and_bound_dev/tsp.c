@@ -49,47 +49,57 @@ int findACPM (tsp_t *t) {
 
 	int curnode = 0, nb_marked = 1, i;
 	int next[2] = {-1};
-
-	while (curnode < t->nb_node && !nbvoisin(t, curnode)) {
-		curnode ++;
-		nb_marked ++;
-	}
+	int mark_sol = 0;
 
 	for (i=0; i<t->nb_node; i++)
+		if (!nbvoisin(t, i)) {
+			nb_marked++;
+			visited[i]++;
+		}
+
+	while (curnode < t->nb_node && visited[curnode]) 
+		curnode ++;
+
+	if (curnode == t->nb_node)
+		return 0;
+
+	for (i=0; i<t->nb_node; i++) {
 		mark[i] = -1;
+		t->sol[i] = -1;
+	}
 
 	while (nb_marked < t->nb_node && curnode != -1) {
 		next[0] = -1;
 		next[1] = -1;
+		visited[curnode] ++;
 
 		for (i=0; i<t->nb_node; i++){
 			if (!visited[i]) {
 				if (t->mat[curnode][i] != -1) {
-					if (next[0] == -1){
-						next[0] = t->mat[curnode][i];
-						next[1] = i;
-					}
-					if (t->mat[curnode][i] < mark[i] || mark[i] == -1) {
+					if (mark[i] == -1 || t->mat[curnode][i] < mark[i]) {
 						src[i] = curnode;
 						mark[i] = t->mat[curnode][i];
 					}
-					if (mark[i] < next[0]) {
-						next[0] = mark[i];
-						next[1] = i;
-					}
+				}
+				if (next[0] == -1 || mark[i] < next[0]){
+					next[0] = mark[i];
+					next[1] = i;
 				}
 			}
 		}
 
-		visited[curnode] ++;
 		if (next[1] != -1)
-			t->sol[nb_marked -1] = src[next[1]] * t->nb_node + next[1];
+			t->sol[mark_sol++] = src[next[1]] * t->nb_node + next[1];
 		curnode = next[1];
 		nb_marked++;
 	}
 	free(visited);
 	free(src);
 	free(mark);
+
+	for (i=0; i<t->nb_node-2; i++)
+		if (t->sol[i] == -1)
+			return 0;
 
 	return nb_marked == t->nb_node ? 1 : 0;
 }
@@ -131,6 +141,9 @@ int stratBranch (void *branchpoint, void **newbranch, size_t *size) {
 	tsp_t *bp = (tsp_t *)branchpoint;
 	*size = sizeof (tsp_t *);
 
+	printf ("TSP recu :\n");
+	printTSP(bp);
+
 	// Find number of children
 	int *degre = (int *) calloc (bp->nb_node, sizeof (int)), i, j;
 	for (i=0; i<bp->nb_node; i++) {
@@ -145,18 +158,22 @@ int stratBranch (void *branchpoint, void **newbranch, size_t *size) {
 			ind_max = i;
 		}
 
+	if (max <= 2) {
+		return 0;
+	}
+
 	int *nodes = (int *) malloc (sizeof(int) * max);
 	int zz = 0;
 	for (i=0; i<bp->nb_node; i++) {
 		if (bp->sol[i]/bp->nb_node == ind_max)
-			nodes[zz] = bp->sol[i]%bp->nb_node;
+			nodes[zz++] = bp->sol[i]%bp->nb_node;
 		else if (bp->sol[i]%bp->nb_node == ind_max)
-			nodes[zz] = bp->sol[i]/bp->nb_node;
-		zz++;
+			nodes[zz++] = bp->sol[i]/bp->nb_node;
 	}
 
 	tsp_t **nb = (tsp_t **) malloc (max * sizeof(tsp_t *));
 	tsp_t *tmp;
+
 	for (i=0; i< max; i++) {
 		tmp = (tsp_t *) malloc (sizeof(tsp_t));
 		tmp->nb_node = bp->nb_node;
@@ -164,12 +181,14 @@ int stratBranch (void *branchpoint, void **newbranch, size_t *size) {
 		tmp->mat = (int **) malloc (sizeof(int*) *bp->nb_node);
 		for (j=0; j<bp->nb_node; tmp->mat[j++] = (int *) malloc (sizeof(int)*bp->nb_node));
 		copyData(tmp, bp);
+		tmp->mat[nodes[i]][ind_max] = -1;
+		tmp->mat[ind_max][nodes[i]] = -1;
 		compPartSolFromACPM(tmp, 0);
-		printTSP (tmp);
 		nb[i] = tmp;
 	}
 	*newbranch = nb;
 	free (degre);
+	free(nodes);
 	//	free(nb);
 
 	return max;
@@ -254,7 +273,8 @@ int lightestString (void *data) {
 int opt2 (void *data) {}
 int opt3 (void *data) {}
 
-void printTSP (tsp_t *t) {
+void printTSP (void *s) {
+	tsp_t *t = (tsp_t *)s;
 	printf ("Nombre de noeuds : %d\n", t->nb_node);
 	int i, j;
 	printf ("Graphe : \n");
@@ -271,8 +291,10 @@ int compPartSolFromACPM (void *data, int a) {
 	createEmptyTSP(&s, t->nb_node);
 	copyData(s, t);
 
-	for (i=0; i<t->nb_node; t->mat[i][a] = -1, t->mat[a][i++]);
-	findACPM(t);
+	for (i=0; i<t->nb_node; t->mat[i][a] = -1, t->mat[a][i++] = -1);
+	if (!findACPM(t))
+		return 0;
+
 	int mina = -1, minb = -1, inda = -1, indb = -1;
 
 	for (i=0; i<t->nb_node; i++) {

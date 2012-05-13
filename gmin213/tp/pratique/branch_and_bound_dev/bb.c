@@ -28,19 +28,26 @@ bls_t *newSol(void *variable) {
 }
 
 // Insert given solution at the right place in the list of all solution
-void insSol (ls_t **lsol, bls_t *blsol, int b, opt_t order, strat_t str) {
+ls_t *insSol (ls_t *lsol, bls_t *blsol, int b, opt_t order, strat_t str) {
 	int relb = order * b;
-	ls_t *tmpsol = *lsol;
+	ls_t *tmpsol = lsol;
+	if (!tmpsol) {
+		tmpsol = (ls_t *) malloc (sizeof (ls_t));
+		tmpsol->first = blsol;
+		tmpsol->last = blsol;
+		tmpsol->bound = b;
+		return tmpsol;
+	}
+
 	switch (str) {
 		case BEST_FIRST:
 			if (relb > order * tmpsol->bound) {
-				ls_t *new = (ls_t *) malloc (SIZE_LS);
+				ls_t *new = (ls_t *) malloc (sizeof(ls_t));
 				new->bound = b;
 				new->first = blsol;
 				new->last = blsol;
 				new->next = tmpsol;
-				*lsol = new;
-				return;
+				return new;
 			}
 
 			while (tmpsol->next && relb <= order * tmpsol->next->bound)
@@ -51,7 +58,7 @@ void insSol (ls_t **lsol, bls_t *blsol, int b, opt_t order, strat_t str) {
 				tmpsol->first = blsol;
 			}
 			else {
-				ls_t *new = (ls_t *) malloc (SIZE_LS);
+				ls_t *new = (ls_t *) malloc (sizeof(ls_t));
 				new->bound = b;
 				new->first = blsol;
 				new->next = tmpsol->next;
@@ -67,6 +74,7 @@ void insSol (ls_t **lsol, bls_t *blsol, int b, opt_t order, strat_t str) {
 			tmpsol->last = blsol;
 			break;
 	}
+	return tmpsol;
 }
 
 // Recover the first sol of the list of solution
@@ -76,6 +84,7 @@ bls_t *popSol(ls_t **lsol, int *b){
 	if (!t->next){
 		(*lsol)->first = NULL;
 		freeSol (lsol, NULL);
+		*lsol = NULL;
 	}
 	else
 		(*lsol)->first = t->next;
@@ -103,7 +112,7 @@ void freeSol(ls_t **s, void (*freeData)(void *)) {
 }
 
 // Initialize branch and bound problem
-pb_t *initPb (int (*compInitVal) (void *), int (*compCurVal) (void *), int (*stratBranch) (void *, void **, size_t *), opt_t order, void *data, void (*copyData) (void *, void*), void (*freeData) (void *), strat_t str, int (*acceptableSol) (void *), size_t size_data, int (*initData) (void *), void (*allocMem) (void **, void *)) {
+pb_t *initPb (int (*compInitVal) (void *), int (*compCurVal) (void *), int (*stratBranch) (void *, void **, size_t *), opt_t order, void *data, void (*copyData) (void *, void*), void (*freeData) (void *), strat_t str, int (*acceptableSol) (void *), size_t size_data, int (*initData) (void *), void (*allocMem) (void **, void *), void (*printData) (void *)) {
 	pb_t *new = (pb_t *) malloc (sizeof(pb_t));
 	new->compInitVal = compInitVal;
 	new->compCurVal = compCurVal;
@@ -115,6 +124,7 @@ pb_t *initPb (int (*compInitVal) (void *), int (*compCurVal) (void *), int (*str
 	new->freeData = freeData;
 	new->size_data = size_data;
 	new->allocMem = allocMem;
+	new->printData = printData;
 
 	void *tmp1, *tmp2;
 	allocMem(&tmp1, data);
@@ -126,6 +136,7 @@ pb_t *initPb (int (*compInitVal) (void *), int (*compCurVal) (void *), int (*str
 
 	new->curnode = (ls_t *) malloc (sizeof(ls_t));
 	new->curnode->first = newSol(tmp1);
+	new->curnode->last = new->curnode->first;
 	new->curnode->next = NULL;
 	new->curnode->bound = initData(tmp1);
 	return new;
@@ -143,36 +154,44 @@ int resolve_pb (pb_t *pb, void *sol) {
 	if (!pb)
 		return -1;
 
-	pb->copyData(sol, pb->curnode->first->var);
+	pb->copyData(sol, pb->best);
 
 	int i = 0;
 
 	while (pb->curnode) {
+		printf ("Je rentre dans l'opt\n");
 		int b = 0, nb_branch;
 		size_t size_data;
 		void *d1;
 		// Choose a node
 		bls_t *tmp = popSol(&(pb->curnode), &b);
 		// Generate sons
-		nb_branch = pb->stratBranch(tmp, &d1, &size_data);
+		nb_branch = pb->stratBranch(tmp->var, &d1, &size_data);
 		void *dtmp = d1, *y;
 		int **z;
+		printf ("Nombre de fils trouvés : %d\n", nb_branch);
 		for (i=0; i<nb_branch; i++) {
 			z = (int **)dtmp;
-			y = (void *) z;
+			y = (void *) *z;
+			pb->printData(y);
 			int heur = pb->compCurVal(y);
 			if (heur * pb->order > pb->order * pb->bestsol) {
 				if (pb->acceptableSol(y)) {
 					pb->copyData(pb->best, y);
 					pb->bestsol = heur;
+					printf("=============> Nouvelle Solution : %d <==============\n", pb->bestsol);
 				}
-				else
-					insSol(&(pb->curnode), y, heur, pb->order, pb->strat);
+				else 
+					pb->curnode = insSol(pb->curnode, newSol(y), heur, pb->order, pb->strat);
 			}
-			freeData(y);
+			else {
+				printf ("%d > %d ==> Pas de branchements\n", heur, pb->bestsol);
+				freeData(y);
+			}
 			dtmp += size_data;
 		}
-		free(d1);
+		if (nb_branch)
+			free(d1);
 		freeBSol(&tmp, pb->freeData);
 	}
 	copyData(sol, pb->best);

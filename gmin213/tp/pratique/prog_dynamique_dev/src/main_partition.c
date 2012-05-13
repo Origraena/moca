@@ -11,7 +11,7 @@ global_var global;
 
 int main(int argc, char** argv) {
 	global.debug = 0;
-	global.verbose = 0;
+	global.verbose = 1;
 	uint i,j;
 	const long seed = time(0);
 	srand(seed);
