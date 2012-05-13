@@ -36,6 +36,8 @@ void createEmptyTSP (tsp_t **tsp, int);
 int compCurVal (void *s);
 int stratBranch (void *branchpoint, void **newbranch, size_t *size);
 int acceptableSol (void *data);
+int initData (void *data);
+int compPartSolFromACPM (void *data, int a);
 
 void copyData (void *d1, void *d2);
 void freeData (void *d);

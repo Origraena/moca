@@ -59,6 +59,8 @@ typedef struct list_sol {
 // data structure representing a branch and bound problem
 typedef struct pb {
 	int bestsol;
+	void *best;
+	size_t size_data;
 	ls_t *curnode;
 	opt_t order;
 	strat_t strat;
@@ -83,7 +85,7 @@ bls_t *popSol(ls_t **lsol, int *b);
 void freeBSol(bls_t **b, void (*freeData)(void *));
 void freeSol(ls_t **s, void (*freeData)(void *));
 
-pb_t *initPb (int (*compInitVal) (void *), int (*compCurVal) (void *), int (*stratBranch) (void *, void **, size_t *), opt_t order, bls_t *initData(void *), void *data, void (*copyData) (void *, void*), void (*freeData) (void *), strat_t str, int (*acceptableSol) (void *));
+pb_t *initPb (int (*compInitVal) (void *), int (*compCurVal) (void *), int (*stratBranch) (void *, void **, size_t *), opt_t order, void *data, void (*copyData) (void *, void*), void (*freeData) (void *), strat_t str, int (*acceptableSol) (void *), size_t size_data, int (*initData) (void *));
 void freePb (pb_t *p);
 
 int resolve_pb (pb_t *pb, void *sol);

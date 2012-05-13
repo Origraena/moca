@@ -103,7 +103,7 @@ void freeSol(ls_t **s, void (*freeData)(void *)) {
 }
 
 // Initialize branch and bound problem
-pb_t *initPb (int (*compInitVal) (void *), int (*compCurVal) (void *), int (*stratBranch) (void *, void **, size_t *), opt_t order, bls_t *initData(void *), void *data, void (*copyData) (void *, void*), void (*freeData) (void *), strat_t str, int (*acceptableSol) (void *)) {
+pb_t *initPb (int (*compInitVal) (void *), int (*compCurVal) (void *), int (*stratBranch) (void *, void **, size_t *), opt_t order, void *data, void (*copyData) (void *, void*), void (*freeData) (void *), strat_t str, int (*acceptableSol) (void *), size_t size_data, int (*initData) (void *)) {
 	pb_t *new = (pb_t *) malloc (SIZE_PB);
 	new->compInitVal = compInitVal;
 	new->compCurVal = compCurVal;
@@ -113,18 +113,25 @@ pb_t *initPb (int (*compInitVal) (void *), int (*compCurVal) (void *), int (*str
 	new->acceptableSol = acceptableSol;
 	new->copyData = copyData;
 	new->freeData = freeData;
+	new->size_data = size_data;
+
+	void *tmp1 = malloc (size_data), *tmp2 = malloc (size_data);
+	copyData (tmp1, data); copyData (tmp2, data);
+
+	new->bestsol = compInitVal(tmp2);
+	new->best =	tmp2;
 
 	new->curnode = (ls_t *) malloc (SIZE_LS);
-	new->curnode->first = initData(data);
+	new->curnode->first = newSol(tmp1);
 	new->curnode->next = NULL;
-	new->curnode->bound = compInitVal(new->curnode->first);
-	new->bestsol = new->curnode->bound; 
+	new->curnode->bound = initData(tmp1);
 }
 
 // Free Branch and bound problem
 void freePb (pb_t *p) {
 	while (p->curnode)
 		freeSol(&(p->curnode), p->freeData);
+	freeData(p->best);
 	free (p);
 }
 
@@ -144,21 +151,27 @@ int resolve_pb (pb_t *pb, void *sol) {
 		bls_t *tmp = popSol(&(pb->curnode), &b);
 		// Generate sons
 		nb_branch = pb->stratBranch(tmp, &d1, &size_data);
-		void *dtmp = d1;
+		void *dtmp = d1, *y;
+		int **z;
 		for (i=0; i<nb_branch; i++) {
-			dtmp += size_data;
-			int heur = pb->compCurVal(dtmp);
+			z = (int **)dtmp;
+			y = (void *) z;
+			int heur = pb->compCurVal(y);
 			if (heur * pb->order > pb->order * pb->bestsol) {
-				if (pb->acceptableSol(dtmp)) {
-					pb->copyData(sol, dtmp);
+				if (pb->acceptableSol(y)) {
+					pb->copyData(pb->best, y);
 					pb->bestsol = heur;
 				}
 				else
-					insSol(&(pb->curnode), dtmp, heur, pb->order, pb->strat);
+					insSol(&(pb->curnode), y, heur, pb->order, pb->strat);
 			}
+			freeData(y);
+			dtmp += size_data;
 		}
+		free(d1);
 		freeBSol(&tmp, pb->freeData);
 	}
+	copyData(sol, pb->best);
 	return pb->bestsol;
 }
 

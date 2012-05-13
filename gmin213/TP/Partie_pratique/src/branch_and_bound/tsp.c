@@ -139,6 +139,16 @@ int stratBranch (void *branchpoint, void **newbranch, size_t *size) {
 			ind_max = i;
 		}
 
+	int *nodes = (int *) malloc (sizeof(int) * max);
+	int zz = 0;
+	for (i=0; i<bp->nb_node; i++) {
+		if (bp->sol[i]/bp->nb_node == ind_max)
+			nodes[zz] = bp->sol[i]%bp->nb_node;
+		else if (bp->sol[i]%bp->nb_node == ind_max)
+			nodes[zz] = bp->sol[i]/bp->nb_node;
+		zz++;
+	}
+
 	tsp_t **nb = (tsp_t **) malloc (max * sizeof(tsp_t *));
 	tsp_t *tmp;
 	for (i=0; i< max; i++) {
@@ -148,13 +158,13 @@ int stratBranch (void *branchpoint, void **newbranch, size_t *size) {
 		tmp->mat = (int **) malloc (sizeof(int*) *bp->nb_node);
 		for (j=0; j<bp->nb_node; tmp->mat[j++] = (int *) malloc (sizeof(int)*bp->nb_node));
 		copyData(tmp, bp);
+		compPartSolFromACPM(tmp, 0);
 		printTSP (tmp);
-		printTSP (bp);
 		nb[i] = tmp;
 	}
 	*newbranch = nb;
 	free (degre);
-//	free(nb);
+	//	free(nb);
 
 	return max;
 }
@@ -231,7 +241,7 @@ int lightestString (void *data) {
 		sum += t->mat[curnode][0];
 		return sum;
 	} 
-		
+
 	fprintf (stderr, "Erreur\n");
 	return -1;
 }
@@ -249,3 +259,46 @@ void printTSP (tsp_t *t) {
 		printf ("%d -- %d\n", t->sol[i]/t->nb_node, t->sol[i]%t->nb_node);
 }
 
+int compPartSolFromACPM (void *data, int a) {
+	int i;
+	tsp_t *t = (tsp_t *) data, *s;
+	createEmptyTSP(&s, t->nb_node);
+	copyData(s, t);
+
+	for (i=0; i<t->nb_node; t->mat[i][a] = -1, t->mat[a][i++]);
+	findACPM(t);
+	int mina = -1, minb = -1, inda = -1, indb = -1;
+
+	for (i=0; i<t->nb_node; i++) {
+		t->mat[i][a] = s->mat[i][a];
+		t->mat[a][i] = s->mat[a][i];
+		if (mina == -1) {
+			mina = s->mat[a][i];
+			inda = i;
+		} else if (minb == -1) {
+			minb = s->mat[a][i];
+			indb = i;
+		}
+		if (s->mat[a][i] > 0) {
+			if (s->mat[a][i] < mina) {
+				minb = mina;
+				indb = inda;
+				mina = s->mat[a][i];
+				inda = i;
+			} else if (s->mat[a][i] < minb) {
+				indb = i;
+				minb = s->mat[a][i];
+			}
+		}
+	}
+
+	t->sol[t->nb_node -1] = a*t->nb_node + inda;
+	t->sol[t->nb_node -2] = a*t->nb_node + indb;
+
+	freeData(s);
+	return (compCurVal(t));
+}
+
+int initData (void *s) {
+	return compPartSolFromACPM(s, 0);
+}
