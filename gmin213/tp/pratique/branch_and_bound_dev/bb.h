@@ -72,6 +72,7 @@ typedef struct pb {
 	void (*allocMem) (void **d1, void *d2);
 	void (*copyData) (void *d1, void *d2);
 	void (*freeData) (void *d);
+	void (*printData) (void *d);
 } pb_t;
 
 #define SIZE_PB sizeof(int) + sizeof(ls_t *) + 4*sizeof(int *)
@@ -79,14 +80,14 @@ typedef struct pb {
 // Create a new solution
 bls_t *newSol(void *variables);
 // Insert a solution at the right place in the list of acceptable bound
-void insSol (ls_t **lsol, bls_t *blsol, int b, opt_t order, strat_t str);
+ls_t *insSol (ls_t *lsol, bls_t *blsol, int b, opt_t order, strat_t str);
 // Retrieve the best current solution
 bls_t *popSol(ls_t **lsol, int *b);
 
 void freeBSol(bls_t **b, void (*freeData)(void *));
 void freeSol(ls_t **s, void (*freeData)(void *));
 
-pb_t *initPb (int (*compInitVal) (void *), int (*compCurVal) (void *), int (*stratBranch) (void *, void **, size_t *), opt_t order, void *data, void (*copyData) (void *, void*), void (*freeData) (void *), strat_t str, int (*acceptableSol) (void *), size_t size_data, int (*initData) (void *), void (*allocMem) (void **, void *));
+pb_t *initPb (int (*compInitVal) (void *), int (*compCurVal) (void *), int (*stratBranch) (void *, void **, size_t *), opt_t order, void *data, void (*copyData) (void *, void*), void (*freeData) (void *), strat_t str, int (*acceptableSol) (void *), size_t size_data, int (*initData) (void *), void (*allocMem) (void **, void *), void (*printData) (void *));
 void freePb (pb_t *p);
 
 int resolve_pb (pb_t *pb, void *sol);
