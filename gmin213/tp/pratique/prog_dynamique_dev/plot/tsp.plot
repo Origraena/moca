@@ -1,3 +1,4 @@
+set term png font "/Library/Fonts/Arial.ttf" 10
 set term png 
 set output "./res/tsp.png"
 
@@ -6,10 +7,10 @@ set output "./res/tsp.png"
 set xtics 5
 set ytics 30
 set xlabel "Nombre de sommets"
-set ylabel "Temps d'execution"
-set title "Temps d'execution sur le probleme du voyageur de commerce"
+set ylabel "Temps d'exécution"
+set title "Temps d'exécution sur le probleme du voyageur de commerce"
 #set style function lp
 #set contour
 
-plot "./res/tsp.output" with dots 
+plot "./res/lissage.txt" notitle with linespoints
 
