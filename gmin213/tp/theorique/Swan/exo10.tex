@@ -1,0 +1,84 @@
+% !TEX root = ../../Rapport/rapport.tex
+\section{Seuil d'approximation pour le problème Bin Packing}\label{ex10}
+
+\subsection{Définition du problème}\label{ex10_q1}
+Soient un ensemble $O = \{o_i : i \in [1;n]\}$ de $n$ objets, une fonction $q : O \rightarrow \mathbb{N}$, une taille de boîte $Q$.
+
+Le problème de décision Bin Packing est le suivant :\\
+Existe-t-il une k-partition $O_1,...,O_k \subseteq O$ telle que :
+\begin{itemize}
+	\item $O = \cup_{i = 1}^{k}O_i$,
+	\item $\forall i,j \in \mathbb{N}$, $i \neq j$, $O_i \cap O_j = \emptyset$,
+	\item $\sum_{o_{ij} \in O_i} \leq Q\ \forall i \in [1;k]$.
+\end{itemize}
+~\\
+Le problème d'optimisation associé est :\\
+Minimiser $k \in \mathbb{N} : \exists$ k-partition qui respecte les conditions ci-dessus.
+
+Dans la suite on notera $B(O_i) = \sum\limits_{o_{ij} \in O_i}q(o_i)$ la somme des poids des
+éléments de $O_i$, $B = B(O)$, et $K^*$ la solution optimale au problème d'optimisation.
+
+\subsection{Construction d'une instance de Bin Packing à partir d'une instance de Partition}\label{ex10_q2}
+Remarque : pour les définitions et notations concernant le problème de partition, voir
+l'\href{ex5}{exercice \ref{ex5}}.
+
+Soit $x$ une instance du problème partition, nous construisons
+une instance $x'$ de Bin Packing de la manière suivante :
+\begin{itemize}
+	\item $O = A$,
+	\item $q(o_i) = \frac{2 \times p(a_i)}{w(A)}$,
+	\item $Q = 1$.
+\end{itemize}
+%TODO
+
+
+\subsection{Instance positive}\label{ex10_q3}
+Nous devons montrer que si $x$ est positive alors $K^*(x') = 2$ et que $K^*(x') = 3$
+sinon.
+Commençons par calculer $B = \sum_{a_i \in A} \frac{2 \times p(a_i)}{w(a)} =
+\frac{2}{w(a)} \times \sum_{a_{i} \in A} = \frac{2}{w(a)} \times w(a) = 2$.
+
+Montrons tout d'abord que $K^*(x') \leq 3$.\\
+Nous supposons que $K(x') = 4 > 3$. Nous savons alors qu'il existe quatre ensembles
+$O_1,O_2,O_3,O_4$ tels que $B(O_i) \leq 1$.
+De plus, puisque les $O_i$ sont disjoints, nous avons $B = B(O_1)+B(O_2)+B(O_3)+B(O_4)$,
+et nous pouvons énumérer les $O_i$ de sorte que $B(O_i) \geq B(O_{i+1})$.\\
+Or, $B(O_i) + B(O_j) > 1\ \forall i \neq j$, en effet si ce n'était pas le cas, alors on
+pourrait unir les deux ensembles et $K^*(x')$ serait égal à 3.
+En particulier nous avons : $B(O_1)+B(O_2) > 1$ et $B(O_3)+B(O_4) > 1$, c'est à dire :
+$2 = B(O_1) + B(O_2) + B(O_3) + B(O_4) > 2$, ce qui est absurde.\\
+Nous avons donc que $K(x') \leq 3$.
+
+Supposons que $x$ soit une instance positive.\\
+Soit la solution $P$ de $x$ $Y_1,Y_2$, on a donc $w(Y_1) = w(Y_2) = \frac{w(A)}{2} = P$.
+Soit $O_1$ (resp. $O_2$) l'image de $Y_1$ (resp. $Y_2$) dans le problème $x'$.\\
+On a donc : $B(O_2) = B(O_1) = \frac{2 \times w(Y_1)}{w(A)} = \frac{2 \times w(A)}{2
+\times w(A)} = 1 \leq Q$.\\
+Ainsi $K^* = 2$.
+
+Supposons maintenant que $x$ soit une instance négative et on suppose que $K(x') < 3$.
+Si $K(x') = 1$, il est trivial de voir que $B = 2$ et que $B \leq Q = 1$ ce qui est
+absurde.\\
+Si $K(x') = 2$, on a alors $O = O_1 \cup O_2$. 
+De plus, $B = 2$, $B = B(O_1) + B(O_2)$ et $B(O_i) \leq 1$.
+On a donc $B(O_1) = B(O_2) = 1$.\\
+Soit $Y_1$ (resp. $Y_2$) l'ensemble correspondant à $O_1$ (resp. $O_2$) dans le problème
+x. On a :
+$1 = w(O_1) = \frac{2}{w(A)} \times w(Y_1) \leftrightarrow w(Y_1) = \frac{w(A)}{2}$.
+Donc il existe une solution $Y_1,Y_2$ au problème $x$, ce qui est absurde.\\
+Ainsi si l'instance $x$ est négative, $K^*(x') = 3$.
+
+\subsection{Classe d'approximation du Bin Packing}\label{ex10_q5}
+Supposons qu'il existe un algorithme A qui donne une solution $(\frac{3}{2} -
+\epsilon)$-approchée au problème Bin Packing.\\
+Soit $x$ un problème de Partition.
+Grâce à la réduction polynomiale étudiée ci-dessus, nous avons donc :
+$sol_{A}(x') < \frac{3}{2}sol_{opt}(x')$.\\
+Et si le problème partition admet une solution alors $sol_{opt}(x') = 2$, nous en
+déduisons : $sol_{A}(x') < 3$, ie $sol_A(x') = 2 = sol_{opt}(x')$, et si ce n'est pas le
+cas $sol_A(x') = 3$.
+A permet donc de résoudre le problème Partition en temps polynomial, celui-ci étant
+NP-complet, il n'existe pas un tel algorithme.\\
+Ainsi le problème Bin Packing admet un seuil d'approximation en $\frac{3}{2}$ et donc 
+n'appartient pas à la classe d'approximation $PTAS$.
+

@@ -1,0 +1,44 @@
+\section{Sur le problème de la coupe maximum}
+
+\subsection{Complexité}
+
+A chaque itération de l'algorithme, la valeur de la coupe maximale augmente au minimum d'une unité.
+Or la valeur de la coupe maximale étant bornée par le nombre d'arêtes, on obtient donc que
+l'algorithme effectue au plus $m$ opérations. On a donc un algorithme en $O(m)$.
+
+\subsection{Un algorithme 2-approché}
+
+Considérons $(Y_1, Y_2)$ la coupe renvoyée par l'algorithme, nous chercherons dans un premier temps
+à montrer que chaque sommet dans $Y_1$ admet au moins autant d'arêtes dans $Y_2$ que dans $Y_1$.
+
+Pour ce faire, considérons un sommet $v \in Y_1$, supposons que ce sommet possède plus d'arêtes dans
+$Y_1$ que dans $Y_2$, nous noterons $a_1$ le nombre d'arêtes incidentes à $v$ dans $Y_1$ et $a_2$ le
+nombre d'arêtes adjacentes à $v$ dans $Y_2$. Déplacer $v$ de $Y_1$ vers $Y_2$ reviendrait à diminuer
+la coupe de $a_2$ et augmenter celle-ci de $a_1$, or d'après l'hypothèse de départ $a_2 < a_1$, on
+observerait une augmentation de la valeur de la coupe, ce qui est impossible si $(Y_1, Y_2)$ est une
+coupe retournée par l'algorithme. On en déduit donc que l'hypothèse de départ est fausse.
+
+Autrement dit, pour un sommet $v \in V$, en notant $d_v$ le degré de $v$, $v_c$ le nombre d'arêtes
+adjacentes à $v$ traversant la coupe et $v_s$ le nombre d'arêtes adjacentes à $v$ ne la traversant
+pas, on peut écrire : $$
+\begin{array}{lrcl}
+	&v_c + v_s &=& d_v \quad \mbox{or on a } v_c \geq v_s \\
+	\Rightarrow & v_c & \geq & \frac{d_v}{2}
+\end{array} $$
+
+Si l'on généralise sur l'ensemble du graphe, on peut en déduire : $$
+\begin{array}{rcl}
+	|(Y_1,Y_2)| & = & \frac{1}{2} \sum_{v \in V} v_c\\
+							& \geq & \frac{1}{2} \sum_{v \in V} \frac{d_v}{2} \\
+					 	& = & \frac{m}{2}
+\end{array}
+$$
+
+On a donc : $|(Y_1,Y_2)| \geq \frac{m}{2}$, de plus comme vu précédemment, la valeur de la coupe
+maximale (que nous noterons $OPT$) est bornée par le nombre d'arêtes. On peut donc en déduire : $$
+\frac{OPT}{|(Y_1,Y_2)|} \leq \frac{m}{\frac{m}{2}} = 2 $$
+
+L'algorithme donné est donc bien un algorithme 2-approché.
+
+\subsection{Atteindre la borne}
+%TODO
