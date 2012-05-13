@@ -123,7 +123,7 @@ int compCurVal (void *s) {
 
 int stratBranch (void *branchpoint, void **newbranch, size_t *size) {
 	tsp_t *bp = (tsp_t *)branchpoint;
-	*size = sizeof (tsp_t);
+	*size = sizeof (tsp_t *);
 
 	// Find number of children
 	int *degre = (int *) calloc (bp->nb_node, sizeof (int)), i, j;
@@ -139,22 +139,21 @@ int stratBranch (void *branchpoint, void **newbranch, size_t *size) {
 			ind_max = i;
 		}
 
-	tsp_t *nb = (tsp_t *) malloc (max * sizeof(tsp_t));
-	tsp_t *tmp = nb;
+	tsp_t **nb = (tsp_t **) malloc (max * sizeof(tsp_t *));
+	tsp_t *tmp;
 	for (i=0; i< max; i++) {
-		nb->nb_node = bp->nb_node;
-		nb->sol = (int *) malloc (bp->nb_node * sizeof(int));
-//		free(nb->sol);
-		nb->mat = (int **) malloc (sizeof(int*) *bp->nb_node);
-		for (j=0; j<bp->nb_node; nb->mat[j++] = (int *) malloc (sizeof(int)*bp->nb_node));
-		copyData(nb, bp);
-		printTSP (nb);
-		if (i)
-			printTSP (nb-1);
+		tmp = (tsp_t *) malloc (sizeof(tsp_t));
+		tmp->nb_node = bp->nb_node;
+		tmp->sol = (int *) malloc (bp->nb_node * sizeof(int));
+		tmp->mat = (int **) malloc (sizeof(int*) *bp->nb_node);
+		for (j=0; j<bp->nb_node; tmp->mat[j++] = (int *) malloc (sizeof(int)*bp->nb_node));
+		copyData(tmp, bp);
+		printTSP (tmp);
 		printTSP (bp);
-		nb ++;
+		nb[i] = tmp;
 	}
-	*newbranch = tmp;
+	*newbranch = nb;
+	free (degre);
 //	free(nb);
 
 	return max;
