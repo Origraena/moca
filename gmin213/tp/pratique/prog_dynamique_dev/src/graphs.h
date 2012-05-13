@@ -19,6 +19,37 @@ typedef struct path {
 	uint* vertices;
 } path;
 
+typedef struct solution_list {
+	uint id;
+	struct solution_list* next;
+} solution_list;
+
+typedef struct column {
+	uint n;	
+	solution_list* s;
+	path** p;
+} column;
+
+typedef struct column_list {
+	column* c;
+	struct column_list* next;
+} column_list;
+
+/* solution_list */
+solution_list* addToList(solution_list* l, uint id);
+int contains2(solution_list* l, uint id);
+void freeList(solution_list* l);
+solution_list* copyList(solution_list* src, solution_list* dest);
+void printList(solution_list* l);
+
+column_list* addToColumnList(column_list* l, column* c);
+void freeColumnList(column_list* l);
+column_list* copyColumnList(column_list* src, column_list* dest);
+
+column* createColumn(column* l, const uint n);
+column* addToColumn(column* l, uint id);
+void freeColumn(column* l);
+
 /* random */
 float randBetween(int min, int max);
 float frand();

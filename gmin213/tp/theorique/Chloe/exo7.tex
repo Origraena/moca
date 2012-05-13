@@ -52,7 +52,7 @@ la ligne $i$ en fonction de la ligne $i-1$ et $p(a_i)$ :
 On peut alors donner un algorithme pour résoudre le problème de la partition : l'algorithme
 \ref{solvepart}.
 
-\begin{algorithm}
+\begin{algorithm}[H]
 	\caption{solve-partition}
 	\label{solvepart}
 	\begin{algorithmic}[1]
@@ -60,7 +60,7 @@ On peut alors donner un algorithme pour résoudre le problème de la partition :
 		\IF{$p_{max} \equiv 1 \pmod{2}$}
 			\STATE Pas de solutions
 		\ELSE
-			\FOR {$j \in \mathbb{[}0,p_{max}\mathbb{]}$}
+			\FOR {$j \in \mathbb{[}0,p_{max}/2\mathbb{]}$}
 				\IF{$j = 0$}
 					\STATE $T(0, j) \leftarrow \TRUE$
 				\ELSE
@@ -68,8 +68,8 @@ On peut alors donner un algorithme pour résoudre le problème de la partition :
 				\ENDIF
 			\ENDFOR
 			\FOR{$i \in \mathbb{[}1, n \mathbb{]}$}
-				\FOR{$j \in \mathbb{[}0, p_{max}\mathbb{]}$}
-					\STATE $T(i, j) \leftarrow j = 0 \vee j = p(a_i) \vee T(i-1, j) \vee T(i-1, j-p(a_i))$
+				\FOR{$j \in \mathbb{[}0, p_{max}/2\mathbb{]}$}
+					\STATE $T(i, j) \leftarrow [\left (j = 0) \vee (j = p(a_i)) \vee (T(i-1, j)) \vee (T(i-1, j-p(a_i))) \right]$
 				\ENDFOR
 			\ENDFOR
 			\IF{$T(n, p_{max} / 2) = \FALSE$}
@@ -80,7 +80,6 @@ On peut alors donner un algorithme pour résoudre le problème de la partition :
 		\ENDIF
 	\end{algorithmic}
 \end{algorithm}
-
 Le sous ensemble solution $S_{sol}$ se construit à l'aide du principe suivant : pour une ligne $i>0$ et
 un poids $j>0$ donnés, on a $a_i \in S_{sol}$ si $T(i-1, j) = \mbox{FAUX} \wedge T(i,j) =
 \mbox{VRAI}$. Ceci n'est vrai que dans un sens et permet d'introduire l'implication suivante :
@@ -110,9 +109,9 @@ Analysons les différents cas : \begin{enumerate}
 	\item C'est ce cas qui est intéressant, puisqu'il nous indique que l'ajout de l'objet $a_i$ permet
 		de trouver une solution au problème du sous-ensemble pour les valeurs données. On a donc $a_i$
 		appartenant bel et bien à la solution.
-	\item Ce cas indique jusque que la solution n'existe pas.
+	\item Ce cas indique juste que que la solution n'existe pas.
 \end{enumerate}
-
+~\\
 De ces principes, on peut déduire l'algorithme \ref{recsol} de reconstruction de la solution.
 \begin{algorithm}
 	\caption{Construct-sol}
@@ -133,6 +132,7 @@ De ces principes, on peut déduire l'algorithme \ref{recsol} de reconstruction d
 
 
 \subsubsection{Complexité}
+$O(n.p_{max})$
 %TODO
 
 \subsubsection{Jeux d'essais}
