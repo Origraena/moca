@@ -73,24 +73,29 @@ int main (int argc, char **argv) {
 	printTSP(t);
 	printf ("Valeur de la solution : %d\n", compCurVal(t));
 
-	void *ta, *tb;
+	void *ta, *tc, *td;
+	int **tb;
 	size_t mouhahaha;
 
 	int nbbranch = stratBranch (t, &ta, &mouhahaha);
+	td = ta;
 
 	tsp_t *f;
-	tb = ta;
+	tsp_t **z = (tsp_t **)ta;
 
 	for (i=0; i<nbbranch; i++) {
-		f = (tsp_t *) tb;
-		tb += mouhahaha;
+		tb = (int **)td;
+		tc = (void *) *tb;
+		f = (tsp_t *) tc;
 		printf ("==========> %d\n", i);
 		printTSP(f);
 		freeData(f);
+		td += mouhahaha;
 	}
 
 	freeData((void *) t);
 	freeData(tmp);
+	free(ta);
 
 	fclose(in);
 	return 0;
