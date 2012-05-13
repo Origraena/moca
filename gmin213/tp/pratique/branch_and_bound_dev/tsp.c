@@ -158,6 +158,7 @@ int stratBranch (void *branchpoint, void **newbranch, size_t *size) {
 		}
 
 	if (max <= 2) {
+		free (degre);
 		return 0;
 	}
 
