@@ -47,7 +47,7 @@ int lightestString (void *data);
 int opt2 (void *data);
 int opt3 (void *data);
 
-void printTSP (tsp_t *t);
+void printTSP (void *t);
 
 int findACPM (tsp_t *t);
 #endif
