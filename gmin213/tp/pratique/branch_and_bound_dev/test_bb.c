@@ -36,7 +36,7 @@ int main (int argc, char **argv) {
 	opt_t ord = MIN;
 	strat_t str = WIDTH_FIRST;
 
-	pb_t *p = initPb(lightestString, compCurVal, stratBranch, ord, t, copyData, freeData, str, acceptableSol, sizeof(tsp_t), initData, allocMem, printTSP);
+	pb_t *p = initPb(opt2, compCurVal, stratBranch, ord, t, copyData, freeData, str, acceptableSol, sizeof(tsp_t), initData, allocMem, printTSP);
 
 	resolve_pb(p, sol);
 

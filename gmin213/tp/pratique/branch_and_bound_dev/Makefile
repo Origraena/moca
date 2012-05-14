@@ -1,18 +1,18 @@
 CC = gcc
-CFLAGS = -c
+CFLAGS = -c -g
 LFLAGS = -o 
 
 A_OBJECTS =  bb.o tsp.o test.o
 B_OBJECTS =  bb.o tsp.o test_bb.o
 A_EXEC = phase
-B_EXEC = phasebis
+B_EXEC = solver_2opt
 
-all: phase phasebis
+all: phase $(B_EXEC)
 
 phase: $(A_OBJECTS)
 	$(CC) $(LFLAGS) $(A_EXEC) $(A_OBJECTS)
 
-phasebis: $(B_OBJECTS)
+$(B_EXEC): $(B_OBJECTS)
 	$(CC) $(LFLAGS) $(B_EXEC) $(B_OBJECTS)
 
 bb.o: bb.h bb.c

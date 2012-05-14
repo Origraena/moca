@@ -69,7 +69,7 @@ int findACPM (tsp_t *t) {
 					mark[i] = t->mat[curnode][i];
 					src[i] = curnode;
 				}
-		
+
 		next[0] = -1;
 		next[1] = -1;
 		for (i=0; i<t->nb_node; i++) 
@@ -274,7 +274,47 @@ int lightestString (void *data) {
 	fprintf (stderr, "Erreur\n");
 	return -1;
 }
-int opt2 (void *data) {}
+
+int opt2 (void *data) {
+	int res = lightestString(data);
+	tsp_t *t = (tsp_t *) data;
+	printTSP(t);
+	int i, j, better = 1;
+	int sub;
+	while (better) {
+		better = 0;
+		for (i=0; i<t->nb_node; i++) {
+			for (j=0; j<t->nb_node; j++)
+				if (j!=i) {
+					int k = 0;
+					int jsrc = t->sol[j]/t->nb_node, jdest = t->sol[j]%t->nb_node;
+					int isrc = t->sol[i]/t->nb_node, idest = t->sol[i]%t->nb_node;
+					if (jsrc == isrc || jsrc == idest || jdest == isrc || jdest == idest)
+						continue;
+					for (k=0; k<t->nb_node; k++) {
+						if (t->sol[k] == isrc*t->nb_node + jdest || t->sol[k] == isrc*t->nb_node + jsrc || t->sol[k] == jsrc*t->nb_node + idest || t->sol[k] == jsrc*t->nb_node + isrc || t->sol[k] == idest*t->nb_node + jsrc || t->sol[k] == idest*t->nb_node + jdest || t->sol[k] == jdest*t->nb_node + isrc || t->sol[k] == jdest*t->nb_node + idest){
+							k=-1;
+							break;
+						}
+					}
+					if (k==-1)
+						continue;
+					sub = t->mat[isrc][idest] + t->mat[jsrc][jdest] > t->mat[isrc][jdest] + t->mat[jsrc][jdest];
+					if(sub > 0) {
+						t->sol[i] = isrc*t->nb_node + jdest;
+						t->sol[j] = jsrc*t->nb_node + idest;
+						better++;
+						res -= sub;
+						printf ("%d %d\n", res, sub);
+						printTSP(t);
+					}
+				}
+		}
+	}
+	printf ("Fin init\n");
+	return res;
+}
+
 int opt3 (void *data) {}
 
 void printTSP (void *s) {
