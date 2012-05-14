@@ -36,3 +36,17 @@ Les tailles de paquets sont donc respectivement :
 Les quatre connexions sont lancées simultanément au démarrage, et sont stoppées à 10
 secondes du démarrage.
 
+\hbox{
+	\begin{tikzpicture}
+		\node[circle,draw,fill=black!10] (O) at (0,0) {O};
+		\node[circle,draw,fill=black!10] (D) at (5,0) {D}
+			edge[<-,bend left=22] node[above] {UDP} (O)
+			edge[<-,bend left=45] node[above] {TCP1} (O)
+			edge[<-,bend right=45] node[above] {TCP2} (O)
+			edge[<-,bend right=22] node[above] {TCP3} (O)
+			;
+	\end{tikzpicture}
+%\caption{Topologie}
+\label{topo_fig}
+}
+

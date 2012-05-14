@@ -36,13 +36,21 @@ attendent une réponse avant de recommencer à envoyer.
 
 \subsection{Taille de la file d'attente}
 
-\begin{figure}[ht]
+Comme nous pouvons le constater sur la figure suivante \ref{fa}, la taille de la file d'attente du lien augmente puis diminue
+le temps que les messages soient traités.
+
+\begin{figure}[!h]\label{fa}
 \includegraphics[scale=0.7]{../res/queuesize.png}
 \caption{Evolution de la taille de la file d'attente au cours du temps}
 \end{figure}
 
 \subsection{Taille de la fenêtre TCP}
-\begin{figure}[ht]
+
+Sur la figure suivante \ref{fe} où les tailles des différentes fenêtres TCP sont représentées, nous observons que la première
+connexion TCP utilise la majorité de la bande passante restante après le passage du trafic UDP. Ainsi les deux dernières
+connexions ont une fenêtre qui diminue peu (étant donné que la fenêtre est réinitialisée à la réception d'un accusé et que ceux-ci ne peuvent pas circuler sur le lien surchargé).
+
+\begin{figure}[!h]\label{fe}
 \includegraphics[scale=0.7]{../res/winsize.png}
 \caption{Evolution de la taille de la fenêtre TCP}
 \end{figure}
