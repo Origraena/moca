@@ -50,7 +50,7 @@ la ligne $i$ en fonction de la ligne $i-1$ et $p(a_i)$ :
 \end{equation}
 
 On peut alors donner un algorithme pour résoudre le problème de la partition : l'algorithme
-\ref{solvepart}.
+\ref{algo_dyn_partition}.
 
 \input{../theorique/Swan/algo_partition.tex}
 
@@ -89,10 +89,9 @@ Analysons les différents cas : \begin{enumerate}
 De ces principes, on peut déduire l'algorithme \ref{recsol} de reconstruction de la solution.
 
 \subsubsection{Complexité}
-$O(n.P)$
-%TODO
+Complexité en espace et en temps : $O(n.P)$.
 
-\subsubsection{Jeux d'essais}
+%\subsubsection{Jeux d'essais}
 
 
 \subsection{Le problème du sac à dos}
@@ -100,6 +99,8 @@ $O(n.P)$
 \input{../theorique/Swan/algo_bag.tex}
 
 \subsubsection{Justification des formules}
+Chaque ligne est indicée par $i$ telle que ses solutions ne peuvent contenir qu'une combinaison des $i$ premiers objets. Chaque colonne est indicée par le volume maximum du sous-problème. Chaque case contient l'utilité maximum en considérant le problème réduit aux $i$ premiers objets et au volume $j$ maximum.
+En effet, à chaque nouvelle case, on compare la valeur obtenue avec le volume précédent et les solutions considérants uniquement les objets précédents auxquelles on ajoute le nouvel objet un nombre de fois $k$. Évidemment, il faut regarder la case correspondant au volume obtenu en enlevant le volume de cet objet $k$ fois.
 
 \subsubsection{Exemple}
 
@@ -197,9 +198,12 @@ $\begin{array}{|c|c|c|c|c|} \hline
 
 Solution optimale : $\{0,3,2,1,4,0\} = 5$.
 
+\input{../theorique/Chloe/exemple_tsp_resolu.tex}
+
 \subsubsection{Complexité}
 La matrice générée ici est de taille $n,2^n$, et il faut $\bigcirc(n)$ opérations pour remplir une case.
 Les complexités sont donc :
+
 \begin{itemize}
 	\item temps : $\bigcirc(n^2\times 2^n)$
 	\item espace : $\bigcirc(n\times 2^n)$

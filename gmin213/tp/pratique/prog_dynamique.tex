@@ -5,7 +5,7 @@
 Nous avons décidé d'implémenter tous les algorithmes suivants en langage C pour des raisons d'efficacité.
 
 \section{Programmation dynamique}
-La programmation dynamique est un paradigme d'algorithmes exacts qui consiste à plonger le problème dans sa généralisation. Le principe est d'utiliser une fonction de récursion pour calculer la solution optimale d'un sous-problème du problème courant. À partir de la solution de ce sous-problème, on obtient la solution d'un sous-problème plus grand, etc, jusqu'à résoudre le problème de départ. Ainsi, tous les calculs sont effectués une et une seule fois.
+La programmation dynamique est un paradigme d'algorithmes exacts qui consiste à plonger le problème dans sa généralisation. Le principe est d'utiliser une fonction de récursion pour calculer la solution optimale d'un sous-problème du problème courant. À partir de la solution de ce sous-problème, on obtient la solution d'un sous-problème plus grand, etc, jusqu'à résoudre le problème de départ.
 
 %Espace de recherche, sous-ensemble de l'espace de recherche
 
@@ -15,11 +15,16 @@ La programmation dynamique est un paradigme d'algorithmes exacts qui consiste à
 Le problème de la 2-partition de $n$ objets consiste à trouver deux sous-ensembles de ces $n$ objets tel que chacun des sous-ensembles ait le même poids. Les poids de chacun des objets étant des valeurs entières, pour qu’il existe deux sous-ensembles distincts ayant le même poids, il faut que la somme des poids des objets soit paire.
 
 \subsubsection{Algorithme de programmation dynamique}
-Prenons l'algorithme de résolution présenté dans la section théorique (cf \ref{solvepart}) et rappelé ci-dessous. Cet algorithme est un algorithme exact admettant une complexité en $O(n.P)$ avec $n$ le nombre d'objets et $P$ la somme des poids de tous les objets.
+Prenons l'algorithme de résolution présenté dans la section théorique (cf \ref{algo_dyn_partition}) et rappelé ci-dessous. Cet algorithme est un algorithme exact admettant une complexité en $O(n.P)$ avec $n$ le nombre d'objets et $P$ la somme des poids de tous les objets.
 \input{../theorique/Swan/algo_partition.tex}
 
-\subsubsection{Tests}
 
+\subsubsection{Implémentation}
+Cet algorithme a été implémenté de manière naïve : comme présenté en partie théorique et ci-dessus.
+Nous avons donc codé la matrice intégralement.
+
+\subsubsection{Tests}
+La phase de tests dont la courbe ci-dessous résulte a été limitée par la capacité de la mémoire vive de notre ordinateur de test.
 \begin{figure}[H]
 	\includegraphics[width=\linewidth]{../pratique/prog_dynamique_dev/res/partition.png}
 \end{figure}
@@ -31,13 +36,17 @@ Prenons l'algorithme de résolution présenté dans la section théorique (cf \r
 Le problème du sac à dos consiste à vouloir mettre des objets ayant chacun différents volumes et utilités dans un sac à dos à volume limité. Le but est d'obtenir un sac à dos rempli avec une utilité maximum.
 
 \subsubsection{Algorithme de programmation dynamique}
-Prenons l'algorithme de résolution présenté ci-dessous. Cet algorithme est un algorithme exact admettant une complexité en $O(n.V^2)$ avec $n$ le nombre d'objets et $V$ le volume du sac à dos. Notons que la borne (pire des cas) est atteinte si tous les objets sont de volume 1.
+Prenons l'algorithme de résolution présenté ci-dessous servant à résoudre le problème du sac à dos dans lequel nous pouvons mettre plusieurs fois le même objet. Cet algorithme est un algorithme exact admettant une complexité en $O(n.V^2)$ avec $n$ le nombre d'objets et $V$ le volume du sac à dos. Notons que la borne (pire des cas) est atteinte si tous les objets sont de volume 1.
 \input{../theorique/Swan/algo_bag.tex}
 
 \subsubsection{Implémentation}\label{bag_impl}
+Etant donné que pour calculer une nouvelle ligne, il nous suffit de regarder dans la précédente, nous 
+avons décidé de ne pas stocker la matrice intégralement mais uniquement les deux dernières lignes.
+Ainsi, pour obtenir la solution, nous devons stocker les solutions temporaires dans chaque case.
+Pour cela, nous avons utilisé une liste simplement chaînée.
 
 \subsubsection{Tests}
-
+Sur la courbe suivante, nous remarquons que le volume du sac influe plus que le nombre d'objets sur le temps d'exécution. Ce qui confirme nos attentes théoriques.
 \begin{figure}[H]
 	\includegraphics[width=\linewidth]{../pratique/prog_dynamique_dev/res/bag.png}
 \end{figure}
@@ -51,7 +60,16 @@ Le problème du voyageur de commerce consiste à trouver un cycle hamiltonien de
 \input{../theorique/Swan/algo_tsp.tex}
 
 
+\subsubsection{Implémentation}
+Comme pour le problème du sac à dos, nous n'avons pas conservé l'ensemble de la matrice.
+Ici, nous ne gardons que les colonnes dont l'ensemble $S$ a pour arité la taille des chemins en cours
+de calcul moins un.
+De plus, étant donné que le nombre de colonnes à générer pour une nouvelle cardinalité est difficile à prévoir,
+nous avons utilisé des listes chaînées de manière à stocker celles-ci sans pour autant allouer plus de mémoire que nécessaire.
+
+
 \subsubsection{Tests}
+Comme visible sur la courbe, il est très difficile de résoudre ce problème via la programmation dynamique. En effet dès que le nombre de sommets dépasse 15, le temps d'exécution n'est plus raisonnable.
 
 \begin{figure}[H]
 	\includegraphics[width=\linewidth]{../pratique/prog_dynamique_dev/res/tsp.png}
