@@ -139,16 +139,59 @@ De plus, si la matrice est stockée entièrement, la complexité en espace est d
 
 \subsubsection{Exemple}
 \input{../theorique/Chloe/exemple_tsp.tex}
+
 {\bf i = 1}\\
 \begin{center}
-$$\begin{array}{|c|c|c|c|c|c|c|} \hline
-	i & S = \{0\} \\ \hline
-	1 & \{0,1\} = 
-	2 & \{0,2\} = 
-	3 & \{0,3\} =
-	4 & \{0,4\} =
+$$\begin{array}{|c|c|} \hline
+	_i^S & \{0\} \\ \hline
+	1 & \{0,1\} = 1\\ \hline
+	2 & \{0,2\} = 2\\ \hline
+	3 & \{0,3\} = 1\\ \hline
+	4 & \{0,4\} = 0\\ \hline
 \end{array}$$
 \end{center}
+
+
+{\bf i = 2}\\
+\begin{center}
+$$\begin{array}{|c|c|c|c|c|} \hline
+	_i^S & \{0,1\} & \{0,2\} & \{0,3\} & \{0,4\} \\ \hline
+	1 & $\ding{55}$ & \{0,2,1\} = 5 & \{0,3,1\} = 6& \{0,4,1\} = 0\\ \hline
+	2 & \{0,1,2\} = 4 & $\ding{55}$ & \{0,3,2\} = 3& \{0,4,2\} = 1\\ \hline
+	3 & \{0,1,3\} = 6 & \{0,2,3\} = 4 & $\ding{55}$ & \{0,4,3\} = 4\\ \hline
+	4 & \{0,1,4\} = 1 & \{0,2,4\} = 3 & \{0,3,4\} = 5& $\ding{55}$\\ \hline
+\end{array}$$
+\end{center}
+
+{\bf i = 3}\\
+\begin{center}
+$$\begin{array}{|c|c|c|c|c|c|c|} \hline
+	_i^S & \{0,1,2\} & \{0,1,3\} & \{0,1,4\} & \{0,2,3\}
+& \{0,2,4\}& \{0,3,4\} 
+\\ \hline
+	1 & $\ding{55}$ & $\ding{55}$ & $\ding{55}$ & \{0,3,2,1\} = 6
+& \{0,2,4,1\} = 3 & \{0,3,4,1\} = 5 \\ \hline
+	2 & $\ding{55}$ & \{0,1,3,2\} = 8 & \{0,1,4,2\} = 2 & $\ding{55}$ 
+& $\ding{55}$ & \{0,3,4,2\} = 6 \\ \hline
+	3 & \{0,1,2,3\} = 6 & $\ding{55}$ & \{0,1,4,3\} = 5 & $\ding{55}$
+& \{0,4,2,3\} = 3 & $\ding{55}$ \\ \hline
+	4 & \{0,1,2,4\} = 5 & \{0,3,1,4\} = 6 & $\ding{55}$ & \{0,3,2,4\} = 4 
+& $\ding{55}$ & $\ding{55}$ \\ \hline
+\end{array}$$
+\end{center}
+
+{\bf i = 4}\\
+\begin{center}
+$$\begin{array}{|c|c|c|c|c|} \hline
+	_i^S & \{0,1,2,3\} & \{0,1,2,4\} & \{0,1,3,4\} & \{0,2,3,4\} \\ \hline
+	1 & $\ding{55}$ & $\ding{55}$ & $\ding{55}$ & \{0,3,2,4,1\} = 4 \\ \hline
+	2 & $\ding{55}$ & $\ding{55}$ & \{0,1,4,3,2\} = 7 & $\ding{55}$ \\ \hline
+	3 & $\ding{55}$ & \{0,1,4,2,3\} = 4 & $\ding{55}$ & \ding{55} \\ \hline
+	4 & \{0,3,2,1,4\} = 5 & $\ding{55}$ & $\ding{55}$ & \ding{55} \\ \hline
+\end{array}$$
+\end{center}
+
+Solution optimale : $\{0,3,2,1,4,0\} = 5$.
 
 \subsubsection{Complexité}
 La matrice générée ici est de taille $n,2^n$, et il faut $\bigcirc(n)$ opérations pour remplir une case.
