@@ -19,11 +19,15 @@
 #include "tsp.h"
 #include "bb.h"
 
-int main (int argc, char *argv) {
+int main (int argc, char **argv) {
 	tsp_t *t;
 	void *sol;
+	char *fil = "graph";
 
-	FILE *in = fopen("graph", "r");
+	if (argc == 2)
+		fil = argv[1];
+
+	FILE *in = fopen(fil, "r");
 	initTSPFromFile(&t, in);
 	fclose (in);
 
@@ -36,7 +40,9 @@ int main (int argc, char *argv) {
 
 	resolve_pb(p, sol);
 
-	printTSP((tsp_t*)sol);
+	if (acceptableSol(sol))
+		printTSP((tsp_t*)sol);
+
 	printf("Valeur solution : %d\n", compCurVal(sol));
 
 	freePb(p);

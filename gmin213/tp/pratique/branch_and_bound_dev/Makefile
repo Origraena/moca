@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -c -g
+CFLAGS = -c
 LFLAGS = -o 
 
 A_OBJECTS =  bb.o tsp.o test.o

@@ -159,7 +159,6 @@ int resolve_pb (pb_t *pb, void *sol) {
 	int i = 0;
 
 	while (pb->curnode) {
-		printf ("Je rentre dans l'opt\n");
 		int b = 0, nb_branch;
 		size_t size_data;
 		void *d1;
@@ -169,11 +168,9 @@ int resolve_pb (pb_t *pb, void *sol) {
 		nb_branch = pb->stratBranch(tmp->var, &d1, &size_data);
 		void *dtmp = d1, *y;
 		int **z;
-		printf ("Nombre de fils trouvés : %d\n", nb_branch);
 		for (i=0; i<nb_branch; i++) {
 			z = (int **)dtmp;
 			y = (void *) *z;
-			pb->printData(y);
 			int heur = pb->compCurVal(y);
 			if (heur * pb->order > pb->order * pb->bestsol) {
 				if (pb->acceptableSol(y)) {
@@ -184,10 +181,8 @@ int resolve_pb (pb_t *pb, void *sol) {
 				else 
 					pb->curnode = insSol(pb->curnode, newSol(y), heur, pb->order, pb->strat);
 			}
-			else {
-				printf ("%d > %d ==> Pas de branchements\n", heur, pb->bestsol);
+			else 
 				freeData(y);
-			}
 			dtmp += size_data;
 		}
 		if (nb_branch)

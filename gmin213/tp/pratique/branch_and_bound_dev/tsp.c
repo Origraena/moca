@@ -47,27 +47,17 @@ int findACPM (tsp_t *t) {
 	char *src = (char *) malloc (t->nb_node * sizeof(char));
 	char *visited = (char *) calloc (t->nb_node, sizeof(char));
 
-	int curnode = 0, nb_marked = 1, i;
+	int curnode = 1, nb_marked = 1, i;
 	int next[2] = {-1};
 	int mark_sol = 0;
 	int rate = 0;
-
-	for (i=0; i<t->nb_node; i++)
-		if (!nbvoisin(t, i)) {
-			nb_marked++;
-			visited[i]++;
-		}
-
-	while (curnode < t->nb_node && visited[curnode]) 
-		curnode ++;
-
-	if (curnode == t->nb_node)
-		return 0;
 
 	for (i=0; i<t->nb_node; i++) {
 		mark[i] = -1;
 		t->sol[i] = -1;
 	}
+
+	visited[0]++;
 
 	while (nb_marked < t->nb_node && !rate) {
 		visited[curnode] ++;
@@ -90,17 +80,24 @@ int findACPM (tsp_t *t) {
 						next[1] = i;
 					}
 
-		if (next[1] == -1)
-			rate++;
+		if (next[1] == -1 || next[1] == 0) 
+			++rate;
+		else
+			t->sol[mark_sol++] = src[next[1]] * t->nb_node + next[1];
 
-		t->sol[mark_sol++] = src[next[1]] * t->nb_node + next[1];
 		curnode = next[1];
 	}
-	free(visited);
 	free(src);
 	free(mark);
 
-	return rate ? 0 : 1;
+	for (i=0; i<t->nb_node; i++)
+		if (!visited[i]) {
+			free(visited);
+			return 0;
+		}
+
+	free(visited);
+	return 1;
 }
 
 void initTSPFromFile (tsp_t **tsp, FILE *in) {
@@ -139,9 +136,6 @@ int compCurVal (void *s) {
 int stratBranch (void *branchpoint, void **newbranch, size_t *size) {
 	tsp_t *bp = (tsp_t *)branchpoint;
 	*size = sizeof (tsp_t *);
-
-	printf ("TSP recu :\n");
-	printTSP(bp);
 
 	// Find number of children
 	int *degre = (int *) calloc (bp->nb_node, sizeof (int)), i, j;
@@ -183,8 +177,13 @@ int stratBranch (void *branchpoint, void **newbranch, size_t *size) {
 		copyData(tmp, bp);
 		tmp->mat[nodes[i]][ind_max] = -1;
 		tmp->mat[ind_max][nodes[i]] = -1;
-		compPartSolFromACPM(tmp, 0);
-		nb[i] = tmp;
+		if (compPartSolFromACPM(tmp, 0)) 
+			nb[i] = tmp;
+		else {
+			i--;
+			max--;
+			freeData(tmp);
+		}
 	}
 	*newbranch = nb;
 	free (degre);
@@ -199,11 +198,16 @@ int acceptableSol (void *data) {
 
 	int *node_deg = (int *) calloc (t->nb_node, sizeof(int)), i;
 
-	for (i=0; i<t->nb_node; i++)
+	for (i=0; i<t->nb_node; i++){
+		if (t->sol[i] == -1){
+			free (node_deg);
+			return 0;
+		}
 		if (++node_deg[t->sol[i]/t->nb_node] > 2 || ++node_deg[t->sol[i]%t->nb_node] > 2) {
 			free (node_deg);
 			return 0;
 		}
+	}
 
 	free(node_deg);
 	return 1;
@@ -292,8 +296,7 @@ int compPartSolFromACPM (void *data, int a) {
 	copyData(s, t);
 
 	for (i=0; i<t->nb_node; t->mat[i][a] = -1, t->mat[a][i++] = -1);
-	if (!findACPM(t))
-		return 0;
+	int ret = findACPM(t);
 
 	int mina = -1, minb = -1, inda = -1, indb = -1;
 
@@ -324,6 +327,8 @@ int compPartSolFromACPM (void *data, int a) {
 	t->sol[t->nb_node -2] = a*t->nb_node + indb;
 
 	freeData(s);
+	if (!ret)
+		return 0;
 	return (compCurVal(t));
 }
 
