@@ -63,6 +63,7 @@ graph* generateGraph(uint n, int minWeight, int maxWeight);
 graph* generateGeoGraph(const uint n, int points[][2]);
 void freeGraph(graph*);
 void printGraph(graph* g);
+void fprintGraph(graph* g, const char* filename);
 void setEdge(graph* g, const uint u, const uint v, const int w);
 
 /* paths */

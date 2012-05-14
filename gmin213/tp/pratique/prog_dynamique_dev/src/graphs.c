@@ -270,6 +270,22 @@ void printGraph(graph* g) {
 	}
 }
 
+void fprintGraph(graph* g, const char* filename) {
+	uint i,j;
+	FILE* output = fopen(filename,"w");
+	if ((!output) || (!g)) {
+		perror("Opening file");
+		return;
+	}
+	fprintf(output,"%u\n",g->n);
+	for (i = 0 ; i < g->n ; i++) {
+		for (j = i+1 ; j < g->n ; j++)
+			fprintf(output,"%d ",g->edges[i][j]);
+		fprintf(output,"\n");
+	}
+	fclose(output);
+}
+
 path* createPath(uint capacity) {
 	path* p = malloc(sizeof(path));
 	p->n = 0;
