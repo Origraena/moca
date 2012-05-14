@@ -1,8 +1,13 @@
 % !TEX encoding = UTF-8 Unicode
 % !TEX root = ../Rapport/rapport.tex
 
-\section{Programmation dynamique}
+
 Nous avons décidé d'implémenter tous les algorithmes suivants en langage C pour des raisons d'efficacité.
+
+\section{Programmation dynamique}
+La programmation dynamique est un paradigme d'algorithmes exacts qui consiste à plonger le problème dans sa généralisation. Le principe est d'utiliser une fonction de récursion pour calculer la solution optimale d'un sous-problème du problème courant. À partir de la solution de ce sous-problème, on obtient la solution d'un sous-problème plus grand, etc, jusqu'à résoudre le problème de départ. Ainsi, tous les calculs sont effectués une et une seule fois.
+
+%Espace de recherche, sous-ensemble de l'espace de recherche
 
 \subsection{Problème de la partition}
 
@@ -41,6 +46,10 @@ Prenons l'algorithme de résolution présenté dans la section théorique (cf \r
 
 \subsubsection{Tests}
 
+\begin{figure}[H]
+	\includegraphics[width=\linewidth]{../pratique/prog_dynamique_dev/res/partition.png}
+\end{figure}
+
 
 \subsection{Problème du sac à dos}
 
@@ -73,6 +82,9 @@ Prenons l'algorithme de résolution présenté ci-dessous. Cet algorithme est un
 
 \subsubsection{Tests}
 
+\begin{figure}[H]
+	\includegraphics[width=\linewidth]{../pratique/prog_dynamique_dev/res/bag.png}
+\end{figure}
 
 
 \subsection{Problème du voyageur de commerce}
@@ -103,5 +115,9 @@ Le problème du voyageur de commerce consiste à trouver un cycle hamiltonien de
 
 
 \subsubsection{Tests}
+
+\begin{figure}[H]
+	\includegraphics[width=\linewidth]{../pratique/prog_dynamique_dev/res/tsp.png}
+\end{figure}
 
 
