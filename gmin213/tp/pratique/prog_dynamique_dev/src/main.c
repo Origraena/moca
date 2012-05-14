@@ -12,6 +12,7 @@ int main(int argc, char** argv) {
 	global.debug = 0;
 	global.verbose = 0;
 	uint i,j;
+	sleep(1);
 	const long seed = time(0);
 	srand(seed);
 	if (global.verbose)

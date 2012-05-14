@@ -82,9 +82,15 @@ Le nombre d'opérations nécessaires pour calculer un produit matriciel dépenda
  
  
 \subsection{Nombre de parenthésages possibles d'un produit de $k$ matrices}
-% TODO
+Montrons que le nombre de parenthésages possibles est le suivant : $c(k)=\sum\limits_{i=1}^{k-1}{c(i)c(k-i)}$. Posons $c(1)=1$.
 
-\subsection{Récurrence}
+Pour $n=2$, il n'y a qu'une façon de parenthéser le produit de deux matrices donc $c(2)=1$. Or, $c(1).c(2-1) = 1 \times 1 = 1$. Donc la récurrence est initialisée.
 
+Nous admettrons que $\forall k \in \mathbb{N}$ on a : $c(k)=\sum\limits_{i=1}^{k-1}{c(i)c(k-i)}$.
 
-\subsection{Exemple}
+Pour $k = n+1$, on a les mêmes façons de parenthéser le produit que pour $k=n$ plus .
+
+%\subsection{Récurrence}
+%TODO
+
+%\subsection{Exemple}
