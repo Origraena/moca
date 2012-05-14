@@ -52,34 +52,8 @@ la ligne $i$ en fonction de la ligne $i-1$ et $p(a_i)$ :
 On peut alors donner un algorithme pour résoudre le problème de la partition : l'algorithme
 \ref{solvepart}.
 
-\begin{algorithm}[H]
-	\caption{solve-partition}
-	\label{solvepart}
-	\begin{algorithmic}[1]
-		\STATE $p_{max} \leftarrow \sum_{i \in \mathbb{[}1, n \mathbb{]}} p(a_i)$
-		\IF{$p_{max} \equiv 1 \pmod{2}$}
-			\STATE Pas de solutions
-		\ELSE
-			\FOR {$j \in \mathbb{[}0,p_{max}/2\mathbb{]}$}
-				\IF{$j = 0$}
-					\STATE $T(0, j) \leftarrow \TRUE$
-				\ELSE
-					\STATE $T(0, j) \leftarrow \FALSE$
-				\ENDIF
-			\ENDFOR
-			\FOR{$i \in \mathbb{[}1, n \mathbb{]}$}
-				\FOR{$j \in \mathbb{[}0, p_{max}/2\mathbb{]}$}
-					\STATE $T(i, j) \leftarrow [\left (j = 0) \vee (j = p(a_i)) \vee (T(i-1, j)) \vee (T(i-1, j-p(a_i))) \right]$
-				\ENDFOR
-			\ENDFOR
-			\IF{$T(n, p_{max} / 2) = \FALSE$}
-				\STATE Pas de solutions
-			\ELSE
-				\STATE Construire le sous ensemble solution
-			\ENDIF
-		\ENDIF
-	\end{algorithmic}
-\end{algorithm}
+\input{../theorique/Swan/algo_partition.tex}
+
 Le sous ensemble solution $S_{sol}$ se construit à l'aide du principe suivant : pour une ligne $i>0$ et
 un poids $j>0$ donnés, on a $a_i \in S_{sol}$ si $T(i-1, j) = \mbox{FAUX} \wedge T(i,j) =
 \mbox{VRAI}$. Ceci n'est vrai que dans un sens et permet d'introduire l'implication suivante :
@@ -113,23 +87,6 @@ Analysons les différents cas : \begin{enumerate}
 \end{enumerate}
 ~\\
 De ces principes, on peut déduire l'algorithme \ref{recsol} de reconstruction de la solution.
-\begin{algorithm}
-	\caption{Construct-sol}
-	\label{recsol}
-	\begin{algorithmic}[1]
-		\STATE $S \leftarrow \emptyset$
-		\IF{$i = 0$ \OR $j=0$}
-			\STATE Retourne $S$
-		\ELSE
-			\IF{$T(i-1,j) = \FALSE$}
-				\STATE Retourne $a_i \cup$ Construct-sol($i-1$,$j-a_i$)
-			\ELSE
-				\STATE Retourne Construct-sol($i-1$, $j$)
-			\ENDIF
-		\ENDIF
-	\end{algorithmic}
-\end{algorithm}
-
 
 \subsubsection{Complexité}
 $O(n.P)$
@@ -139,7 +96,8 @@ $O(n.P)$
 
 
 \subsection{Le problème du sac à dos}
-\input{
+
+\input{../theorique/Swan/algo_bag.tex}
 
 \subsubsection{Justification des formules}
 
@@ -150,8 +108,8 @@ Le sac à dos a une capacité de 6 et les propriétés des objets sont définies
 :
 \begin{center}
 \begin{tabular}{|c|c|c|c|c|} \hline
-	utilité & 1 & 3 & 2 & 2 \\ \hline
-	volume & 1 & 4 & 4 & 5 \\ \hline
+	utilité & 1 & 3 & 4 & 5 \\ \hline
+	volume & 1 & 4 & 2 & 2 \\ \hline
 \end{tabular}
 \end{center}
 
@@ -172,9 +130,31 @@ Il ne nous reste plus qu'à lire la solution optimale dans la case [4,6].
 
 
 \subsubsection{Complexité}
-
+Notre algorithme génère une matrice de taille $n \times V$, et pour chaque case dans le pire des cas (si $v_i = 1$), il faudra $V$ 
+itérations. Ainsi nous obtenons la complexité en temps suivante : $\bigcirc(n\times V^2)$.
+De plus, si la matrice est stockée entièrement, la complexité en espace est donc en $\bigcirc(n\times V)$.
 
 \subsection{Le problème du voyageur de commerce}
+\input{../theorique/Swan/algo_tsp.tex}
+
 \subsubsection{Exemple}
+\input{../theorique/Chloe/exemple_tsp.tex}
+{\bf i = 1}\\
+\begin{center}
+$$\begin{array}{|c|c|c|c|c|c|c|} \hline
+	i & S = \{0\} \\ \hline
+	1 & \{0,1\} = 
+	2 & \{0,2\} = 
+	3 & \{0,3\} =
+	4 & \{0,4\} =
+\end{array}$$
+\end{center}
 
 \subsubsection{Complexité}
+La matrice générée ici est de taille $n,2^n$, et il faut $\bigcirc(n)$ opérations pour remplir une case.
+Les complexités sont donc :
+\begin{itemize}
+	\item temps : $\bigcirc(n^2\times 2^n)$
+	\item espace : $\bigcirc(n\times 2^n)$
+\end{itemize}
+
