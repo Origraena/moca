@@ -1,5 +1,5 @@
 % !TEX root = ../../Rapport/rapport.tex
-\section{Sur le problème de la couverture sommet minimale : trois approches différentes}
+\section{Sur le problème de la couverture sommet minimale}
 
 \subsection{Première approche : la programmation linéaire en nombres entiers}
 
@@ -9,7 +9,7 @@ On considère le problème de la couverture minimale sous la forme suivante : $$
 \left \lbrace \begin{array}{l}
 	\min z = \sum\limits_{j=1}^n x_j\\
 	x_r + x_s \geq 1, \quad \forall \{v_r, v_s\} \in E \\
-	x_j \in \{0,1\} \quad j = 1, \dot, n
+	x_j \in \{0,1\} \quad j = 1, \ldots, n
 \end{array} \right .
 $$
 
@@ -136,7 +136,7 @@ $$
 $$
 
 \paragraph{iii. Algorithme 2-approché}
-% TODO
+Dans le pire des cas, on prend tous les sommets du graphe et chaque arête est comptée deux fois. La solution optimale admet une borne inférieure égale à la somme du poids des arcs. Donc la valeur de la fonction objectif  dans le pire des cas vaut deux fois la somme totale des poids des arêtes et il existe un algorithme deux-approché (celui qui prend tous les sommets).
 
 
 \subsection{Seconde approche : la recherche d'un couplage maximal}
@@ -182,5 +182,3 @@ Le graphe suivant met en évidence la borne 2 de l'algorithme.
 \subsubsection{(c) Application de l'algorithme}
 L'application de l'algorithme 3 au graphe d'exemple de la figure 1 donne une couverture $C = \{a_i\} \cup \{b_i\}$ alors que la solution optimale est $C = \{b_i\}$. Si le graphe de la figure 1 est bien le pire des cas pour cet algorithme alors c'est un algorithme $1.6$-approché.
 
-\subsection{Utilisation d'un algorithme primal-dual}
-% TODO

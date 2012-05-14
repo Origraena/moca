@@ -36,9 +36,9 @@ int main (int argc, char **argv) {
 	allocMem(&sol, t);
 
 	opt_t ord = MIN;
-	strat_t str = WIDTH_FIRST;
+	strat_t str = DEPTH_FIRST;
 
-	pb_t *p = initPb(opt2, compCurVal, stratBranch, ord, t, copyData, freeData, str, acceptableSol, sizeof(tsp_t), initData, allocMem, printTSP);
+	pb_t *p = initPb(lightestString, compCurVal, stratBranch, ord, t, copyData, freeData, str, acceptableSol, sizeof(tsp_t), initData, allocMem, printTSP);
 	
 	time_t cur = time(0);
 	resolve_pb(p, sol);
