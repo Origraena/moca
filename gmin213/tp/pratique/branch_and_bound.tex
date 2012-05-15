@@ -81,7 +81,7 @@ une arête pour obtenir un cycle hamiltonien.
 Les résultats des temps d'exécution sont présentés à la figure \ref{tsp_chaine}. On remarquera la forme
 exponentielle de la courbe de résultats.
 
-D'autres stratégie peuvent être choisie comme point de départ, on peut par exemple citer 2-opt
+D'autres stratégies peuvent être choisies comme point de départ, on peut par exemple citer 2-opt
 permettant l'amélioration d'un cycle en analysant les 2-permutations de celui-ci : si en échangeant
 les extrêmités de deux arêtes on améliore le cycle alors, on réalise la permutation.
 
@@ -96,16 +96,38 @@ fonction du nombre de villes à visiter}
 
 \subsection{Comparaisons}
 
+\begin{figure}[H]
+	\begin{center}
+	\includegraphics[width=\linewidth]{../pratique/comp.png}
+\end{center}
+\caption{Comparaison du temps d'exécution des algorithmes Branch and Bound et de programmation
+dynamique en fonction du nombre de sommets}
+\label{comp_algo}
+\end{figure}
 
-\subsection{Algorithme $\frac{3}{2}$ approché}
+La figure \ref{comp_algo} met en avant le temps gagné (en moyenne) par des algorithmes de branch and
+bound. On observe que pour des problèmes mettant en scène 14 villes, le Branch and Bound présente un
+temps d'exécution moyen plus de quatre fois inférieur au temps d'exécution de la programmation
+dynamique. 
 
+Ceci met en avant le nombre très important d'opérations économisées par l'élagation de l'arbre. En
+effet, il ne faut pas oublier qu'à chaque étape de l'algorithme de branch and bound, ce dernier
+résouds un problème relaxé ce qui représente là un nombre considérable d'opérations et malgré ceci
+le branch and bound est beaucoup plus rapide.
 
+On confirme alors que le nombre de solutions réalisables intéressantes et très faible par rapport à
+la taille de l'espace des solutions.
 
 \section{Conclusion}
 
+Malheureusement, nous n'avons pas pu mettre en \oe uvre d'autres algorithmes d'initialisation pour
+le branch and bound du TSP, ce qui aurait permis de mettre en avant l'importance de la solution
+acceptable initiale sur le temps d'exécution de l'algorithme.
 
-\begin{figure}[H]
-	\includegraphics[width=\linewidth]{../pratique/comp.png}
-\end{figure}
+Théoriquement parlant, plus la solution initiale est proche de la solution optimale, plus le temps
+d'exécution est faible. Seulement, réduire la marge d'erreur lors de l'initialisation implique un
+calcul plus long. Il faut donc trouver le juste équilibre entre le temps consacré à l'initialisation
+et celui consacré à la résolution.
 
-
+Il aurait été intéressant de pouvoir mettre en \oe uvre l'algorithme de Christophides afin de
+pouvoir comparer les résultats en temps et en précision de tous ces algorithmes.
