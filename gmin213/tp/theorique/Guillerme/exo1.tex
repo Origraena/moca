@@ -118,8 +118,8 @@ Cet algorithme est donc une 2-approximation.
 \paragraph{i. Programme linéaire}
 $$
 \left \lbrace \begin{array}{l}
-	\min z = \sum\limits_{(i,j)\in E}{(x_i \times w_{ij} + x_j \times w_{ij})}\\
-	x_r + x_s \geq 1, \quad \forall \{v_r, v_s\} \in E \\
+	\min z = \sum\limits_{(i,j)\in E}{x_i w_{ij} + x_j w_{ij}}\\
+	x_r + x_s \geq 1, \quad \forall v_r, v_s \in E \\
 	x_j \in \{0,1\} \quad j \in \{1, \ldots, n\}
 \end{array} \right .
 $$
@@ -129,7 +129,7 @@ $$
 Posons la matrice A, la $(n,n)$-matrice d'adjacente du graphe et X le vecteur contenant les variables existentielles définies précédemment. Le PLNE correspondant est le suivant :
 $$
 \left \lbrace \begin{array}{l}
-	\min z = \sum\limits_{(i,j)\in E}{(x_i \times w_{ij} + x_j \times w_{ij})}\\
+	\min z = \sum\limits_{(i,j)\in E}{x_i w_{ij} + x_j w_{ij}}\\
 	A.X \geq 1\\
 	x_j \in \{0,1\} \quad j \in \{1, \ldots, n\}
 \end{array} \right .
