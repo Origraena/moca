@@ -1,0 +1,46 @@
+\begin{algorithm}[H]
+	\caption{Partition}
+	\label{algo_dyn_partition}
+	\begin{algorithmic}[1]
+		\STATE $P \leftarrow \sum_{i \in \mathbb{[}1, n \mathbb{]}} p(a_i)$
+		\IF{$P \equiv 1 \pmod{2}$}
+			\RETURN Pas de solution
+		\ELSE
+			\FOR {$j \in \mathbb{[}0,P/2\mathbb{]}$}
+				\IF{$j = 0$}
+					\STATE $T(0, j) \leftarrow \TRUE$
+				\ELSE
+					\STATE $T(0, j) \leftarrow \FALSE$
+				\ENDIF
+			\ENDFOR
+			\FOR{$i \in \mathbb{[}1, n \mathbb{]}$}
+				\FOR{$j \in \mathbb{[}0, P/2\mathbb{]}$}
+					\STATE $T(i, j) \leftarrow [\left (j = 0) \vee (j = p(a_i)) \vee (T(i-1, j)) \vee (T(i-1, j-p(a_i))) \right]$
+				\ENDFOR
+			\ENDFOR
+			\IF{$T(n, P / 2) = \FALSE$}
+				\RETURN Pas de solution
+			\ELSE
+				\RETURN Partition-Solution($n$,$\frac{P}{2}$,$T$)
+			\ENDIF
+		\ENDIF
+	\end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}
+	\caption{Partition-Solution}
+	\label{recsol}
+	\begin{algorithmic}[1]
+	\REQUIRE
+		\IF{$i = 0$ \OR $j=0$}
+			\RETURN $S$
+		\ELSE
+			\IF{$T(i-1,j) = \FALSE$}
+				\RETURN $a_i \cup$ Partition-Solution($i-1$,$j-a_i$,$T$)
+			\ELSE
+				\RETURN Partition-Solution($i-1$, $j$, $T$)
+			\ENDIF
+		\ENDIF
+	\end{algorithmic}
+\end{algorithm}
+

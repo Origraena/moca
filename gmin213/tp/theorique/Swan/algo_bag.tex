@@ -1,0 +1,22 @@
+\begin{algorithm}[H]
+	\caption{Sac à Dos}
+	\label{algo_dyn_bag}
+	\begin{algorithmic}[1]
+		\FOR {$j \in \mathbb{\{}1, \ldots, volumeMax \mathbb{\}}$}
+				\STATE $T[0, j] \leftarrow 0$
+		\ENDFOR
+		\FOR{$i \in \mathbb{\{}1, \ldots, n \mathbb{\}}$}
+			\FOR{$j \in \mathbb{\{}1, \ldots, volumeMax \mathbb{\}}$}
+				\IF{$j \neq 1$}
+					\STATE $T[i, j] \leftarrow T[i, j-1]$
+				\ENDIF
+				\FOR{$k \in \mathbb{\{}0, \ldots, volumeMax/volume[i] \mathbb{\}}$}
+					\STATE $T[i,j] \leftarrow \max(T[i,j], T[i-1,j-k \times volume[i]] + k \times utilite[i])$
+				\ENDFOR
+			\ENDFOR
+		\ENDFOR
+	
+	\RETURN $T[n,volumeMax]$
+	\end{algorithmic}
+\end{algorithm}
+

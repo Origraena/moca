@@ -1,0 +1,18 @@
+
+\begin{algorithm}[H]
+	\caption{Voyageur de Commerce}
+	\begin{algorithmic}[1]
+		\FOR{$i \in \{1,...,n\}$}
+			\STATE $C(\{0\},i) \leftarrow \omega(0,i)$
+		\ENDFOR
+		\FOR{$i \in \{2,...,n\}$}
+			\FOR{$S \subseteq \{1,...,n\} : |S| = i$}
+				\FOR{$j \in V \setminus S$}
+					\STATE $C(S,j) \leftarrow \min\limits_{k \in S \setminus \{0\}}(C(S\setminus\{k\},k) + \omega(k,j))$
+				\ENDFOR
+			\ENDFOR
+		\ENDFOR
+		\RETURN $\min\limits_{i\in V\setminus\{0\}}(C(V\setminus\{i\},i) + \omega(i,0))$
+	\end{algorithmic}
+\end{algorithm}
+

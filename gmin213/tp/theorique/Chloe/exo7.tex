@@ -50,36 +50,10 @@ la ligne $i$ en fonction de la ligne $i-1$ et $p(a_i)$ :
 \end{equation}
 
 On peut alors donner un algorithme pour résoudre le problème de la partition : l'algorithme
-\ref{solvepart}.
+\ref{algo_dyn_partition}.
 
-\begin{algorithm}[H]
-	\caption{solve-partition}
-	\label{solvepart}
-	\begin{algorithmic}[1]
-		\STATE $p_{max} \leftarrow \sum_{i \in \mathbb{[}1, n \mathbb{]}} p(a_i)$
-		\IF{$p_{max} \equiv 1 \pmod{2}$}
-			\STATE Pas de solutions
-		\ELSE
-			\FOR {$j \in \mathbb{[}0,p_{max}/2\mathbb{]}$}
-				\IF{$j = 0$}
-					\STATE $T(0, j) \leftarrow \TRUE$
-				\ELSE
-					\STATE $T(0, j) \leftarrow \FALSE$
-				\ENDIF
-			\ENDFOR
-			\FOR{$i \in \mathbb{[}1, n \mathbb{]}$}
-				\FOR{$j \in \mathbb{[}0, p_{max}/2\mathbb{]}$}
-					\STATE $T(i, j) \leftarrow [\left (j = 0) \vee (j = p(a_i)) \vee (T(i-1, j)) \vee (T(i-1, j-p(a_i))) \right]$
-				\ENDFOR
-			\ENDFOR
-			\IF{$T(n, p_{max} / 2) = \FALSE$}
-				\STATE Pas de solutions
-			\ELSE
-				\STATE Construire le sous ensemble solution
-			\ENDIF
-		\ENDIF
-	\end{algorithmic}
-\end{algorithm}
+\input{../theorique/Swan/algo_partition.tex}
+
 Le sous ensemble solution $S_{sol}$ se construit à l'aide du principe suivant : pour une ligne $i>0$ et
 un poids $j>0$ donnés, on a $a_i \in S_{sol}$ si $T(i-1, j) = \mbox{FAUX} \wedge T(i,j) =
 \mbox{VRAI}$. Ceci n'est vrai que dans un sens et permet d'introduire l'implication suivante :
@@ -113,40 +87,125 @@ Analysons les différents cas : \begin{enumerate}
 \end{enumerate}
 ~\\
 De ces principes, on peut déduire l'algorithme \ref{recsol} de reconstruction de la solution.
-\begin{algorithm}
-	\caption{Construct-sol}
-	\label{recsol}
-	\begin{algorithmic}[1]
-		\STATE $S \leftarrow \emptyset$
-		\IF{$i = 0$ \OR $j=0$}
-			\STATE Retourne $S$
-		\ELSE
-			\IF{$T(i-1,j) = \FALSE$}
-				\STATE Retourne $a_i \cup$ Construct-sol($i-1$,$j-a_i$)
-			\ELSE
-				\STATE Retourne Construct-sol($i-1$, $j$)
-			\ENDIF
-		\ENDIF
-	\end{algorithmic}
-\end{algorithm}
-
 
 \subsubsection{Complexité}
-$O(n.p_{max})$
-%TODO
+Complexité en espace et en temps : $O(n.P)$.
 
-\subsubsection{Jeux d'essais}
+%\subsubsection{Jeux d'essais}
 
 
 \subsection{Le problème du sac à dos}
+
+\input{../theorique/Swan/algo_bag.tex}
+
 \subsubsection{Justification des formules}
+Chaque ligne est indicée par $i$ telle que ses solutions ne peuvent contenir qu'une combinaison des $i$ premiers objets. Chaque colonne est indicée par le volume maximum du sous-problème. Chaque case contient l'utilité maximum en considérant le problème réduit aux $i$ premiers objets et au volume $j$ maximum.
+En effet, à chaque nouvelle case, on compare la valeur obtenue avec le volume précédent et les solutions considérants uniquement les objets précédents auxquelles on ajoute le nouvel objet un nombre de fois $k$. Évidemment, il faut regarder la case correspondant au volume obtenu en enlevant le volume de cet objet $k$ fois.
 
 \subsubsection{Exemple}
 
-\subsubsection{Complexité}
+Considérons le problème suivant :
+Le sac à dos a une capacité de 6 et les propriétés des objets sont définies dans le tableau suivant
+:
+\begin{center}
+\begin{tabular}{|c|c|c|c|c|} \hline
+	utilité & 1 & 3 & 4 & 5 \\ \hline
+	volume & 1 & 4 & 2 & 2 \\ \hline
+\end{tabular}
+\end{center}
 
+L'algorithme va donc créer la matrice suivante :
+\begin{center}
+$$\begin{array}{|c|c|c|c|c|c|c|} \hline
+  _{objet}^{volume} & 1 & 2 & 3 & 4 & 5 & 6 \\ \hline
+	0		  & 0 & 0 & 0 & 0 & 0 & 0 \\ \hline
+	1			& 1 \times i_1 = 1 & 2 \times i_1 = 2 & 3 \times i_1 = 3 & 4 \times i_1 = 4 & 5 \times i_1 = 5 & 6 \times i_1 = 6 \\ \hline
+	2			& 1 \times i_1 = 1 & 2 \times i_1 = 2 & 3 \times i_1 = 3 & 4 \times i_1 = 4 & 5 \times i_1 = 5 & 6 \times i_1 = 6 \\ \hline
+	3			& 1 \times i_1 = 1 & 1 \times i_3 = 4 & 1 \times i_1 + 1 \times i_3 = 5 & 2 \times i_3 = 8 & 1 \times i_1 + 2 \times i_3 = 9 & 3 \times i_3 = 12 \\ \hline
+	4			& 1 \times i_1 = 1 & 1 \times i_3 = 4 & 1 \times i_1 + 1 \times i_4 = 6 & 2 \times i_4 = 10
+	& 1 \times i_1 + 2 \times i_4 = 11  & 3 \times i_4 = 15 \\ \hline
+\end{array}$$
+\end{center}
+
+Il ne nous reste plus qu'à lire la solution optimale dans la case [4,6].
+
+
+\subsubsection{Complexité}
+Notre algorithme génère une matrice de taille $n \times V$, et pour chaque case dans le pire des cas (si $v_i = 1$), il faudra $V$ 
+itérations. Ainsi nous obtenons la complexité en temps suivante : $\bigcirc(n\times V^2)$.
+De plus, si la matrice est stockée entièrement, la complexité en espace est donc en $\bigcirc(n\times V)$.
 
 \subsection{Le problème du voyageur de commerce}
+\input{../theorique/Swan/algo_tsp.tex}
+
 \subsubsection{Exemple}
+\input{../theorique/Chloe/exemple_tsp.tex}
+
+{\bf i = 1}\\
+\begin{center}
+$\begin{array}{|c|c|} \hline
+	_i^S & \{0\} \\ \hline
+	1 & \{0,1\} = 1\\ \hline
+	2 & \{0,2\} = 2\\ \hline
+	3 & \{0,3\} = 1\\ \hline
+	4 & \{0,4\} = 0\\ \hline
+\end{array}$
+\end{center}
+
+
+{\bf i = 2}\\
+\begin{center}
+$\begin{array}{|c|c|c|c|c|} \hline
+	_i^S & \{0,1\} & \{0,2\} & \{0,3\} & \{0,4\} \\ \hline
+	1 & $\ding{55}$ & \{0,2,1\} = 5 & \{0,3,1\} = 6& \{0,4,1\} = 0\\ \hline
+	2 & \{0,1,2\} = 4 & $\ding{55}$ & \{0,3,2\} = 3& \{0,4,2\} = 1\\ \hline
+	3 & \{0,1,3\} = 6 & \{0,2,3\} = 4 & $\ding{55}$ & \{0,4,3\} = 4\\ \hline
+	4 & \{0,1,4\} = 1 & \{0,2,4\} = 3 & \{0,3,4\} = 5& $\ding{55}$\\ \hline
+\end{array}$
+\end{center}
+
+{\bf i = 3}
+~\\
+~\\
+\noindent\makebox[\textwidth]{
+%\resizebox{0.95\paperwidth}{!}{
+$\begin{array}{|c|c|c|c|c|c|c|} \hline
+	_i^S & \{0,1,2\} & \{0,1,3\} & \{0,1,4\} & \{0,2,3\}
+& \{0,2,4\}& \{0,3,4\} 
+\\ \hline
+	1 & $\ding{55}$ & $\ding{55}$ & $\ding{55}$ & \{0,3,2,1\} = 6
+& \{0,2,4,1\} = 3 & \{0,3,4,1\} = 5 \\ \hline
+	2 & $\ding{55}$ & \{0,1,3,2\} = 8 & \{0,1,4,2\} = 2 & $\ding{55}$ 
+& $\ding{55}$ & \{0,3,4,2\} = 6 \\ \hline
+	3 & \{0,1,2,3\} = 6 & $\ding{55}$ & \{0,1,4,3\} = 5 & $\ding{55}$
+& \{0,4,2,3\} = 3 & $\ding{55}$ \\ \hline
+	4 & \{0,1,2,4\} = 5 & \{0,3,1,4\} = 6 & $\ding{55}$ & \{0,3,2,4\} = 4 
+& $\ding{55}$ & $\ding{55}$ \\ \hline
+\end{array}$
+%}
+}
+
+{\bf i = 4}\\
+\begin{center}
+$\begin{array}{|c|c|c|c|c|} \hline
+	_i^S & \{0,1,2,3\} & \{0,1,2,4\} & \{0,1,3,4\} & \{0,2,3,4\} \\ \hline
+	1 & $\ding{55}$ & $\ding{55}$ & $\ding{55}$ & \{0,3,2,4,1\} = 4 \\ \hline
+	2 & $\ding{55}$ & $\ding{55}$ & \{0,1,4,3,2\} = 7 & $\ding{55}$ \\ \hline
+	3 & $\ding{55}$ & \{0,1,4,2,3\} = 4 & $\ding{55}$ & $\ding{55}$ \\ \hline
+	4 & \{0,3,2,1,4\} = 5 & $\ding{55}$ & $\ding{55}$ & $\ding{55}$ \\ \hline
+\end{array}$
+\end{center}
+
+Solution optimale : $\{0,3,2,1,4,0\} = 5$.
+
+\input{../theorique/Chloe/exemple_tsp_resolu.tex}
 
 \subsubsection{Complexité}
+La matrice générée ici est de taille $n,2^n$, et il faut $\bigcirc(n)$ opérations pour remplir une case.
+Les complexités sont donc :
+
+\begin{itemize}
+	\item temps : $\bigcirc(n^2\times 2^n)$
+	\item espace : $\bigcirc(n\times 2^n)$
+\end{itemize}
+

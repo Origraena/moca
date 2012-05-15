@@ -1,3 +1,4 @@
+set term png font "/Library/Fonts/Arial.ttf" 10
 set term png 
 set output "./res/bag.png"
 
