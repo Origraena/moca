@@ -36,9 +36,9 @@ public class Graph<V,E> extends AbstractGraph<V,E> implements Iterable<V> {
 	/* CONSTRUCTORS */
 
 	public Graph(VertexCollection<V> vertices, EdgeCollection<E> edges) throws IllegalConstructionException {
+		super(vertices);
 		if ((vertices == null) || (edges == null))
 			throw new IllegalConstructionException();
-		super(vertices);
 		_edges = edges;
 	}
 
@@ -114,7 +114,7 @@ public class Graph<V,E> extends AbstractGraph<V,E> implements Iterable<V> {
 
 	public void addVertex(V value) {
 		super.addVertex(value);
-		_edges.onVertexAdded(v.getID());	// uses directly vertex class ?
+		_edges.onVertexAdded(getNbVertices()-1);	// uses directly vertex class ?
 	}
 
 	public void contract(Vertex<V> u, Vertex<V> v) {
