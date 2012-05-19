@@ -31,14 +31,14 @@ import java.util.Comparator;
  * It is instantiated by giving two parameters : the vertex collection (empty if possible), and the edge collection (same).
  * The copy constructor may be overriden to provide more efficient copy for specific graphs.
  */
-public class Graph<V,E> implements Iterable<V> {
+public class Graph<V,E> extends AbstractGraph<V,E> implements Iterable<V> {
 
 	/* CONSTRUCTORS */
 
 	public Graph(VertexCollection<V> vertices, EdgeCollection<E> edges) throws IllegalConstructionException {
 		if ((vertices == null) || (edges == null))
 			throw new IllegalConstructionException();
-		_vertices = vertices;
+		super(vertices);
 		_edges = edges;
 	}
 
@@ -49,12 +49,12 @@ public class Graph<V,E> implements Iterable<V> {
 	}
 
 	protected Graph() {
-		_vertices = null;
+		super();
 		_edges = null;
 	}
 
 	public void clear() {
-		_vertices.clear();
+		super.clear();
 		_edges.clear();
 	}
 	
@@ -94,13 +94,6 @@ public class Graph<V,E> implements Iterable<V> {
 
 	/* VERTICES */
 
-	public int getNbVertices() {
-		return _vertices.size();
-	}
-
-	public Vertex<V> getVertex(int id) throws NoSuchElementException {
-		return _vertices.get(id);
-	}
 
 	public int getNbNeighbours(int id) throws UnsupportedOperationException, NoSuchElementException {
 		return _edges.getNbNeighbours(id); 
@@ -116,26 +109,11 @@ public class Graph<V,E> implements Iterable<V> {
 
 	public void removeVertex(int id) {
 		_edges.onVertexRemoved(id);
-		_vertices.remove(id);
-	}
-
-	
-	public V get(int id) throws NoSuchElementException {
-		return getVertex(id).getValue();
-	}
-
-	public void set(int id, V value) throws NoSuchElementException {
-		getVertex(id).setValue(value);
-	}
-
-	public void add(V value) {
-		addVertex(value);
+		super.removeVertex(id);
 	}
 
 	public void addVertex(V value) {
-		Vertex<V> v = new Vertex<V>(value);
-		v.setID(getNbVertices());
-		_vertices.add(v);					// this method should change vertex id to match its index
+		super.addVertex(value);
 		_edges.onVertexAdded(v.getID());	// uses directly vertex class ?
 	}
 
@@ -157,15 +135,6 @@ public class Graph<V,E> implements Iterable<V> {
 		}
 	}
 
-	public VertexCollection<V> getVertexCollection() {
-		return _vertices;
-	}
-	
-	/** protected because no real check 
-	 * (used by vertex contraction) */
-	protected void setVertex(int i, Vertex<V> u) {
-		_vertices.set(i,u);
-	}
 
 	/* EDGES */
 
@@ -229,14 +198,6 @@ public class Graph<V,E> implements Iterable<V> {
 
 
 	/** ITERATORS */
-
-	public Iterator<V> iterator() {
-		return new VertexValueIterator(_vertices.iterator());
-	}
-
-	public Iterator<Vertex<V> > vertexIterator() {
-		return _vertices.iterator();
-	}
 
 	public Iterator<Edge<E> > edgeIterator() {
 		return _edges.iterator();
@@ -852,11 +813,11 @@ public class Graph<V,E> implements Iterable<V> {
 		int i, j;
 		NeighbourEdge<E> edge;
 		StringBuilder res = new StringBuilder();
-		res.append("Nombre de noeuds : "+ getNbVertices());
-		res.append("\nNombre d'aretes : "+getNbEdges());
+		res.append("Vertices number : "+ getNbVertices());
+		res.append("\nEdges number : "+getNbEdges());
 		for(i = 0 ; i < getNbVertices() ; i++)
 		{
-			res.append("\nVoisins du sommet "+ getVertex(i).getID()+" : ");
+			res.append("\nNeighbours of vertex "+ getVertex(i).getID()+" : ");
 			for (Iterator<NeighbourEdge<E>> iterator = neighbourIterator(getVertex(i).getID()) ; iterator.hasNext() ; )
 			{
 				edge = iterator.next();
@@ -865,70 +826,6 @@ public class Graph<V,E> implements Iterable<V> {
 		}
 		return res.toString();
 	}
-
-	public class Path implements Iterable<Vertex<V> >, Iterator<Vertex<V> > {
-		
-		/* Constructors */
-		public Path() { }
-		public Path(Path p)  {
-			for (int i = 0 ; i < p.length() ; i++)
-				add(p.get(i));
-		}
-		public Path(ParentFunction<V> parentFunction, Vertex<V> begin, Vertex<V> end) {
-			Vertex<V> current = end;
-			while (current != begin) {
-				add(0,current);
-				current = parentFunction.getParent(current);
-			}
-			add(0,begin);
-		}
-
-		/* Collection */
-		public int length() {
-			return _vertices.size();
-		}
-		public Vertex<V> get(int id) {
-			if (id < 0 || id >= length())
-				return null;
-			return _vertices.get(id);
-		}
-		public void add(int id, Vertex<V> v) {
-			if (id >= length())
-				id = length();
-			_vertices.add(id,v);
-		}
-		public void add(Vertex<V> v) {
-			_vertices.add(v);
-		}
-		public Vertex<V> remove(int id) {
-			if (id < length())
-				return _vertices.remove(id);
-			return null;
-		}
-		
-		/* Iterable */
-		public Iterator<Vertex<V> > iterator() {
-			return this;
-		}
-
-		/* Iterator */
-		public boolean hasNext() {
-			return _current < length();
-		}
-		public Vertex<V> next() throws NoSuchElementException {
-			if (!hasNext())
-				throw new NoSuchElementException();
-			_current++;
-			return _vertices.get(_current-1);
-		}
-		public void remove() {
-			_vertices.remove(_current);
-		}
-
-		/* Members */
-		protected int _current = 0;
-		private ArrayList<Vertex<V> > _vertices = new ArrayList<Vertex<V> >();
-	};
 
 };
 
