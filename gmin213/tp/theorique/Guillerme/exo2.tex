@@ -1,4 +1,3 @@
-% !TEX root = ../../Rapport/rapport.tex
 \section{Sur le problème de la couverture d'ensembles}
 
 \subsection{Modélisation du problème à l'aide de la PLNE}
@@ -7,14 +6,14 @@ On considère le problème de la couverture d'ensemble, défini par :
 Soit $E = \lbrace e_1, \dots, e_n \rbrace$, soient $S_1, \dots, S_m$ des sous-ensembles non vides
 de $E$ tels que $\forall i \in \{1, \dots, m\}$, on a : $S_i \subset E$. On associe à chaque
 ensemble $S_j$ un poids $w_j \geq 0$. Le problème consiste à trouver une collection de sous-ensemble
-de poids minimum et telle que $\bigcup\limits_{i=1}^m S_i = E$.
+de poids minimum et telle que $\bigcup_{i=1}^m S_i = E$.
 
 Ce problème peut s'exprimer à l'aide de la Programmation Linéaire en Nombres entiers de la manière
 suivante : $$
 \left \lbrace
 \begin{array}{l}
 	min z = \sum_{i=1}^m w_ix_i \\
-	\sum\limits_{x_j : e_i \in S_j} x_j \geq 1 \quad \forall e_i \in E \\
+	\sum_{j / e_i \in S_j} x_j \geq 1 \quad \forall e_i \in E \\
 	x_i \in \{0, 1\}
 \end{array} \right.
 $$
@@ -31,19 +30,16 @@ x_i = \left \{ \begin{array}{rcl}
 	\end{array} \right .
 	$$
 
-\subsection{Garantie d'une solution réalisable}
 Cherchons à démontrer que cette procédure d'arrondis garantit une solution réalisable. Pour ce
-faire, nous allons procéder par l'absurde. Supposons qu'il existe un sommet $k$ qui ne respecte pas
-sa contrainte d'intégrité associée, à savoir : $$
-\sum_{x_j : e_k \in S_j} < 1 $$
+faire, considérons l'ensemble $C$ des sous-ensembles sélectionnés par la procédure d'arrondis : $$ C
+= \{ S_i : x_i \geq \frac{1}{f} \} $$
 
-Les variables $x_j$ de cette contrainte étant définies positives et entières, le cas pris en
-considération si dessus implique que toutes les variables de l'inéquation sont nulles pour le
-programme en nombres entiers et donc : $$
-\forall x_j : e_k \in S_j < \frac{1}{f} $$ dans le cas de la version relaxée du problème. Or ceci
-n'est possible que si le nombre de sous-ensemble contenant $x_k$ est supérieur à $f$, ce qui est
-impossible par définition. Tous les sommets respectent donc leur contrainte d'intégrité et on en
-déduit que la procédure d'arrondis garantit une solution réalisable.
+Soir un élément quelconque $c$, par définition de $f$, $c$ appartient à, au plus $f$ sous-ensembles.
+De plus, par définition du problème, on a : $$
+\sum_{j : c \in S_j} x_j \geq 1 $$
+
+On a donc au moins un des $x_j \geq \frac{1}{f}$, et donc $c$ est couvert par la solution. Cette
+procédure d'arrondis garantit une solution réalisable.
 
 \subsection{Existence d'un algorithme $f$-approché}
 

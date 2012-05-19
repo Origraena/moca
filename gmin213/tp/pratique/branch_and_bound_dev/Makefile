@@ -1,11 +1,11 @@
 CC = gcc
-CFLAGS = -c -g
+CFLAGS = -c
 LFLAGS = -o 
 
 A_OBJECTS =  bb.o tsp.o test.o
 B_OBJECTS =  bb.o tsp.o test_bb.o
 A_EXEC = phase
-B_EXEC = solver_2opt
+B_EXEC = solver_lstring_best
 
 all: phase $(B_EXEC)
 
