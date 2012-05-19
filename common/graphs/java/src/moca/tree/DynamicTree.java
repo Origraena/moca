@@ -110,7 +110,7 @@ public abstract class DynamicTree<V> {
 		return alphabeta(n,0,f);
 	}
 	public Node alphabeta(Node n, int maxDepth, NodeFunction f) {
-		return alphabeta(n,0,maxDepth,f.maxValue(),f.minValue(),f);
+		return alphabeta(n,0,maxDepth,f.minValue(),f.maxValue(),f);
 	}
 	protected Node alphabeta(Node n, int depth, int maxDepth, int alpha, int beta, NodeFunction f) {
 		Node result = n;
@@ -121,26 +121,26 @@ public abstract class DynamicTree<V> {
 		if ((maxDepth > 0) && (depth >= maxDepth))
 			return n;
 		if (!isMinNode(n)) {	
-			value = alpha;
+			value = beta;
 			for (Node child : children(n)) {
 				childValue = f.exec(alphabeta(child,depth+1,maxDepth,alpha,value,f));
-				if (childValue < value) {
+				if (childValue <= value) {
 					value = childValue;
 					result = child;
-					if (value <= beta)
+					if (value <= alpha)
 						return result;
 				}
 			}
 			return result;
 		}
-		else {	// n is a max node
-			value = beta;
+		else {
+			value = alpha;
 			for (Node child : children(n)) {
 				childValue = f.exec(alphabeta(child,depth+1,maxDepth,value,beta,f));
 				if (childValue > value) {
 					value = childValue;
 					result = child;
-					if (value >= alpha)
+					if (value >= beta)
 						return result;
 				}
 			}

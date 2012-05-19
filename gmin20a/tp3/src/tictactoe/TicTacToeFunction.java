@@ -27,10 +27,10 @@ public class TicTacToeFunction extends NodeFunction {
 	protected int leafValue(DynamicTree.Node n) {
 		TicTacToeGrid grid = ((TicTacToeTree.Node)n).getValue();
 		Integer winner = grid.winner();
+		if (winner == null)
+			return 0;				
 		if (isPlayer(winner))
 			return grid.getSize()*grid.getSize()*grid.getSize(); 
-		if (winner == null)
-			return 0;
 		return 0 - (grid.getSize()*grid.getSize()*grid.getSize());
 	}
 

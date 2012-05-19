@@ -33,16 +33,16 @@ public class TicTacToeAI implements TicTacToePlayer {
 	}
 
 	public TicTacToeGrid play(TicTacToeGrid grid) {
-		if (_currentNode == null)
+//		if (_currentNode == null)
 			_currentNode = _tree.node(grid);
-		else {
+/*		else {
 			for (TicTacToeTree.Node n : _tree.children(_currentNode)) {
 				if (grid.equals(n.getValue())) {
 					_currentNode = n;
 					break;
 				}
 			}
-		}
+		}*/
 		_currentNode = nextNode();
 		return currentGrid();
 	}
@@ -56,9 +56,6 @@ public class TicTacToeAI implements TicTacToePlayer {
 			default :
 				return _tree.alphabeta(_currentNode,_maxDepth,_function);
 		}
-		if (_minimax)
-			return _tree.minimax(_currentNode,_maxDepth,_function);
-		return _tree.negamax(_currentNode,_maxDepth,_function);
 	}
 
 	protected TicTacToeGrid currentGrid() {

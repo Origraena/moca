@@ -35,7 +35,6 @@ public class TicTacToeFunction extends NodeFunction {
 	}
 
 	protected int nodeValue(DynamicTree.Node n) {
-		System.out.println("Node = "+n);
 		TicTacToeGrid grid = ((TicTacToeTree.Node)n).getValue();
 		int value = firstDiagonalValue(grid);
 		value += secondDiagonalValue(grid);
