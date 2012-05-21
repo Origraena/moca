@@ -1,5 +1,5 @@
 java \
 -Xms256M \
--Xmx1024M \
+-Xmx2048M \
 -cp lib/graphs.jar:target/class \
 Main
