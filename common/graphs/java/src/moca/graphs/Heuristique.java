@@ -27,6 +27,18 @@ public class Heuristique<E> extends ArrayList<E>{
 		}
 	}
 	
+	public void setManhattanDistance(Graph<Point,Long> g, ArrayList<Vertex<Point>> ends) {
+		super.clear();
+		for (int i = 0 ; i < g.getNbVertices() ; i++) {
+			Long min = new Long(-1);
+			for (Vertex<Point> q : ends) {
+				if ((min < 0) || (Point.euclidianDistance(q.getValue(),g.get(i)) < min))
+					min = Point.manhattanDistance(q.getValue(),g.get(i));
+			}
+			super.add((E)min);
+		}
+	}
+	
 };
 
 

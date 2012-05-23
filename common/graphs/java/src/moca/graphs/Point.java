@@ -35,6 +35,10 @@ public class Point implements Comparable<Point> {
 	public static long euclidianDistance(Point p, Point q) {
 		return (long)Math.floor(Math.sqrt(euclidianDistanceS(p,q)));
 	}
+	
+	public static long manhattanDistance(Point p, Point q) {
+		return (long)Math.abs((q.y - p.y) + (q.x - p.x));
+	}
 
 	public static long euclidianDistanceS(Point p, Point q) {
 		return ((p.x - q.x) * (p.x - q.x)) + ((p.y - q.y) * (p.y - q.y));

@@ -100,11 +100,15 @@ public class Main {
 			ends = new ArrayList<Vertex<Point>>();
 			ends.add(l.getDestination());
 			h = new Heuristique<Long>(geograph2.getNbVertices());
+			Heuristique h2 = new Heuristique<Long>(geograph2.getNbVertices());
 			h.setEuclidianDistance(geograph2, ends);
-			
+			h2.setManhattanDistance(geograph2, ends);
 			geographParent = geograph2.AStar(l.getNumSource(),ends,h);
 			l.computeVertexDrawFunction(geographParent);
-			System.out.println("Chemin emprunté jusqu'à la sortie :\n"+l);
+			System.out.println("Chemin emprunté jusqu'à la sortie (Euclidian Distance) :\n"+l);	
+			geographParent = geograph2.AStar(l.getNumSource(),ends,h2);
+			l.computeVertexDrawFunction(geographParent);
+			System.out.println("Chemin emprunté jusqu'à la sortie (Manhattan Distance) :\n"+l);
 
 		}
 		catch (Exception e) {
