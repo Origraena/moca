@@ -1,0 +1,79 @@
+% !TEX root = ../main.tex
+
+\chapter{Contraintes}\label{chap6}
+
+\section{Exercice 19 - Mélangeons les reines et les sudokus}
+
+\subsection{Modèles}
+Pour le modèle orienté case de l'échiquier à remplir, on pose l'ensemble des $X_{ij} \in \{0,1\}, \forall i,j \in \{1,\ldots,n\}$. Ces variables booléennes $X_{ij}$ représentent la présence ou non d'une reine sur une case $ij$. Les contraintes sont les suivantes :
+$$ Lignes : \forall i \in \{1,\ldots,n\}, \sum\limits_{j=1}^{n}{X_{ij}} = 1 $$
+$$ Colonnes : \forall j \in \{1,\ldots,n\}, \sum\limits_{i=1}^{n}{X_{ij}} = 1 $$
+%$$ Diagonale\ NO - SE : \sum\limits_{i=1,j=1}^{n}{X_{ij}} = 1 $$
+%$$ Diagonale\ SO - NE : \sum\limits_{i=n,j=1}^{i \geq 1, j \leq n}{X_{ij}} = 1 $$
+$$ Diagonales : \forall i,j,k,l : X_{ij} = 1 \wedge X_{kl} = 1 , |i - k| \ne |j-l| $$
+
+Pour le modèle orienté position de la reine sur une colonne, on pose l'ensemble des $X_{i} \in \{1,\ldots,n\}, \forall i \in \{1,\ldots,n\}$. Ces variables $X_{i}$ représentent la position d'une reine sur la colonne $i$. Les contraintes sont les suivantes :
+$$ Lignes : \forall i,j : 1 \leq i < j \leq n, X_i \ne X_j $$
+$$ Diagonales : \forall i,j : 1 \leq i < j \leq n, |X_i - X_j| \ne |j-i| $$
+
+\subsection{Dual du modèle position sur la colonne}
+Le dual de ce modèle est celui de la position des reines sur les lignes. On pose l'ensemble des $Y_{i} \in \{1,\ldots,n\}, \forall i \in \{1,\ldots,n\}$. Ces variables $Y_{i}$ représentent la position d'une reine sur la ligne $i$. Les contraintes sont les suivantes :
+$$ Colonnes : \forall i,j : 1 \leq i < j \leq n, Y_i \ne Y_j $$
+$$ Diagonales : \forall i,j : 1 \leq i < j \leq n, |Y_i - Y_j| \ne |j-i| $$
+On remarque que les deux modèles sont strictement équivalents grâce à la relation suivante : $X_i = j \iff Y_j = i$.
+
+\subsection{Stratégie de recherche}
+Comme ce problème génère un grand espace de recherche, il est nécessaire de chercher à en explorer le moins possible (dans le cas de recherche d'une seule solution). Afin de réduire le facteur de branchement, on va chercher à affecter en priorité les variables dont le domaine est le plus réduit par les contraintes posées précédemment.
+
+D'autre part, on va également chercher à affecter d'abord les variables qui génèrent le plus de contraintes car ce sont celles qui réduiront le plus les possibilités restantes.
+
+\subsection{Modèle pour la coloration des reines}
+Les modèles proposés précédemment permettent de résoudre ce problème avec une seule couleur, il faut donc ajouter une dimension à notre modèle : la dimension des couleurs. Reprenons donc le modèle orienté case de l'échiquier à remplir avec des variables entières cette fois et les contraintes suivantes :
+$$ Lignes : \forall i,j,k \in \{1,\ldots,n\} : j \ne k, X_{ij} \ne X_{ik} $$
+$$ Colonnes : \forall i,j,k \in \{1,\ldots,n\} : i \ne j, X_{ik} \ne X_{jk} $$
+$$ Diagonales : \forall i,j,k,l : |i - k| = |j-l| , X_{ij} \ne X_{kl}$$
+Notons que chaque $X_{ij}$ est affectée à la plus petite valeur possible de façon à minimiser le nombre de couleurs utilisées.
+
+\subsection{Solutions pour $n = 5$}
+Voici la solution donnée par l'énoncé :
+
+$\begin{array}{|c|c|c|c|c|}
+\hline
+0 & 1 & 2 & 3 & 4 \\ \hline
+3 & 4 & 0 & 1 & 2 \\ \hline
+1 & 2 & 3 & 4 & 0 \\ \hline
+4 & 0 & 1 & 2 & 3 \\ \hline
+2 & 3 & 4 & 0 & 1 \\ \hline
+\end{array}$
+
+Il existe d'autres solutions comme celle-ci par exemple :
+
+$\begin{array}{|c|c|c|c|c|}
+\hline
+0 & 2 & 4 & 1 & 3 \\ \hline
+1 & 3 & 0 & 2 & 4 \\ \hline
+2 & 4 & 1 & 3 & 0 \\ \hline
+3 & 0 & 2 & 4 & 1 \\ \hline
+4 & 1 & 3 & 0 & 2 \\ \hline
+\end{array}$
+
+\subsection{Solution pour $n > 5$}
+
+Pour $n = 6$, il n'y a pas de solution. Pour $n = 7$ en voici une :
+
+$\begin{array}{|c|c|c|c|c|c|c|}
+\hline
+0 & 2 & 4 & 6 & 1 & 3 & 5 \\ \hline
+1 & 3 & 5 & 0 & 2 & 4 & 6 \\ \hline
+2 & 4 & 6 & 1 & 3 & 5 & 0 \\ \hline
+3 & 5 & 0 & 2 & 4 & 6 & 1 \\ \hline
+4 & 6 & 1 & 3 & 5 & 0 & 2 \\ \hline
+5 & 0 & 2 & 4 & 6 & 1 & 3 \\ \hline
+6 & 1 & 3 & 5 & 0 & 2 & 4 \\ \hline
+\end{array}$
+
+\subsection{Conclusion}
+Nous remarquons que ces solutions répètent les mêmes motifs d'une ligne sur l'autre et que par conséquent, elles doivent être étendables à des grilles plus grandes.
+
+
+
