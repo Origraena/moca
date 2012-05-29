@@ -1,3 +1,4 @@
+% !TEX root = ../main.tex
 %ex22.tex
 
 \section{Exercice 22 - Homomorphisme et Satisfaction de Contraintes}\label{ex22}
@@ -6,6 +7,7 @@ d'une solution d'un r\'eseau de contraintes (Constraint Satisfaction Problem)
 vers le probl\`eme de recherche d'homomorphisme dans un graphe (HOM).
 
 Soit le CSP suivant : C = (X,D,C,R) avec :
+\spacelist
 \begin{itemize}
 	\item $X = \{x_i : \forall i \in [1,n]\}$ l'ensemble des variables de C,
 	\item $D = \cup_{i \in [1,n]}D_i$ o\`u chaque $D_i$ est le domaine de la variable
@@ -14,7 +16,7 @@ Soit le CSP suivant : C = (X,D,C,R) avec :
 	d\'efinie par un ensemble ordonn\'e de variables $x_{ji} \in X_j \in X \forall i \in
 	[1,q]$,
 	\item $R = \{R_j : \forall j \in [1,q]\}$ o\`u $R_j \in \{\times_{i \in [1,q]}D_{ji}\}$ est
-	la d\'efinition de la contrainte $C_j$.
+	la d\'efinition de la contrainte $C_j$.\\
 \end{itemize}
 R\'esoudre $C$ revient \`a d\'eterminer si ce r\'eseau est consistant.
 
@@ -22,19 +24,21 @@ Nous allons construire deux graphes bipartis diff\'erents $G_{X} = (V_X,E_X,\ome
 "requ\^ete") et $G_R = (V_R,E_R,\omega_R)$ (la base de connaissance).
 
 Soit $G_X$ d\'efini comme suit :
+\spacelist
 \begin{itemize}
 	\item $V_X = \{x_i \in X\} \cup \{C_j \in C\}$,
 	\item $E_X = \{(x_i,C_j) : x_i$ est une variable apparaissant dans $C_j \}$,
 	\item $\omega_X : E_X \rightarrow N$ une fonction d\'efinie telle que
-	$\omega_X(x_i,C_j) = p$ avec $p$ la position de $x_i$ dans $C_j$.
+	$\omega_X(x_i,C_j) = p$ avec $p$ la position de $x_i$ dans $C_j$.\\
 \end{itemize}
 
 Soit $G_R$ d\'efini comme suit :
+\spacelist
 \begin{itemize}
 	\item $V_R = \{D_{ji} \in R\} \cup \{C_j \in C\}$,
 	\item $E_R = \{(D_{ji},C_j)\}$,
 	\item $\omega_R : E_R \rightarrow N$ une fonction d\'efinie telle que
-	$\omega_R(D_{ji},C_j) = q$ avec $q$ la position de $D_{ji}$ dans $C_j$.
+	$\omega_R(D_{ji},C_j) = q$ avec $q$ la position de $D_{ji}$ dans $C_j$.\\
 \end{itemize}
 
 $C$ est consistant $\leftrightarrow$ $\exists h$ un homomorphisme de $G_X$ dans $G_R$.
