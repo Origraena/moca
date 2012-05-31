@@ -305,3 +305,119 @@ vraie que si $P = NP$.
 \subsubsection{Graphe planaire dont les sommets sont de degré inférieur ou égal à 2}
 
 Tous ces graphes sont 3-coloriable.
+
+\section{Exercice 13 - Sur le problème de la coloration sur liste}
+
+\subsection{$(=k-k)$-List coloring}
+
+Considérons un graphe $H(X,Y,E)$ biparti construit de la façon suivante :
+\begin{itemize}
+	\item X est l'ensemble des sommets de $G$
+	\item Y est l'ensemble des couleurs appartenant à au moins une liste $L$
+	\item soient $x \in X$ et $y \in Y$, $(x,y) \in E$ si et seulement si $y \in L(x)$
+\end{itemize}
+
+On recherche alors un couplage parfait dans $H$. La résolution de ce problème nous donne une
+solution au problème de la coloration par liste dans la mesure où, si l'on trouve un couplage
+parfait, tous les sommets ont une couleur différente\footnote{Il peut exister des solutions de
+coloration par liste qui ne donnent pas lieu à un couplage parfait dans $H$, mais celà importe peu
+puisque l'on cherche à démontrer que pour ce problème il existe toujours un couplage parfait dans
+$H$ et donc une $k-$liste-coloration pour $G$.}
+
+Par définition du problème, on a $n$ listes contenant exactement $k$ couleurs, chaque couleur
+apparaissant dans au plus $k$ listes. Le nombre de couleurs est alors minoré par le nombre de
+sommets et la relation suivante est vérifiée : $$
+|\bigcup_{v \in V'} L(v)| \geq |V'|, \quad \forall V' \subset V $$
+Donc d'après le théorème de Hall, il existe un système de représentants distincts $c_v^\in L(v), v
+\in V$, autrement dit on peut trouver un couplage parfait dans le graphe $H$.
+
+\subsection{Instances particulières}
+
+\subsubsection{$(2,\infty)-$List coloring}
+
+Nous supposerons par la suite que chaque liste est de taille $2$. On cherchera à montrer que la
+formule $\phi_e$ est satisfaite par $\phi$ ssi la fonction $f$ est localement valide sur l'arête
+$e$, ainsi si $f$ est valide localement sur toutes les arêtes de $G$, $f$ est alors une
+2-liste-coloration de $G$. Or 2-SAT étant polynomial et la réduction de $(2, \infty)$-list coloring
+vers 2-SAT se faisant en $O(E)$, le problème initial est polynomial.
+
+Dans un premier temps, cherchons à montrer que $\phi_e$ satisfait par $\phi \Rightarrow f$ valide
+localement.
+
+Si $\phi$ satisfait $\phi_e$, $\phi_e$ est vraie, listons les cas possibles : \begin{itemize}
+	\item $c_u^1 = c_v^1, c_u^2 = c_v^2$ : $\phi_e$ est vraie implique $x_u \not = x_v$ et donc chaque
+		sommet de $e$ de couleur différente.
+	\item $c_u^1 = c_v^2, c_u^2 = c_v^1$ : $\phi_e$ est vraie implique $x_u = x_v$ et donc chaque
+		sommet de $e$ de couleur différente.
+	\item $c_u^1 = c_v^1, c_u^2 \not = c_v^2$ : $\phi_e$ est vraie implique qu'une seule ou aucune des
+		deux variables doit être vraie et donc chaque somme de $e$ a une couleur différente.
+	\item ...
+\end{itemize}
+
+De la même manière on peut énumérer les cas et vérifier que si $f$ et valide localement alors
+$\phi_e$ est vraie.
+
+On a donc $\phi_e$ est satisfait par $\phi$ si et seulement si $f$ est valide localement et donc
+comme expliqué précédemment, $(2, \infty)$-list coloring se résout en temps polynomial.
+
+\subsubsection{$(\infty, 2)-$List coloring}
+
+Soit un graphe $G = (V,E)$ et une collection de listes $L(v), v \in V$ tels que chaque couleur
+apparait au plus dans 2 listes. Pour chaque sommet auquel est associée une liste de couleur de
+taille $1$, on colore alors le sommet en question et on supprime cette couleur de la liste de ses
+voisins. On répète alors cette opération jusqu'à ce que l'on obtienne un ensemble de sommets dont
+les listes sont de taille inférieure ou égale à 2\footnote{Il est aussi possible d'arriver à une
+contradiction, dans ce cas, le graphe donné n'est pas $(\infty, 2)$-coloriable par liste.} On a
+alors une instance de $(2,2)-$list-coloring et comme la recherche d'un couplage parfait se fait en
+temps polynomial, la solution de cette instance se trouve en temps polynomial. L'ensemble des
+transformation effectué ci-dessus est polynomial, donc $(\infty, 2)-$list-coloring est polynomial.
+
+\subsection{$NP-$Complétude}
+
+\subsubsection{Validité de l'instance construite}
+
+Vérifions les conditions énoncées une à une :
+\begin{itemize}
+	\item chaque couleur apparait au plus dans 3 listes puisque à chaque variable sont associées deux
+		couleurs, or chaque variable apparaissant au plus dans trois clauses (deux fois négativement et
+		un fois positivement), on a alors $x$ apparaissant $L(x)$ et dans $L(c)$ une fois chacune et
+		$\bar x$ apparaissant 2 fois dans des $L(c)$ différents et un fois dans $L(x)$ donc trois fois en tout.
+	\item on voit immédiatement que $|L(v)| \leq 3$ 
+\end{itemize}
+
+\subsubsection{$\phi$ satisfiable $\Rightarrow$ $G$ est list coloriable}
+
+Supposons que $f$ est une liste coloration de $G$, on pose : $$
+\phi(x) = \left \lbrace \begin{array}{rcl}
+	true & si & f(x) = x \\
+	false & si & f(x) = \bar x 
+\end{array}
+\right .
+$$
+
+Soit une clause $c$, si $f(c) = x$ pour une variable $x$ quelconque. On a alors par définition de
+l'instance construite $\neg x \in c$ et puisque $f$ est une coloration, on a aussi $f \not = x$. On
+en déduit que $f(x) = \bar x$, donc $\phi$ est faux et $c$ est mis à vrai par la variable $x$. D'un
+autre côté si $f(c) = \bar x$, alors il s'agit de $x$ qui est dans $c$ et $c$ est satisfaite par
+$x$.
+
+Dans l'autre sens maintenant, on définit $f$ comme suit, si $\phi$ est satisfaite : $$
+f(x) = \left \lbrace \begin{array}{rcl}
+	x & si & \phi(x) = vrai \\
+	\bar x & si & \phi(x) = faux
+\end{array}
+\right .
+$$
+
+et pour chaque clause $c$ , on choisit une variable $x_c$ satisfaisant $c$, on fixe alors : $$
+f(c) = \left \lbrace \begin{array}{rcl}
+	x_c & si & \phi(x_c) = faux et \neg x_c \in c \\
+	\bar x_c & si & \phi(x_c) = vrai et x_c \in c
+\end{array} \right .
+$$
+
+$f$ définit alors une coloration valide.
+
+Les preuves ont été trouvée dans l'article suivant :
+\emph{Algorithmic complexity of list colorings}
+de Jan Kratochvil et Zsolt Tuzab.
