@@ -244,4 +244,64 @@ graphe final est planaire.
 
 \subsubsection{Couleur de $A_n$, $B_0$ et $C_{n-1}$}
 
-L'hypothèse est vérifié pour $n=1$, on la suppose vraie pour $n=m-1$
+L'hypothèse est vérifié pour $n=1$, on la suppose vraie pour $n=m$, qu'en est il de la $m+1^e$
+opération ?
+
+Puisque $C_{m-1}$ est rouge, l'hypothèse est vraie au rang $m$, alors $B_m$ est rouge aussi puisque
+les deux sommets sont confondu. Ce dernier appartenant à une clique de taille 3, il n'existe qu'une
+possibilité pour colorer ses sommets voisins (à permutation des couleurs près).
+
+\input{3_complexite/graphe16.tex}
+
+Le sommet $2_m$ est obligatoirement de couleur rouge et donc $5_m$ et de couleur, ce qui impose la
+coloration bleue de $3_m$.
+
+\input{3_complexite/graphe17.tex}
+
+On a alors $A_m$ et $C_m$ qui sont de couleur rouge, la propriété est donc démontrée.
+
+\input{3_complexite/graphe18.tex}
+
+De manière moins visuelle et plus concise, on a démontré que pour colorer une brique élémentaire du
+schéma, il faut que les sommets $A$, $B$ et $C$ aient la même couleur. Dans la dernière brique du
+schéma, la couleur de $B$ est fixée (expliqué précédemment), ce qui fixe la couleur de $A$ et de
+$C$.
+
+\subsubsection{Coloration possible du gadget étendu}
+
+Procédons par récurrence : nous avons démontré que l'hypothèse est vraie au rang $0$. On la suppose
+vraie au rang $m$. On a alors une coloration du gadget étendu telle que $A_k, B_0, C_{m-1}$, $k \in
+0, \dots, m-1$ ont la même couleur. 
+
+Au rang $m+1$, la couleur de $A_m$ est $C_m$ est fixée et est la même que $B_0$ et tous les $A_k$,
+or $B_m$ est confondu avec $C_{m-1}$ donc $B_m$ est de la même couleur que les sommets précédents.
+Or si tous les sommets ont la même couleur, il existe une coloration possible de la dernière brique
+élémentaire et donc une coloration du gadget étendu au rang $m$. L'hypothèse est donc vérifiée.
+
+\subsection{$NP$-complétude de la 3-coloration d'un graphe dont les sommets sont de degré inférieur
+ou égal à 4}
+
+Soit $G$ un graphe planaire quelconque. Pour tous les sommets $i$ de $G$ de dégré strictement $d
+>4$, on réalise la transformation suivante pour obtenir $H$ : on sélectionne $z = d-3$ arêtes sortant de
+$i$ et on les supprime, $i$ est alors confondu avec le sommet $B_0$ d'un gadget étendu au rang $z-1$.
+les sommets adjacents aux arêtes sélectionnées sont reliés aux sommets $C_{z-2}$ et$A_k$, $k=1, \dots,
+z-2$.
+
+On transforme alors $G$ en graphe planaire dont tous les sommets ont un degré inférieur ou égal à
+$4$. De plus une 3-coloration pour $G$ est une 3-coloration pour $H$ puisqu'il est possible de colorer
+le gadget en fixant la couleur des sommets $A_k$ et $C_{z-2}$ à celle de $B_0$.
+
+Inversement une 3-coloration de $H$ est une 3-coloration de $G$ puisque les sommets du gadget étendu
+auxquels sont reliés les sommets adjecents à $i$ dont de la même couleur que $i$, donc lors de la
+suppression des gadgets étendus, les sommets adjacents à $i$ seront d'une couleur différente de
+celle de $i$.
+
+Supposons à présent qu'il existe un algorithme polynomial résolvant 3-COLOR-PLAN(G) tel que les
+sommets de $G$ ont un degré inférieur ou égal à $4$. La transformation d'un graphe planaire $H$ dont
+les sommets sont de degrés quelconque est en temps polynomial, donc il existerait un algorithme
+résolvant 3-COLOR-PLAN. Or ce dernier est $NP$-complet, donc l'existence de cet algorithme n'est
+vraie que si $P = NP$.
+
+\subsubsection{Graphe planaire dont les sommets sont de degré inférieur ou égal à 2}
+
+Tous ces graphes sont 3-coloriable.
