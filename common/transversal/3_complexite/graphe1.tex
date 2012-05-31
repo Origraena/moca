@@ -1,0 +1,83 @@
+
+\begin{center}
+	\begin{tikzpicture}[scale=1.8]
+		\tikzset{nd/.style={circle, draw=black, minimum width=1cm}};
+		\node[nd, red] (a) at (2, 6) {$a$};
+		\node[nd, violet] (b) at (4, 6) {$b$};
+		\node[nd, green] (c) at (6, 6) {$c$};
+		\node[nd, violet] (d) at (8, 6) {$d$};
+		\node[nd, violet] (na) at (2, 0) {$\bar a$};
+		\node[nd, blue] (nb) at (4, 0) {$\bar b$};
+		\node[nd, violet] (nc) at (6, 0) {$\bar c$};
+		\node[nd, yellow] (nd) at (8, 0) {$\bar d$};
+		\node[nd, red] (c1) at (3, 4) {$C_1$};
+		\node[nd, green] (c2) at (5, 4) {$C_2$};
+		\node[nd, blue] (c3) at (7, 4) {$C_3$};
+		\node[nd, red] (y1) at (1, 2) {$y_1$};
+		\node[nd, blue] (y2) at (3, 2) {$y_2$};
+		\node[nd, green] (y3) at (5, 2) {$y_3$};
+		\node[nd, yellow] (y4) at (7, 2) {$y_4$};
+
+		\draw (a) -- (na);
+		\draw (b) -- (nb);
+		\draw (c) -- (nc);
+		\draw (d) -- (nd);
+
+		\draw (y1) -- (y2);
+		\draw (y1) to[out=30, in=150](y3);
+		\draw (y1) to[out=40, in=140](y4);
+
+		\draw (y2) -- (y3);
+		\draw (y2) to[out=330, in=210] (y4);
+
+		\draw (y3) -- (y4);
+
+		\draw (y1) -- (b);
+		\draw (y1) -- (c);
+		\draw (y1) -- (d);
+		\draw (y1) -- (nb);
+		\draw (y1) -- (nc);
+		\draw (y1) -- (nd);
+
+		\draw (y2) -- (a);
+		\draw (y2) -- (c);
+		\draw (y2) -- (d);
+		\draw (y2) -- (na);
+		\draw (y2) -- (nc);
+		\draw (y2) -- (nd);
+
+		\draw (y3) -- (a);
+		\draw (y3) -- (b);
+		\draw (y3) -- (d);
+		\draw (y3) -- (na);
+		\draw (y3) -- (nb);
+		\draw (y3) -- (nd);
+
+		\draw (y4) -- (a);
+		\draw (y4) -- (b);
+		\draw (y4) -- (c);
+		\draw (y4) -- (na);
+		\draw (y4) -- (nb);
+		\draw (y4) -- (nc);
+
+		\draw (c1) -- (na);
+		\draw (c1) -- (nb);
+		\draw (c1) -- (c);
+		\draw (c1) -- (d);
+		\draw (c1) -- (nd);
+
+		\draw (c2) -- (a);
+		\draw (c2) -- (nb);
+		\draw (c2) -- (nc);
+		\draw (c2) -- (d);
+		\draw (c2) -- (b);
+
+		\draw (c3) -- (na);
+		\draw (c3) -- (a);
+		\draw (c3) -- (b);
+		\draw (c3) -- (c);
+		\draw (c3) -- (nd);
+
+
+	\end{tikzpicture}
+\end{center}

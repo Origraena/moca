@@ -1,0 +1,60 @@
+\begin{center}
+	\begin{tikzpicture}[scale=1.4]
+		\tikzset{nd/.style={circle, draw=black, minimum width=1.2cm}};
+
+		\node[nd, red] (a0) at (2, 2) {$A_O$};
+		\node[nd, blue] (10) at (1, 1) {$1_0$};
+		\node[nd, red] (20) at (2, 1) {$2_0$};
+		\node[nd, green] (30) at (3, 1) {$3_0$};
+		\node[nd, red] (b0) at (0, 0) {$B_0$};
+		\node[nd, green] (40) at (1, 0) {$4_0$};
+		\node[nd, blue] (50) at (3, 0) {$5_0$};
+		\node[nd, red] (c0) at (4, 0) {$C_0$};
+		\node (rien0) at (5,0) {$\dots$};
+		\node[nd] (a1) at (8, 2) {$A_m$};
+		\node[nd, green] (11) at (7, 1) {$1_m$};
+		\node[nd] (21) at (8, 1) {$2_m$};
+		\node[nd] (31) at (9, 1) {$3_m$};
+		\node[nd, red] (b1) at (6, 0) {$B_m$};
+		\node[nd, blue] (41) at (7, 0) {$4_m$};
+		\node[nd] (51) at (9, 0) {$5_m$};
+		\node[nd] (c1) at (10, 0) {$C_m$};
+	
+
+		\draw (a0) to (10);
+		\draw (a0) to (30);
+		\draw (10) to (20);
+		\draw (10) to (b0);
+		\draw (10) to (40);
+		\draw (20) to (30);
+		\draw (20) to (40);
+		\draw (20) to (50);
+		\draw (30) to (50);
+		\draw (30) to (c0);
+		\draw (b0) to (40);
+		\draw (40) to (50);
+		\draw (50) to (c0);
+
+		\draw (c0) to (4.5, 0.5);
+		\draw (c0) to (4.5, 0);
+
+		\draw (b1) to (5.5, 0.5);
+		\draw (b1) to (5.5, 0);
+
+		\draw (a1) to (11);
+		\draw (a1) to (31);
+		\draw (11) to (21);
+		\draw (11) to (b1);
+		\draw (11) to (41);
+		\draw (21) to (31);
+		\draw (21) to (41);
+		\draw (21) to (51);
+		\draw (31) to (51);
+		\draw (31) to (c1);
+		\draw (b1) to (41);
+		\draw (41) to (51);
+		\draw (51) to (c1);
+
+
+	\end{tikzpicture}
+\end{center}
