@@ -36,23 +36,23 @@ polynomial.
 		pas $3$, la vérification est alors aussi polynomiale
 	\item 3-COLOR-PLAN : \\
 		La vérification de la validité de la $3-$coloration se fait comme précédemment en $O(n^2)$. Il
-			fait cependant tester si le graphe est planaire qui est un problème polynomial, la vérification
-			est don cpolynomiale.
-	\end{enumerate}
+		fait cependant tester si le graphe est planaire qui est un problème polynomial, la vérification
+		est don cpolynomiale.
+\end{enumerate}
 
-	Tous ces problèmes appartiennent donc à $NP$.
+Tous ces problèmes appartiennent donc à $NP$.
 
-	\subsection{Relation enre 3-COLOR et COLOR}
+\subsection{Relation enre 3-COLOR et COLOR}
 
-	Supposons qu'il existe un algorithme résolvant COLOR en temps polynomial quelque soit $k$, il existe
-	alors un algorithme polynomial résolvant 3-COLOR. Par contraposition, on vient de démontrer que si
-	3-COLOR est $NP$-difficile alors COLOR est $NP$-difficile.
+Supposons qu'il existe un algorithme résolvant COLOR en temps polynomial quelque soit $k$, il existe
+alors un algorithme polynomial résolvant 3-COLOR. Par contraposition, on vient de démontrer que si
+3-COLOR est $NP$-difficile alors COLOR est $NP$-difficile.
 
-	\subsection{Étude du problème COLOR}
+\subsection{Étude du problème COLOR}
 
 \subsubsection{Graphe $G_{\phi}$}
 
-\input{graphe1.tex}
+\input{3_complexite/graphe1.tex}
 
 \subsubsection{$\phi$ satisfiable $\Rightarrow$ $n+1-$coloration de $G_\phi$}
 
@@ -88,7 +88,7 @@ pas dans la clause $k^e$ clause, nous appellerons $x_i$ l'une de ces variables. 
 et $\bar x_i$ sont reliés à $C_k$, or l'une des deux variables est de couleur $n+1$ donc $C_k$ ne
 peut être de couleur $n+1$.
 
-\subsubsection{$G_\phi$ $n+1-$coloriable $Rightarrow$ $\phi$est satisfaisable}
+\subsubsection{$G_\phi$ $n+1-$coloriable $\Rightarrow$ $\phi$est satisfaisable}
 
 \subsubsection{$NP$-complétude de COLOR}
 
@@ -96,4 +96,152 @@ peut être de couleur $n+1$.
 
 \subsubsection{Construction du graphe}
 
-\input{graphe2.tex}
+\input{3_complexite/graphe2.tex}
+
+\subsubsection{$\phi \in$ NAE-3-SAT $ \Rightarrow $ 3-coloration de $G_\phi$}
+
+Nous allons cherhcer à démontrer que la coloration obtenue est une coloration valide. pour ce faire,
+prenons les différents points un à un :
+\begin{itemize}
+	\item les $x_i$ sont reliés au $\bar x_i$, or si $x_i$ est vraie le sommet est coloré en rouge,
+		$\bar x_i$ est alors coloré en noir et inversement. Les deux n'ont donc pas la même couleur.
+	\item $V$, coloré en vert, est rélié aux variables, colorées en rouge ou en noir. Les sommets
+		n'ont donc pas la même couleur
+	\item utilisons, pour les triangles de clauses, le fait que $\phi \in$ NAE-3-SAT. Ceci indique
+		qu'à lintérieur d'une même clause, toutes les variables ne peuvent avoir la même valeur. On aura
+		donc, quelque soit le cas, un sommet du triangle relié à une variable colorée en noir
+		(respectivement rouge) et les autres sommets du triangle reliés à des variables colorées en
+		rouge (respectivement noir). Chaque sommet du triangle est alors relié à trois sommets dont les
+		couleurs sont différentes de la sienne.
+\end{itemize}
+
+Il s'agit alors d'une coloration valide.
+
+\subsubsection{Les triangles de clauses}
+
+Supposons $G_\phi$ coloré avec 3 couleurs et supposons que l'un des triangles de clauses soit relié
+à trois sommets de couleur identique. Le triangle étant un graphe complet de taille 3, le nombre de
+couleurs pour le colorer est de 3, si la couleur des trois sommets reliés au triangle est rouge, le
+sommet du triangle de couleur rouge sera relié à un sommet rouge, il ne s'agit alors plus d'une
+coloration valide. On peut faire le même raisonnement
+sur le vert et le noir. Les trois sommets reliés au triangle ne peuvent être de couleur identique.
+
+De plus, le fait que $V$ soit coloré en vert et relié à chacune des variables imposent à ces
+dernières d'être soit noires, soit rouges. Et donc le triangle est relié à au moins un littéral de
+couleur noire et au moins un de couleur rouge.
+
+\subsection{3-COLOR-PLAN}
+
+\subsubsection{Couleur des sommets deux à deux}
+
+Nous allons montrer qu'il n'existe qu'une seule manière de colorer ce graphe avec $3$
+couleurs\footnote{à permutation des couleurs près}. Pour ce faire commençons par rermarquer que
+chaque point appartient à au moins une clique de taille trois, ce qui impose la couleur de ses
+voisins. Donc quelques soit le point de départ, il existera une unique façon de colorer les voisins
+de ce point appartenant à la clique de taille 3, eux même imposant la couleur de leur voisin et
+ainsi de suite. 
+Afin de démontrer l'imossibilité de colorer d'une autre manière nous ne réaliserons aucune
+coloration arbitraire de n\oe ud, si ce n'est la coloration initiale. Commençons donc par le point
+$A$ coloré en rouge. Ce dernier appartien à une clique de taille $3$ avec les sommets $1$ et $2$,
+ils doivent donc avoir une couleur différente, $1$ sera bleu et $2$ sera vert. 
+
+\input{3_complexite/graphe3.tex}
+
+On voi alors que $2$ appartient à deux cliques de taille 3, on colore donc ces dernières.
+
+\input{3_complexite/graphe4.tex}
+
+Le sommet $5$ appartient à une clique, et le sommet $B$ n'a qu'une seule couleur possible, on
+réalise donc les colorations nécessaires.
+
+\input{3_complexite/graphe5.tex}
+
+La couleur du sommet $7$ est obligatoirement bleue, ce qui obliqe $D$ à être rouge, puis $9$ à être
+bleu, $C$ vert et enfin $3$ bleu.
+
+\input{3_complexite/graphe6.tex}
+
+L'unicité de cette coloration (à permutation près) est sue à l'unicité de la coloration du sous
+graphe formé par les sommets $2$, $4$, $5$, $6$ et $8$.
+Et on a bien les couleur de $A$ et $D$ (respectivement $B$ et $C$) appareillée.
+
+\subsubsection{Coloration avec les couleurs des extrêmités données}
+
+Comme annoncé précédemment, lorsque les couleurs  sont fixées, il n'y a plus de choix possibles,
+toutes les possibilités de coloration sont fixées.
+
+Prenons un nouvel exemple, le cas ou $A$ et $B$ sont de couleur différente ayant été présenté
+précédemment, nous et fixons $A$, $B$, $C$ et $D$ à rouge.
+
+\input{3_complexite/graphe7.tex}
+
+Le sommet $5$ est obligatoirement rouge lui aussi.
+
+\input{3_complexite/graphe8.tex}
+
+On a alors $2$ et $8$ de même couleur, ainsi que $4$ et $6$ et $2$ et $4$ de couleur différente.
+
+\input{3_complexite/graphe9.tex}
+
+Toutes les coueurs des autres n\oe uds sont alors fixées.
+
+\input{3_complexite/graphe10.tex}
+
+\subsubsection{$NP$-complétude de 3-COLOR-PLAN}
+
+Considéros un grapge $G$ et $H$ la transformation de $G$ réalisée de la sorte : pour tout couple
+d'arêtes $(i,j)$ et $(k,l)$ s'intersectant de $G$, on insère au point d'intersection le graphe
+étudié précédemment de sorte que $j$ soit confondu avec $C$, l'arête $(i,j)$ devient $(i, B)$, $l$
+soit confondu avec $D$ et $(k,l)$ devient $(k,A)$.
+
+Comme $A$ a la même couleur que $D$ (et donc que $j$), et que $B$ à la même couleur de $D$ (et donc
+que $l$), on s'assure qu'une coloration valide pour $G$ est valide pour $H$. Ceci est vrai aussi
+car il existe toujours une coloration du gadget pour une couleur fixée pour $A$ et $B$.
+
+Supposons à présent qu'il existe une algorithme polynomial permettant de résoudre 3-COLOR-PLAN, la
+transformation présentée ci dessus se faisant en $O(m^2)$, il existerait alors un algortihme
+polynomial pour 3-COLOR. Or ce dernier est $NP$-difficile donc 3-COLOR-PLAN est aussi
+$NP$-difficile.
+
+\subsection{Restriction du problème 3-COLOR-PLAN}
+
+\subsubsection{Exemple de coloration}
+
+On fixe la couleur des sommets $A$, $B$ et $C$ à rouge.
+
+\input{3_complexite/graphe11.tex}
+
+Le graphe est alors 3-coloriable : 
+
+\input{3_complexite/graphe12.tex}
+
+\subsubsection{Couleur de $A$, $B$ et $C$}
+
+Supposons, sans perte de généralité\footnote{Les autres configuration peuvent être obetnue par
+permutation des sommets et des couleurs.}, que $C$ est de couleur différente :
+
+\input{3_complexite/graphe13.tex}
+
+La couleur des sommets $3$ et $5$ est alors imposée.
+
+\input{3_complexite/graphe14.tex}
+
+Ce qui impose les couleurs de $2$ et $4$ et on ne peut pas colorer $1$.
+
+\input{3_complexite/graphe15.tex}
+
+\subsubsection{Degré des sommets dans le gadget étendu}
+
+Dans le graphe ci dessus, tous les sommets sont de degré 4, sauf $A$, $B$ et $C$. Le gadget étendu
+est construit en répétant le graphe ci-dessus $n$ fois et de telle sorte que $\forall k \in 1, \dots,
+n-1$, $C_{k-1} = B_k$. Le degré des sommets $B_k$, $k \in 1, \dots, n$ est donc de $4$. Donc tous
+les sommets sont de degré $4$ sauf $B_0, C_{n-1}, A_k$, $k \in 0 \dots n-1$ qui sont de degré $2$.
+
+\subsubsection{Graphe planaire}
+
+La brique élémentaire est planaire, et la répétition du motif n'entraînant pas d'intersection, le
+graphe final est planaire.
+
+\subsubsection{Couleur de $A_n$, $B_0$ et $C_{n-1}$}
+
+L'hypothèse est vérifié pour $n=1$, on la suppose vraie pour $n=m-1$
