@@ -6,41 +6,42 @@
 	\begin{center}
 		\begin{tikzpicture}
 			\tikzset{node/.style={circle, draw=black}};
-			\node[node,fill=red] (A) at (2,0) {};
-			\node[node,fill=green] (B) at (4,0) {};
-			\node[node,fill=green] (C) at (0.5,1) {};
-			\node[node,fill=red] (D) at (5.5,1) {};
-			\node[node,fill=red] (E) at (0,2.5) {};
-			\node[node,fill=green] (F) at (6,2.5) {};
-			\node[node,fill=green] (G) at (0.5,4) {};
-			\node[node,fill=red] (H) at (5.5,4) {};
-			\node[node,fill=red] (I) at (2,5) {};
-			\node[node,fill=green] (J) at (4,5) {};
+			\node[node,fill=green!25] (a) at (2,0) {6};
+			\node[node,fill=yellow!25] (b) at (4,0) {8};
+			\node[node,fill=blue!25] (c) at (0.5,1) {4};
+			\node[node,fill=orange!25] (d) at (5.5,1) {10};
+			\node[node,fill=red!25] (e) at (0,2.5) {1};
+			\node[node,fill=red!25] (f) at (6,2.5) {2};
+			\node[node,fill=orange!25] (g) at (0.5,4) {9};
+			\node[node,fill=blue!25] (h) at (5.5,4) {3};
+			\node[node,fill=yellow!25] (i) at (2,5) {7};
+			\node[node,fill=green!25] (j) at (4,5) {5};
 
-			\draw[black] (A) -- (B);
-			\draw[black] (B) -- (D);
-			\draw[black] (A) -- (C);
-			\draw[black] (C) -- (E);
-			\draw[black] (D) -- (F);
-			\draw[black] (E) -- (G);
-			\draw[black] (F) -- (H);
-			\draw[black] (G) -- (I);
-			\draw[black] (H) -- (J);
-			\draw[black] (I) -- (J);
+			\draw[black] (a) -- (b);
+			\draw[black] (b) -- (d);
+			\draw[black] (a) -- (c);
+			\draw[black] (c) -- (e);
+			\draw[black] (d) -- (f);
+			\draw[black] (e) -- (g);
+			\draw[black] (f) -- (h);
+			\draw[black] (g) -- (i);
+			\draw[black] (h) -- (j);
+			\draw[black] (i) -- (j);
 			
-			\draw[black] (A) -- (G);
-			\draw[black] (A) -- (F);
-			\draw[black] (B) -- (H);
-			\draw[black] (B) -- (E);
-			\draw[black] (C) -- (D);
-			\draw[black] (C) -- (I);
-			\draw[black] (D) -- (J);
-			\draw[black] (E) -- (J);
-			\draw[black] (F) -- (I);
-			\draw[black] (G) -- (H);
+			\draw[black] (a) -- (g);
+			\draw[black] (a) -- (f);
+			\draw[black] (b) -- (h);
+			\draw[black] (b) -- (e);
+			\draw[black] (c) -- (d);
+			\draw[black] (c) -- (i);
+			\draw[black] (d) -- (j);
+			\draw[black] (e) -- (j);
+			\draw[black] (f) -- (i);
+			\draw[black] (g) -- (h);
 		\end{tikzpicture}
 	\end{center}
-	\caption{}
+	\caption{Coloration de la couronne par l'algorithme}
+	\label{ex15_fig3}
 \end{figure}
 
 

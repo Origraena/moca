@@ -1,2 +1,29 @@
 %ex15_fig1.tex
 %numerotation en fonction des degres de l'exemple
+
+\begin{figure}[h]
+	\begin{center}
+	\begin{tikzpicture}
+		\node[circle,draw=black,fill=black!10] (x1) at (0,0) {7};
+		\node[circle,draw=black,fill=black!10] (x2) at (1,1) {1}
+			edge[-] (x1);
+		\node[circle,draw=black,fill=black!10] (x3) at (2,0) {2}
+			edge[-] (x2);
+		\node[circle,draw=black,fill=black!10] (x4) at (1,0) {3}
+			edge[-] (x3);
+		\node[circle,draw=black,fill=black!10] (x5) at (1,-1) {8}
+			edge[-] (x4);
+		\node[circle,draw=black,fill=black!10] (x6) at (2,-1) {5}
+			edge[-] (x4);
+		\node[circle,draw=black,fill=black!10] (x7) at (3,-1) {6}
+			edge[-] (x6);
+		\node[circle,draw=black,fill=black!10] (x8) at (3,0) {4}
+			edge[-] (x3)
+			edge[-] (x2)
+			edge[-] (x7);
+	\end{tikzpicture}
+	\end{center}
+	\caption{Numérotation en fonction des degrés}
+	\label{ex15_fig1}
+\end{figure}
+
