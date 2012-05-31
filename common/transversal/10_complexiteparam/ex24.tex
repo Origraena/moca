@@ -39,47 +39,63 @@ sommet $y$.
 %%%%	$\forall v \in \Gamma(x) = \Gamma(y)\\
 %%%%	couleur(v) \neq couleur(x) et couleur(v) \neq couleur(y)$\\
 %%%%	Nous pouvons donc attribuer la même couleur à 
-\subsection{Question 3}\label{ex24_q3}
 
-\begin{center}
-\begin{algorithm}[H]
-\caption{3-colorable?}\label{ex24_algo1}
-\algsetup{indent=2em,linenodelimiter= }
-\begin{algorithmic}[1]
-\REQUIRE $G = (V,E)$
-\ENSURE $G'' = (V'',E'') ; \forall x,y \in V'', \Gamma_X(x) \neq \Gamma_X(y)$
-	\STATE $G'' \leftarrow G$
-	\WHILE{$\exists x,y \in G''\setminus X : \Gamma_X(x) = \Gamma_X(y)$}
-		\STATE $G'' \leftarrow G'' \setminus \{x\}$
-	\ENDWHILE
-\RETURN $G''$
-\end{algorithmic}
-\end{algorithm}
-\end{center}
+%%%%	\subsection{Question 3}\label{ex24_q3}
 
-\subsubsection{(a)}\label{ex24_q3_a}
+%%%%	\begin{center}
+%%%%	\begin{algorithm}[H]
+%%%%	\caption{3-colorable?}\label{ex24_algo1}
+%%%%	\algsetup{indent=2em,linenodelimiter= }
+%%%%	\begin{algorithmic}[1]
+%%%%	\REQUIRE $G = (V,E)$
+%%%%	\ENSURE $G'' = (V'',E'') ; \forall x,y \in V'', \Gamma_X(x) \neq \Gamma_X(y)$
+%%%%		\STATE $G'' \leftarrow G$
+%%%%		\WHILE{$\exists x,y \in G''\setminus X : \Gamma_X(x) = \Gamma_X(y)$}
+%%%%			\STATE $G'' \leftarrow G'' \setminus \{x\}$
+%%%%		\ENDWHILE
+%%%%	\RETURN $G''$
+%%%%	\end{algorithmic}
+%%%%	\end{algorithm}
+%%%%	\end{center}
 
-\subsubsection{(b)}\label{ex24_q3_b}
-Nous allons montrer par récurence sur la taille k du vertex-cover $X$ que 
-le graphe $G''$ renvoyé par l'algorithme \ref{ex24_algo1} a au
-plus $k + 2^k$ sommets.
+%%%%	\subsubsection{(a)}\label{ex24_q3_a}
 
-{\bfseries k = 1}\\
-Pour qu'il puisse exister un vertex-cover de taille $1$, il faut qu'un sommet du graphe
-$G$ soit l'extrémité de toutes ses arêtes.
-Ainsi, si tel est le cas, $G$ est forcément semblable au graphe de la figure
-\ref{ex24_fig1}.
-Nous avons alors : 
-\begin{itemize}
-	\item $X = \{x\}$
-	\item $G' = \{y \in V : y \neq x\}$
-	\item $\forall y,y' \in G',\ \Gamma_X(y) = \Gamma_X(y')$
-\end{itemize}
-Et donc en appliquant l'algorithme, nous avons $V'' = \{x,y\}$, ie $|V| = 2 \leq 1 + 2^1
-= 3$.
+%%%%	\subsubsection{(b)}\label{ex24_q3_b}
+%%%%	Nous allons montrer par récurence sur la taille k du vertex-cover $X$ que 
+%%%%	le graphe $G''$ renvoyé par l'algorithme \ref{ex24_algo1} a au
+%%%%	plus $k + 2^k$ sommets.
 
-Nous supposons maintenant que cette propriété est vraie pour tout vertex-cover de taille
-$k$, et nous cherchons à vérifier pour $k+1$.
+%%%%	{\bfseries k = 1}\\
+%%%%	Pour qu'il puisse exister un vertex-cover de taille $1$, il faut qu'un sommet du graphe
+%%%%	$G$ soit l'extrémité de toutes ses arêtes.
+%%%%	Ainsi, si tel est le cas, $G$ est forcément semblable au graphe de la figure
+%%%%	\ref{ex24_fig1}.
+%%%%	Nous avons alors : 
+%%%%	\begin{itemize}
+%%%%		\item $X = \{x\}$
+%%%%		\item $V' = \{y \in V : y \neq x\}$
+%%%%		\item $\forall y,y' \in G',\ \Gamma_X(y) = \Gamma_X(y')$
+%%%%	\end{itemize}
+%%%%	Et donc en appliquant l'algorithme, nous avons $V'' = \{x,y\}$, ie $|V| = 2 \leq 1 + 2^1
+%%%%	= 3$.
+%%%%	\input{10_complexiteparam/ex24_fig1.tex}
 
+%%%%	Nous supposons maintenant que cette propriété est vraie pour tout vertex-cover de taille
+%%%%	$k$, et nous cherchons à vérifier pour $k+1$.
+%%%%	Pour cela considérons un sommet $x \in X$ et le sous graphe 
+%%%%	$G_2 = G \setminus (\{x\} \cup \Gamma_{G'}(x)$.
+%%%%	Il est évident de voir que $X_2 = X \setminus (\{x\})$ est un vertex-cover de $G_2$. En
+%%%%	effet, puisque tous les voisins $y \in G'$ de $x$ sont retirés de $G$, les arêtes qui
+%%%%	étaient adjacentes à $x$ ne sont pas dans $G_2$. De plus celles qui étaient connectées à
+%%%%	des sommets du vertex-cover sont toujours couvertes par ceux-ci.
 
-\input{10_complexiteparam/ex24_fig1.tex}
+%%%%	Soit $G''_2$ le graphe retourné par l'algorithme sur $G_2$.
+%%%%	Par hypothèse de récurence nous avons alors que $G''_2$ a au plus $k + 2^k$ sommets.
+%%%%	Nous pouvons également dire que $G''_2$ contient forcément tous les sommets de $X_2$ qui
+%%%%	est de taille $k$, et
+%%%%	donc si nous considérons $G''_2 \setminus X_2$ celui-ci contient au plus $2^k$
+%%%%	sommets.
+
+%%%%	Si maintenant nous {\em rajoutons} le sommet $x$ ainsi que $\Gamma_{G'}(x)$, dans le pire
+%%%%	des cas $\Gamma_{G'}(x)$ contient tous les sommets de $G'$ et nous ajoutons donc 
+

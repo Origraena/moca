@@ -1,3 +1,32 @@
 %ex14_fig3.tex
 %coloration via l'algo 
 
+\begin{figure}[H]
+	\begin{center}
+	\begin{tikzpicture}
+		\node[circle,draw=black,fill=red!25] (x1) at (0,0) {1};
+		\node[circle,draw=black,fill=blue!25] (x3) at (1,0) {3};
+		\node[circle,draw=black,fill=green!25] (x5) at (2,0) {5};
+		\node[circle,draw=black,fill=yellow!25] (x7) at (3,0) {7};
+		\node[circle,draw=black,fill=red!25] (x2) at (0,-1) {2}
+			edge[-] (x3)
+			edge[-] (x5)
+			edge[-] (x7);
+		\node[circle,draw=black,fill=blue!25] (x4) at (1,-1) {4}
+			edge[-] (x1)
+			edge[-] (x5)
+			edge[-] (x7);
+		\node[circle,draw=black,fill=green!25] (x6) at (2,-1) {6}
+			edge[-] (x1)
+			edge[-] (x3)
+			edge[-] (x7);
+		\node[circle,draw=black,fill=yellow!25] (x8) at (3,-1) {8}
+			edge[-] (x1)
+			edge[-] (x3)
+			edge[-] (x5);
+	\end{tikzpicture}
+	\end{center}
+	\caption{Coloration par l'algorithme}
+	\label{ex24_fig3}
+\end{figure}
+

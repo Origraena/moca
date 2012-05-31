@@ -35,15 +35,16 @@ $\frac{n}{2}$.
 En effet, soit le graphe biparti $G = (V,E)$ suivant :\\
 \begin{itemize}
 	\item $V = \{1,2,...,n\}$ ;
-	\item $E = \{(i,j) \forall i,j \in V : i\ impair,\ j\ pair,\ et\ j \neq i+1\}$
+	\item $E = \{(i,j) : \forall i,j \in V : i\ impair,\ j\ pair,\ et\ j \neq i+1\}$\\
 \end{itemize}
 
-\input{4_heuristiques/ex14_fig3.tex}
 
 En ex\'ecutant l'algorithme sur un tel graphe, on voit rapidement que le nombre de
 couleurs utilis\'ees sera bien \'egal au nombre de sommets divis\'e par deux.
 Sur l'exemple de la figure, on voit que pour $n = 6$, la solution $\chi_{alg}(G_{fig3}) =
 3$ tandis que $\chi_{opt}(G_{fig3}) = 2$.
+
+\input{4_heuristiques/ex14_fig3.tex}
 
 \input{4_heuristiques/ex14_fig4.tex}
 
