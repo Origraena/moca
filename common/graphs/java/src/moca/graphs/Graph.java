@@ -31,14 +31,14 @@ import java.util.Comparator;
  * It is instantiated by giving two parameters : the vertex collection (empty if possible), and the edge collection (same).
  * The copy constructor may be overriden to provide more efficient copy for specific graphs.
  */
-public class Graph<V,E> extends AbstractGraph<V,E> implements Iterable<V> {
+public class Graph<V,E> implements Iterable<V> {
 
 	/* CONSTRUCTORS */
 
 	public Graph(VertexCollection<V> vertices, EdgeCollection<E> edges) throws IllegalConstructionException {
-		super(vertices);
 		if ((vertices == null) || (edges == null))
 			throw new IllegalConstructionException();
+		_vertices = vertices;
 		_edges = edges;
 	}
 
@@ -49,12 +49,12 @@ public class Graph<V,E> extends AbstractGraph<V,E> implements Iterable<V> {
 	}
 
 	protected Graph() {
-		super();
+		_vertices = null;
 		_edges = null;
 	}
 
 	public void clear() {
-		super.clear();
+		_vertices.clear();
 		_edges.clear();
 	}
 	
@@ -94,6 +94,47 @@ public class Graph<V,E> extends AbstractGraph<V,E> implements Iterable<V> {
 
 	/* VERTICES */
 
+	public int getNbVertices() {
+		return _vertices.size();
+	}
+
+	public Vertex<V> getVertex(int id) throws NoSuchElementException {
+		return _vertices.get(id);
+	}
+
+	public void removeVertex(int id) {
+		_edges.onVertexRemoved(id);
+		_vertices.remove(id);
+	}
+
+	public V get(int id) throws NoSuchElementException {
+		return getVertex(id).getValue();
+	}
+
+	public void set(int id, V value) throws NoSuchElementException {
+		getVertex(id).setValue(value);
+	}
+
+	public void add(V value) {
+		addVertex(value);
+	}
+
+	public void addVertex(V value) {
+		Vertex<V> v = new Vertex<V>(value);
+		v.setID(getNbVertices());
+		_vertices.add(v);					// this method should change vertex id to match its index
+		_edges.onVertexAdded(v.getID());	// uses directly vertex class ?
+	}
+
+	public VertexCollection<V> getVertexCollection() {
+		return _vertices;
+	}
+	
+	/** protected because no real check 
+	 * (used by vertex contraction) */
+	protected void setVertex(int i, Vertex<V> u) {
+		_vertices.set(i,u);
+	}
 
 	public int getNbNeighbours(int id) throws UnsupportedOperationException, NoSuchElementException {
 		return _edges.getNbNeighbours(id); 
@@ -105,16 +146,6 @@ public class Graph<V,E> extends AbstractGraph<V,E> implements Iterable<V> {
 
 	public V getNeighbourValue(int vertexID, int index) throws UnsupportedOperationException, NoSuchElementException {
 		return getNeighbour(vertexID,index).getValue();
-	}
-
-	public void removeVertex(int id) {
-		_edges.onVertexRemoved(id);
-		super.removeVertex(id);
-	}
-
-	public void addVertex(V value) {
-		super.addVertex(value);
-		_edges.onVertexAdded(getNbVertices()-1);	// uses directly vertex class ?
 	}
 
 	public void contract(Vertex<V> u, Vertex<V> v) {
@@ -134,7 +165,6 @@ public class Graph<V,E> extends AbstractGraph<V,E> implements Iterable<V> {
 			_edges.onVertexContracted(idU,idV);
 		}
 	}
-
 
 	/* EDGES */
 
@@ -817,7 +847,8 @@ public class Graph<V,E> extends AbstractGraph<V,E> implements Iterable<V> {
 		res.append("\nEdges number : "+getNbEdges());
 		for(i = 0 ; i < getNbVertices() ; i++)
 		{
-			res.append("\nNeighbours of vertex "+ getVertex(i).getID()+" : ");
+			res.append("\nVertex " + i + " : " + getVertex(i));
+			res.append("\nNeighbours : ");
 			for (Iterator<NeighbourEdge<E>> iterator = neighbourIterator(getVertex(i).getID()) ; iterator.hasNext() ; )
 			{
 				edge = iterator.next();
@@ -826,6 +857,82 @@ public class Graph<V,E> extends AbstractGraph<V,E> implements Iterable<V> {
 		}
 		return res.toString();
 	}
+	/** ITERATORS */
+
+	public Iterator<V> iterator() {
+		return new VertexValueIterator(_vertices.iterator());
+	}
+
+	public Iterator<Vertex<V> > vertexIterator() {
+		return _vertices.iterator();
+	}
+
+
+
+	public class Path implements Iterable<Vertex<V> >, Iterator<Vertex<V> > {
+		
+		/* Constructors */
+		public Path() { }
+		public Path(Path p)  {
+			for (int i = 0 ; i < p.length() ; i++)
+				add(p.get(i));
+		}
+		public Path(ParentFunction<V> parentFunction, Vertex<V> begin, Vertex<V> end) {
+			Vertex<V> current = end;
+			while (current != begin) {
+				add(0,current);
+				current = parentFunction.getParent(current);
+			}
+			add(0,begin);
+		}
+
+		/* Collection */
+		public int length() {
+			return _vertices.size();
+		}
+		public Vertex<V> get(int id) {
+			if (id < 0 || id >= length())
+				return null;
+			return _vertices.get(id);
+		}
+		public void add(int id, Vertex<V> v) {
+			if (id >= length())
+				id = length();
+			_vertices.add(id,v);
+		}
+		public void add(Vertex<V> v) {
+			_vertices.add(v);
+		}
+		public Vertex<V> remove(int id) {
+			if (id < length())
+				return _vertices.remove(id);
+			return null;
+		}
+		
+		/* Iterable */
+		public Iterator<Vertex<V> > iterator() {
+			return this;
+		}
+
+		/* Iterator */
+		public boolean hasNext() {
+			return _current < length();
+		}
+		public Vertex<V> next() throws NoSuchElementException {
+			if (!hasNext())
+				throw new NoSuchElementException();
+			_current++;
+			return _vertices.get(_current-1);
+		}
+		public void remove() {
+			_vertices.remove(_current);
+		}
+
+		/* Members */
+		protected int _current = 0;
+		private ArrayList<Vertex<V> > _vertices = new ArrayList<Vertex<V> >();
+	};
+
 
 };
 
