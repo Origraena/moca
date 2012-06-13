@@ -7,6 +7,8 @@ import java.util.Iterator;
 
 public interface EdgeCollection<Value> extends Iterable<Edge<Value> > {
 
+	void setNbVertices(int nbV);
+
 	void onVertexAdded(int idV);
 
 	void onVertexRemoved(int idV);

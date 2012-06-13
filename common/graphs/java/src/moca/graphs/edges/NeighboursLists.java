@@ -11,6 +11,12 @@ import java.util.Collection;
  */
 public class NeighboursLists<E> extends AbstractEdgeCollection<E> implements EdgeCollection<E> {
 
+	public void setNbVertices(int nb) {
+		_neighbours = new ArrayList<ArrayList<NeighbourEdge<E> > >(nb);
+		for (int i = 0 ; i < nb ; i++)
+			_neighbours.add(new ArrayList<NeighbourEdge<E> >());
+	}
+
 	public int size() {
 		return _size;
 	}

@@ -13,6 +13,10 @@ public class EdgeCollectionByVertices<E> extends AbstractEdgeCollection<E> {
 		_vertices = vertices;
 	}
 
+	public void setNbVertices(int nb) {
+//	TODO
+	}
+
 	public void onVertexAdded(int idV) {
 //		_edgeValues.add(null);
 	}

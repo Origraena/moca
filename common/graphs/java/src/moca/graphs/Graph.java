@@ -8,6 +8,7 @@ import moca.lists.Fifo;
 
 import moca.graphs.vertices.Vertex;
 import moca.graphs.vertices.VertexCollection;
+import moca.graphs.vertices.VertexArrayList;
 import moca.graphs.vertices.VertexBinaryFunction;
 import moca.graphs.vertices.ParentFunction;
 import moca.graphs.edges.Edge;
@@ -140,6 +141,14 @@ public class Graph<V,E> implements Iterable<V> {
 		return _edges.getNbNeighbours(id); 
 	}
 
+	public VertexArrayList<V> getNeighbours(int vertexID) throws UnsupportedOperationException {
+		VertexArrayList<V> neighbours = new VertexArrayList<V>(getNbNeighbours(vertexID));
+		Iterator<Vertex<V> > iterator = vertexNeighbourIterator(vertexID);
+		while (iterator.hasNext())
+			neighbours.add(iterator.next());
+		return neighbours;
+	}
+
 	public Vertex<V> getNeighbour(int vertexID, int index) throws UnsupportedOperationException, NoSuchElementException {
 		return getVertex(_edges.getNeighbourAt(vertexID,index));
 	}
@@ -229,6 +238,14 @@ public class Graph<V,E> implements Iterable<V> {
 
 	/** ITERATORS */
 
+	public Iterator<V> iterator() {
+		return new VertexValueIterator(_vertices.iterator());
+	}
+
+	public Iterator<Vertex<V> > vertexIterator() {
+		return _vertices.iterator();
+	}
+
 	public Iterator<Edge<E> > edgeIterator() {
 		return _edges.iterator();
 	}
@@ -237,6 +254,12 @@ public class Graph<V,E> implements Iterable<V> {
 		if (id > getNbVertices())
 			throw new NoSuchElementException();
 		return _edges.neighbourIterator(id);
+	}
+
+	public Iterator<Vertex<V> > vertexNeighbourIterator(int id) throws NoSuchElementException {
+		if (id > getNbVertices())
+			throw new NoSuchElementException();
+		return new NeighbourIterator(neighbourIterator(id));
 	}
 
 	public WalkIterator BFSIterator() {
@@ -464,6 +487,50 @@ public class Graph<V,E> implements Iterable<V> {
 		private Iterator<Vertex<V> > _iterator;
 
 	}
+
+	/**
+	 * Iterator over the neighbours of a specific vertex.
+	 */
+	public class NeighbourIterator implements Iterator<Vertex<V> > {
+		
+		/**
+		 * Constructor.
+		 * @param iterator The iterator over the neighbour edges.
+		 */
+		public NeighbourIterator(Iterator<NeighbourEdge<E> > iterator) {
+			_iterator = iterator;
+		}
+
+		/**
+		 * Allows to know if the next call to next() method will not fail.
+		 * @return True if the next call to next() will not fail, false otherwise.
+		 */
+		@Override
+		public boolean hasNext() {
+			return _iterator.hasNext();
+		}
+		
+		/**
+		 * Iterates and returns the next vertex.
+		 * @return The next vertex.
+		 * @throws NoSuchElementException If there is no more vertex to be iterated.
+		 */
+		@Override
+		public Vertex<V> next() throws NoSuchElementException {
+			return getVertex(_iterator.next().getIDV());
+		}
+
+		/**
+		 * This operation is not supported.
+		 * @throws UnsupportedOperationException Always.
+		 */
+		@Override
+		public void remove() throws UnsupportedOperationException { throw new UnsupportedOperationException(); }
+
+		/** An iterator over the neighbour edges. */
+		private Iterator<NeighbourEdge<E> > _iterator;
+
+	};
 
 	/**
 	 * Graph walk iterator nested class.
@@ -857,17 +924,6 @@ public class Graph<V,E> implements Iterable<V> {
 		}
 		return res.toString();
 	}
-	/** ITERATORS */
-
-	public Iterator<V> iterator() {
-		return new VertexValueIterator(_vertices.iterator());
-	}
-
-	public Iterator<Vertex<V> > vertexIterator() {
-		return _vertices.iterator();
-	}
-
-
 
 	public class Path implements Iterable<Vertex<V> >, Iterator<Vertex<V> > {
 		
@@ -933,6 +989,45 @@ public class Graph<V,E> implements Iterable<V> {
 		private ArrayList<Vertex<V> > _vertices = new ArrayList<Vertex<V> >();
 	};
 
+
+	public void reverseEdge() {
+		try {
+			EdgeCollection<E> edges = _edges.getClass().newInstance();
+			edges.setNbVertices(getNbVertices());
+			Iterator<Edge<E> > iterator = edgeIterator();
+			Edge<E> edge;
+			while (iterator.hasNext()) {
+				edge = iterator.next();
+				edges.add(edge.getIDV(),edge.getIDU(),edge.getValue());
+			}
+			_edges = edges;
+		}
+		catch (Exception e) {
+			// TODO log
+			// should never happen
+			e.printStackTrace();
+		}
+	}
+
+	public Graph<V,E> copyReverted() {
+		try {
+			Graph<V,E> result = new Graph<V,E>(_vertices,_edges);
+			result.reverseEdge();
+			return result;
+		}
+		catch (IllegalConstructionException e) {
+			// should never happen
+			// TODO log
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	public Graph<V,E> cloneReverted() {
+		Graph<V,E> result = clone();
+		result.reverseEdge();
+		return result;
+	}
 
 };
 

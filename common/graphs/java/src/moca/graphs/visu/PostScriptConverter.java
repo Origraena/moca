@@ -136,6 +136,7 @@ public class PostScriptConverter {
 					out.write(" arrowhead\n\n");
 				}
 			}
+
 			// other data
 			if (_title != null) {
 				out.write("/Times-Roman findfont\n");
