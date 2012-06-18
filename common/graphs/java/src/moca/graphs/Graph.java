@@ -106,6 +106,9 @@ public class Graph<V,E> implements Iterable<V> {
 	public void removeVertex(int id) {
 		_edges.onVertexRemoved(id);
 		_vertices.remove(id);
+		_stronglyConnectedComponents = null;
+		_stronglyConnectedComponentsGraph = null;
+
 	}
 
 	public V get(int id) throws NoSuchElementException {
@@ -125,6 +128,8 @@ public class Graph<V,E> implements Iterable<V> {
 		v.setID(getNbVertices());
 		_vertices.add(v);					// this method should change vertex id to match its index
 		_edges.onVertexAdded(v.getID());	// uses directly vertex class ?
+		_stronglyConnectedComponents = null;
+		_stronglyConnectedComponentsGraph = null;
 	}
 
 	public VertexCollection<V> getVertexCollection() {
@@ -172,6 +177,9 @@ public class Graph<V,E> implements Iterable<V> {
 			}
 			setVertex(idU,getVertex(idV));
 			_edges.onVertexContracted(idU,idV);
+			_stronglyConnectedComponents = null;
+			_stronglyConnectedComponentsGraph = null;
+
 		}
 	}
 
@@ -209,6 +217,9 @@ public class Graph<V,E> implements Iterable<V> {
 		if ((idU >= getNbVertices()) || (idV >= getNbVertices()))
 			throw new NoSuchElementException();
 		_edges.add(idU, idV, value);
+		_stronglyConnectedComponents = null;
+		_stronglyConnectedComponentsGraph = null;
+
 	}
 
 	public void addEdge(Vertex<V> u, Vertex<V> v, E value) throws NoSuchElementException, IllegalEdgeException {
@@ -219,12 +230,18 @@ public class Graph<V,E> implements Iterable<V> {
 		if ((edge.getIDU() >= getNbVertices()) || (edge.getIDV() >= getNbVertices()))
 			throw new NoSuchElementException();
 		_edges.add(edge);
+		_stronglyConnectedComponents = null;
+		_stronglyConnectedComponentsGraph = null;
+
 	}
 
 	public void removeEdge(int idU, int idV) throws NoSuchElementException {
 		if ((idU >= getNbVertices()) || (idV >= getNbVertices()))
 			throw new NoSuchElementException();
 		_edges.remove(idU,idV);
+		_stronglyConnectedComponents = null;
+		_stronglyConnectedComponentsGraph = null;
+
 	}
 
 	public void removeEdge(Vertex<V> u, Vertex<V> v) throws NoSuchElementException {
