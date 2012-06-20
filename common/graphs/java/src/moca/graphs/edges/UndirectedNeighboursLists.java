@@ -22,6 +22,11 @@ public class UndirectedNeighboursLists<E> extends NeighboursLists<E> implements 
 		_size++;
 	}
 
+	public void removeOne(int idU, int idV) throws NoSuchElementException {
+		super.remove(idU,idV);
+	}
+
+
 	public void remove(int idU, int idV) throws NoSuchElementException {
 		int cpt = internalRemove(idU,idV);
 		if (cpt == 0)

@@ -169,7 +169,6 @@ public class Graph<V,E> implements Iterable<V> {
 	public void contract(int idU, int idV) {
 		if (idU != idV) {
 			NeighbourEdge<E> edge = null;
-			E loopValue = null;
 			for (Iterator<NeighbourEdge<E> > iterator = neighbourIterator(idU) ; iterator.hasNext() ; ) {
 				edge = iterator.next();
 				try {addEdge(idV,edge.getIDV(),edge.getValue());}
@@ -179,7 +178,6 @@ public class Graph<V,E> implements Iterable<V> {
 			_edges.onVertexContracted(idU,idV);
 			_stronglyConnectedComponents = null;
 			_stronglyConnectedComponentsGraph = null;
-
 		}
 	}
 
